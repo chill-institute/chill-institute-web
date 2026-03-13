@@ -11,8 +11,8 @@ export default defineConfig({
   },
   webServer: {
     command: process.env.CI
-      ? "pnpm exec vp preview --host 0.0.0.0 --port 3000"
-      : "pnpm exec vp build && pnpm exec vp preview --host 0.0.0.0 --port 3000",
+      ? "vp preview --host 0.0.0.0 --port 3000"
+      : "vp build && vp preview --host 0.0.0.0 --port 3000",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },
