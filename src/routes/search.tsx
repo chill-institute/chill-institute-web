@@ -25,8 +25,8 @@ export const Route = createFileRoute("/search")({
   loader: ({ context: { queryClient } }) => {
     const token = readStoredToken();
     if (!token) return;
-    queryClient.ensureQueryData(settingsQueryOptions(token));
-    queryClient.ensureQueryData(indexersQueryOptions(token));
+    void queryClient.ensureQueryData(settingsQueryOptions(token));
+    void queryClient.ensureQueryData(indexersQueryOptions(token));
   },
   component: SearchPage,
 });

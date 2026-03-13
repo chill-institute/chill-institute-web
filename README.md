@@ -1,6 +1,8 @@
-# Chill Web
+# `chill-institute/web`
 
 Official web client for Chill, built as a client-rendered React SPA with Vite, TanStack Router, and TanStack Query.
+
+This repo uses Vite+ as its unified frontend toolchain on top of Vite.
 
 ## Runtime model
 
@@ -18,25 +20,26 @@ If not set, the app falls back to `window.location.origin`.
 ## Local development
 
 ```bash
-bun install
-bun run dev
+vp install
+vp dev --host 0.0.0.0 --port 3000
 ```
 
 ## Build
 
 ```bash
-bun run build
+vp build
 ```
 
 ## Verification
 
 ```bash
-mise install
-mise run verify
+vp check
+vp build
+vp run test
 ```
 
 ## Cloudflare Pages (production)
 
-- Build command: `bun run build`
+- Build command: `vp build`
 - Output directory: `dist`
 - Required env var: `VITE_PUBLIC_API_BASE_URL` pointing to your public API origin.

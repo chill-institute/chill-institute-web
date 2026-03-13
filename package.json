@@ -6,16 +6,17 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --host 0.0.0.0 --port 3000",
-    "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "dev": "vp dev --host 0.0.0.0 --port 3000",
+    "build": "vp build",
+    "preview": "vp preview --host 0.0.0.0 --port 3000",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
-    "format": "bunx --bun oxfmt src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx src/routeTree.gen.ts vite.config.ts",
-    "format:check": "bunx --bun oxfmt --check src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx src/routeTree.gen.ts vite.config.ts",
-    "lint": "bunx --bun oxlint --react-plugin --jsx-a11y-plugin --vitest-plugin --deny-warnings . --ignore-pattern 'src/routeTree.gen.ts'",
-    "check": "bun run format:check && bun run lint"
+    "format": "pnpm exec oxfmt src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx src/routeTree.gen.ts vite.config.ts",
+    "format:check": "pnpm exec oxfmt --check src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx src/routeTree.gen.ts vite.config.ts",
+    "lint": "pnpm exec oxlint --react-plugin --jsx-a11y-plugin --vitest-plugin --deny-warnings . --ignore-pattern 'src/routeTree.gen.ts'",
+    "check": "pnpm run format:check && pnpm run lint",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
@@ -42,14 +43,19 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.4",
+    "@vitejs/plugin-react": "^6.0.1",
     "jsdom": "^27.0.0",
     "knip": "^5.85.0",
-    "oxfmt": "^0.35.0",
-    "oxlint": "^1.50.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.5"
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "pnpm@10.15.1",
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    }
   }
 }

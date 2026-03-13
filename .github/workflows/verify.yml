@@ -14,11 +14,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up mise
-        uses: jdx/mise-action@v3
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".tool-versions"
+          cache: true
 
       - name: Install Playwright browser
-        run: bunx playwright install --with-deps chromium
+        run: vp exec playwright install --with-deps chromium
 
       - name: Verify
-        run: mise run verify
+        run: |
+          vp install
+          vp check
+          vp run test
+          vp build

@@ -1,30 +1,30 @@
 [tools]
-bun = "1.3.9"
+node = "24.14.0"
+pnpm = "10.15.1"
 
 [tasks.install]
 description = "Install web dependencies"
-run = "bun install --frozen-lockfile"
+run = "vp install --frozen-lockfile"
 
-[tasks.typecheck]
-description = "Run TypeScript checks"
+[tasks.check]
+description = "Run Vite+ format, lint, and type checks"
 depends = ["install"]
-run = "bun run typecheck"
-
-[tasks.lint]
-description = "Run formatting and lint checks"
-depends = ["install"]
-run = "bun run check"
+run = "vp check"
 
 [tasks.build]
 description = "Build the web app"
 depends = ["install"]
-run = "bun run build"
+run = "vp build"
 
 [tasks.test]
 description = "Run Playwright tests"
-depends = ["build"]
-run = "bun run test"
+run = "vp run test"
 
 [tasks.verify]
 description = "Run the standalone web verification baseline"
-depends = ["typecheck", "lint", "build", "test"]
+depends = ["install"]
+run = '''
+vp check
+vp build
+vp run test
+'''

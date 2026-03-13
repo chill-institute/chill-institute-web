@@ -22,9 +22,9 @@ export const Route = createFileRoute("/")({
     const token = readStoredToken();
     if (!token) return;
     const settingsPromise = queryClient.ensureQueryData(settingsQueryOptions(token));
-    settingsPromise.then((settings) => {
+    void settingsPromise.then((settings) => {
       if (settings.showTopMovies) {
-        queryClient.ensureQueryData(topMoviesQueryOptions(token, settings.topMoviesSource));
+        void queryClient.ensureQueryData(topMoviesQueryOptions(token, settings.topMoviesSource));
       }
     });
   },
