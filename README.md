@@ -1,8 +1,10 @@
 # `chill-institute/web`
 
-Official web client for Chill, built as a client-rendered React SPA with Vite, TanStack Router, and TanStack Query.
+Official web client for `chill.institute`, built as a client-rendered React SPA with Vite, TanStack Router, and TanStack Query.
 
 This repo uses Vite+ as its unified frontend toolchain on top of Vite.
+
+Architecture notes live in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Runtime model
 
@@ -13,7 +15,7 @@ This repo uses Vite+ as its unified frontend toolchain on top of Vite.
 
 ## Environment
 
-- `VITE_PUBLIC_API_BASE_URL`: public base URL for `chill-api` (example: `http://localhost:8080`).
+- `VITE_PUBLIC_API_BASE_URL`: public base URL for the `chill.institute` API (example: `http://localhost:8080`).
 
 If not set, the app falls back to `window.location.origin`.
 
