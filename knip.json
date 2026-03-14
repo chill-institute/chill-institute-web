@@ -1,5 +1,4 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreDependencies": ["@bufbuild/protoc-gen-es"],
-  "ignore": []
+  "entry": ["e2e/**/*.ts", "src/lib/env.test.ts"]
 }

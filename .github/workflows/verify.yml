@@ -30,5 +30,19 @@ jobs:
       - name: Verify
         run: |
           vp check
+
+      - name: Run unit tests
+        run: |
+          pnpm test
+
+      - name: Detect unused files and dependencies
+        run: |
+          pnpm knip
+
+      - name: Build
+        run: |
           vp build
+
+      - name: End-to-end tests
+        run: |
           vp run e2e

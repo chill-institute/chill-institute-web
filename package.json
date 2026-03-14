@@ -9,6 +9,8 @@
     "dev": "vp dev --host 0.0.0.0 --port 3000",
     "build": "vp build",
     "preview": "vp preview --host 0.0.0.0 --port 3000",
+    "knip": "pnpm exec knip",
+    "test": "vp test src --run",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "format": "vp fmt --write",
@@ -44,12 +46,10 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "jsdom": "^27.0.0",
     "knip": "^5.85.0",
     "typescript": "^5.9.3",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+    "vite-plus": "latest"
   },
   "packageManager": "pnpm@10.15.1",
   "pnpm": {
