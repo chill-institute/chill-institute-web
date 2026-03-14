@@ -18,7 +18,7 @@ run = "vp build"
 
 [tasks.test]
 description = "Run Playwright tests"
-run = "vp run test"
+run = "vp run e2e"
 
 [tasks.verify]
 description = "Run the standalone web verification baseline"
@@ -26,5 +26,5 @@ depends = ["install"]
 run = '''
 vp check
 vp build
-vp run test
+vp run e2e
 '''

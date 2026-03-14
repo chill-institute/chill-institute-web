@@ -31,4 +31,4 @@ jobs:
         run: |
           vp check
           vp build
-          vp run test
+          vp run e2e

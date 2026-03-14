@@ -37,7 +37,7 @@ vp build
 ```bash
 vp check
 vp build
-vp run test
+vp run e2e
 ```
 
 ## Cloudflare Pages (production)
