@@ -20,15 +20,15 @@ If unset, the app falls back to `window.location.origin`.
 
 ```bash
 vp install
-vp dev --host 0.0.0.0 --port 3000
+pnpm dev
 ```
 
 ## Verification
 
 ```bash
-vp check
-vp build
-vp run e2e
+pnpm check
+pnpm build
+pnpm e2e
 ```
 
 ## Cloudflare Pages

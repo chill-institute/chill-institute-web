@@ -72,7 +72,7 @@ These commands map to their corresponding tools. For example, `vp dev --port 300
 
 - **Using the package manager directly:** Do not use pnpm, npm, or Yarn directly. Vite+ can handle all package manager operations.
 - **Always use Vite commands to run tools:** Don't attempt to run `vp vitest` or `vp oxlint`. They do not exist. Use `vp test` and `vp lint` instead.
-- **Running scripts:** Vite+ commands take precedence over `package.json` scripts. Keep non-Vitest scripts out of the reserved `test` name. In this repo, Playwright lives under `e2e` and runs via `vp run e2e`.
+- **Running scripts:** Keep the repo entrypoints in `package.json` and have them call `vp` underneath. In this repo, Playwright lives under `e2e` and runs via `pnpm e2e`.
 - **Do not install Vitest, Oxlint, Oxfmt, or tsdown directly:** Vite+ wraps these tools. They must not be installed directly. You cannot upgrade these tools by installing their latest versions. Always use Vite+ commands.
 - **Use Vite+ wrappers for one-off binaries:** Use `vp dlx` instead of package-manager-specific `dlx`/`npx` commands.
 - **Import JavaScript modules from `vite-plus`:** Instead of importing from `vite` or `vitest`, all modules should be imported from the project's `vite-plus` dependency. For example, `import { defineConfig } from 'vite-plus';` or `import { expect, test, vi } from 'vite-plus/test';`. You must not install `vitest` to import test utilities.
@@ -81,5 +81,5 @@ These commands map to their corresponding tools. For example, `vp dev --port 300
 ## Review Checklist for Agents
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check`, `vp build`, and `vp run e2e` to validate changes.
+- [ ] Run `pnpm check`, `pnpm build`, and `pnpm e2e` to validate changes.
 <!--VITE PLUS END-->

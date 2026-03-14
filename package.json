@@ -1,5 +1,5 @@
 {
-  "name": "chill-web",
+  "name": "@chill-institute/web",
   "private": true,
   "type": "module",
   "imports": {
@@ -11,9 +11,9 @@
     "preview": "vp preview --host 0.0.0.0 --port 3000",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "format": "vp fmt src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx vite.config.ts --write",
-    "format:check": "vp fmt src/components src/lib src/routes src/main.tsx src/query-client.ts src/router.tsx vite.config.ts --check",
-    "lint": "vp lint . --react-plugin --jsx-a11y-plugin --vitest-plugin --deny-warnings --ignore-pattern 'src/routeTree.gen.ts'",
+    "format": "vp fmt --write",
+    "format:check": "vp fmt --check",
+    "lint": "vp lint",
     "check": "vp check",
     "prepare": "vp config"
   },

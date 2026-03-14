@@ -10,7 +10,7 @@ Start here:
 
 ```bash
 vp install
-vp dev --host 0.0.0.0 --port 3000
+pnpm dev
 ```
 
 Key docs:

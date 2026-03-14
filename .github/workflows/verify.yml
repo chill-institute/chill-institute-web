@@ -25,10 +25,10 @@ jobs:
         run: vp install
 
       - name: Install Playwright browser
-        run: vp exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Verify
         run: |
-          vp check
-          vp build
-          vp run e2e
+          pnpm check
+          pnpm build
+          pnpm e2e
