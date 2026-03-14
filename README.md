@@ -19,3 +19,5 @@ Key docs:
 - [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
 This repo uses Vite+ as its frontend toolchain and talks to the hosted API directly from the browser.
+
+Hosted environments resolve the API from the current hostname at runtime. `VITE_PUBLIC_API_BASE_URL` is only needed as an explicit local override.

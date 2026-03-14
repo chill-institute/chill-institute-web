@@ -100,11 +100,15 @@ When authenticated requests fail with auth-related errors, the API layer clears 
 
 ## Environment
 
-| Variable                   | Purpose                            |
-| -------------------------- | ---------------------------------- |
-| `VITE_PUBLIC_API_BASE_URL` | public base URL for the hosted API |
+| Variable                   | Purpose                                    |
+| -------------------------- | ------------------------------------------ |
+| `VITE_PUBLIC_API_BASE_URL` | optional local override for the public API |
 
-If `VITE_PUBLIC_API_BASE_URL` is unset, the app falls back to `window.location.origin`.
+Hosted environments resolve the API from the current hostname:
+
+- `localhost` and `*.web-8vr.pages.dev` -> `https://api.binge.institute`
+- `binge.institute` -> `https://api.binge.institute`
+- `chill.institute` -> `https://api.chill.institute`
 
 ## Deployment Model
 

@@ -12,9 +12,13 @@ Development and deployment notes for `chill-institute/web`.
 
 ## Environment
 
-- `VITE_PUBLIC_API_BASE_URL`: public base URL for the `chill.institute` API
+- hosted environments resolve the API at runtime from the current hostname
+- `localhost` and `*.web-8vr.pages.dev` use `https://api.binge.institute`
+- `binge.institute` uses `https://api.binge.institute`
+- `chill.institute` uses `https://api.chill.institute`
+- `VITE_PUBLIC_API_BASE_URL` remains available as an explicit local override
 
-If unset, the app falls back to `window.location.origin`.
+For local development, the override is optional because `localhost` already defaults to staging.
 
 ## Local Development
 
@@ -33,6 +37,6 @@ pnpm e2e
 
 ## Cloudflare Pages
 
-- Build command: `vp build`
+- Build command: `pnpm build`
 - Output directory: `dist`
-- Required env var: `VITE_PUBLIC_API_BASE_URL`
+- No API build variable is required for hosted deploys.
