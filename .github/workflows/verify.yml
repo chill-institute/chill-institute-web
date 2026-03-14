@@ -27,8 +27,14 @@ jobs:
       - name: Install Playwright browser
         run: vp exec playwright install --with-deps chromium
 
-      - name: Verify
+      - name: Typecheck
         run: |
-          vp check
+          pnpm exec tsc --noEmit
+
+      - name: Build
+        run: |
           vp build
+
+      - name: End-to-end tests
+        run: |
           vp run e2e
