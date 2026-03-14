@@ -60,7 +60,9 @@ test.describe("settings and rss", () => {
 
     await expect(
       authenticatedPage.locator('input[readonly][value*="/rss/top-movies/"]'),
-    ).toHaveValue("http://localhost:8080/rss/top-movies/imdb/moviemeter?auth_token=test-token");
+    ).toHaveValue(
+      "https://api.binge.institute/rss/top-movies/imdb/moviemeter?auth_token=test-token",
+    );
   });
 
   test("settings edits persist via SaveUserSettings", async ({ authenticatedPage, mockRpc }) => {
