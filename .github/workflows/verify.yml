@@ -21,6 +21,11 @@ jobs:
           cache: true
           run-install: false
 
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.15.1 --activate
+
       - name: Install dependencies
         run: vp install
 
