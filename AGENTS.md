@@ -1,41 +1,31 @@
-# web Agent Notes
-
-## Purpose
+# Web
 
 `web` is the `chill.institute` React SPA.
 
-## Tooling
+## Workflow
 
 - Use `vp` for toolchain commands.
 - Keep repo entrypoints in `package.json`; they should call `vp` underneath.
-- Node is pinned via [`.node-version`](./.node-version).
-- Do not reintroduce `.tool-versions` here unless Pages support changes and we explicitly decide to.
-
-## Validation
-
-Run these before finishing meaningful changes:
-
-- `vp install`
-- `vp check`
-- `vp run test`
-- `vp run knip`
-- `vp build`
-- `vp run e2e`
-
-If you only touch a narrow area, run the smallest relevant subset too, but do not skip the main checks before commit.
+- Keep toolchain configuration centered on [`.node-version`](./.node-version) and the `vp` workflow.
 
 ## Runtime API Resolution
 
 - Hosted `binge.institute` and `*.web-8vr.pages.dev` talk to `https://api.binge.institute`.
 - Hosted `chill.institute` talks to `https://api.chill.institute`.
 - `localhost` defaults to staging unless `VITE_PUBLIC_API_BASE_URL` is explicitly set.
-- Keep this logic in [`src/lib/env.ts`](./src/lib/env.ts), not scattered across components.
+- Keep this logic centralized in [`src/lib/env.ts`](./src/lib/env.ts).
 
-## Vite+
+## Verification
 
-- `vp check` is the preferred repo-level verification command.
+- Run `vp install` for a fresh clone or when dependencies change.
+- `vp check` is the baseline repo verification command.
+- Before finishing meaningful changes, run `vp run test`, `vp run knip`, `vp build`, and `vp run e2e`.
+- If you only touch a narrow area, run the smallest relevant subset while working, then finish with the main checks before commit.
+
+## Tooling Notes
+
 - Keep Vite+ hook/config changes minimal and intentional.
-- If Vite+ behaves differently in CI, verify with direct local commands before “fixing” the repo around the tool.
+- When Vite+ behaves differently in CI, verify with direct local commands first and then make the smallest repo change that matches the tool's real behavior.
 
 ## Docs
 
