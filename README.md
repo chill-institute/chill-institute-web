@@ -1,47 +1,21 @@
 # `chill-institute/web`
 
-Official web client for `chill.institute`, built as a client-rendered React SPA with Vite, TanStack Router, and TanStack Query.
+![React](https://img.shields.io/badge/React-19-black?logo=react)
+![Vite+](https://img.shields.io/badge/Vite%2B-toolchain-black)
+![SPA](https://img.shields.io/badge/runtime-SPA-black)
 
-This repo uses Vite+ as its unified frontend toolchain on top of Vite.
+Official web client for `chill.institute`.
 
-Architecture notes live in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
-
-## Runtime model
-
-- No server functions.
-- No server-side proxy layer.
-- Browser calls the hosted API directly.
-- Shared RPC types come from [`@chill-institute/contracts`](https://www.npmjs.com/package/@chill-institute/contracts).
-
-## Environment
-
-- `VITE_PUBLIC_API_BASE_URL`: public base URL for the `chill.institute` API (example: `http://localhost:8080`).
-
-If not set, the app falls back to `window.location.origin`.
-
-## Local development
+Start here:
 
 ```bash
 vp install
 vp dev --host 0.0.0.0 --port 3000
 ```
 
-## Build
+Key docs:
 
-```bash
-vp build
-```
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
 
-## Verification
-
-```bash
-vp check
-vp build
-vp run e2e
-```
-
-## Cloudflare Pages (production)
-
-- Build command: `vp build`
-- Output directory: `dist`
-- Required env var: `VITE_PUBLIC_API_BASE_URL` pointing to your public API origin.
+This repo uses Vite+ as its frontend toolchain and talks to the hosted API directly from the browser.
