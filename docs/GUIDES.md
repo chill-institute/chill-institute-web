@@ -1,5 +1,10 @@
 # Guides
 
+## Table of contents
+
+- [Add a top-movies RSS feed to put.io](#add-a-top-movies-rss-feed-to-putio)
+- [Reporting a crash](#reporting-a-crash)
+
 ## Add a top-movies RSS feed to put.io
 
 Want a little more institutional power? Here you go.
@@ -20,7 +25,7 @@ Want a little more institutional power? Here you go.
 
 ![Top-movies feed subscribed in put.io](./assets/guides/rss-putio-saved.jpg)
 
-### A small warning
+### Keep the feed private
 
 RSS feed URLs include a token tied to your session, so keep them private.
 

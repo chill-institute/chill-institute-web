@@ -1,21 +1,18 @@
 # About the Institute
 
-Hello and nice to meet you.
-
 `chill.institute` is a clean search engine for put.io users who want to find stuff fast, compare results, and send downloads to put.io without a bunch of ceremony.
 
 ## What it does
 
 - search across enabled trackers
-- filter and sort results quickly
-- send matches to put.io
+- compare results quickly
+- send downloads to put.io
 - browse top-movie feeds and RSS shortcuts
 
 ## Privacy stance
 
 - the app stores your auth token in the browser so it can talk to the API on your behalf
-- the web app does not send automatic browser telemetry
-- crash reports stay local unless you explicitly copy them or open a prefilled GitHub issue
+- the web app does not send automatic browser telemetry, and crash reports stay local unless you explicitly copy them or open a prefilled GitHub issue
 - some operational diagnostics may exist on the server side to keep the service healthy
 
 ## Contact
@@ -39,15 +36,13 @@ If you want to support the broader ecosystem, consider supporting the open-sourc
 
 Yep.
 
-The web client is developed in the open at [chill-institute/web](https://github.com/chill-institute/web), and contributions are welcome.
+The web client is developed in the open at [chill-institute/web](https://github.com/chill-institute/web).
 
 If you want to build on top of the API or integrate with the service, reach out and say what you have in mind.
 
 ### Which browsers and devices are supported?
 
-The app is built and tested for modern evergreen browsers on desktop and mobile. If you are using a reasonably current version of Safari, Chrome, or Firefox, you should generally be in good shape.
-
-If something breaks on your setup, sending your browser version and device details makes debugging much easier.
+The app is built and tested for modern evergreen browsers on desktop and mobile. If you are using a reasonably current version of Safari, Chrome, or Firefox, you should generally be in good shape. If something breaks on your setup, sending your browser version and device details makes debugging much easier.
 
 ### Are you affiliated with put.io?
 
