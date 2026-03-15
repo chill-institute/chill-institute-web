@@ -62,21 +62,8 @@ export const topMoviesSourceLabels: Record<TopMoviesSource, string> = {
   [TopMoviesSource.TRAKT]: "Trending movies from Trakt",
 };
 
-const topMoviesSourcePath: Record<TopMoviesSource, string> = {
-  [TopMoviesSource.UNSPECIFIED]: "imdb/moviemeter",
-  [TopMoviesSource.IMDB_MOVIEMETER]: "imdb/moviemeter",
-  [TopMoviesSource.IMDB_TOP_250]: "imdb/top250",
-  [TopMoviesSource.YTS]: "yts",
-  [TopMoviesSource.ROTTEN_TOMATOES]: "rottentomatoes",
-  [TopMoviesSource.TRAKT]: "trakt/movies",
-};
-
 export function getTopMoviesSourceLabel(source: TopMoviesSource): string {
   return topMoviesSourceLabels[source];
-}
-
-export function getTopMoviesSourcePath(source: TopMoviesSource): string {
-  return topMoviesSourcePath[source];
 }
 
 export const resolutionFilters = [

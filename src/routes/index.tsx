@@ -76,6 +76,10 @@ function HomePage() {
     .with({ status: "success" }, (q) => {
       const config = q.data;
       if (!config.showTopMovies) return null;
+      const currentTopMoviesResponse =
+        topMoviesQuery.status === "success" && topMoviesQuery.data.source === config.topMoviesSource
+          ? topMoviesQuery.data
+          : undefined;
 
       const topMoviesContent = match(topMoviesQuery)
         .with({ status: "pending" }, () => (
@@ -136,7 +140,12 @@ function HomePage() {
               />
               <div className="w-px h-5 bg-stone-400 dark:bg-stone-700" />
               <div className="flex items-center">
-                <TopMoviesRSSPopover source={config.topMoviesSource} />
+                {currentTopMoviesResponse ? (
+                  <TopMoviesRSSPopover
+                    source={config.topMoviesSource}
+                    feedUrl={currentTopMoviesResponse.rssFeedUrl}
+                  />
+                ) : null}
               </div>
             </div>
           </div>

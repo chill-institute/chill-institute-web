@@ -28,6 +28,27 @@ type ResultInit = MessageInitShape<typeof SearchResultSchema>;
 type TopMovieInit = MessageInitShape<typeof TopMovieSchema>;
 type UserFileInit = MessageInitShape<typeof UserFileSchema>;
 
+function topMoviesSourcePath(source: TopMoviesSource): string {
+  switch (source) {
+    case TopMoviesSource.IMDB_TOP_250:
+      return "imdb/top-250";
+    case TopMoviesSource.YTS:
+      return "yts";
+    case TopMoviesSource.ROTTEN_TOMATOES:
+      return "rotten-tomatoes";
+    case TopMoviesSource.TRAKT:
+      return "trakt";
+    case TopMoviesSource.UNSPECIFIED:
+    case TopMoviesSource.IMDB_MOVIEMETER:
+    default:
+      return "imdb/moviemeter";
+  }
+}
+
+function topMoviesRSSFeedURL(source: TopMoviesSource, authToken = "test-token"): string {
+  return `https://api.binge.institute/rss/top-movies/${topMoviesSourcePath(source)}?auth_token=${encodeURIComponent(authToken)}`;
+}
+
 export function userSettings(init?: ConfigInit) {
   return toJson(
     UserSettingsSchema,
@@ -100,6 +121,7 @@ export function topMoviesResponseForSource(source: TopMoviesSource, movies: TopM
     UserGetTopMoviesResponseSchema,
     create(UserGetTopMoviesResponseSchema, {
       source,
+      rssFeedUrl: topMoviesRSSFeedURL(source),
       movies,
     }),
   );

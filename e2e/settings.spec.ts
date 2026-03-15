@@ -1,11 +1,12 @@
 import { test, expect } from "./support/fixtures";
+import { TopMoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
 import {
   downloadFolderResponse,
   folderResponse,
   indexer,
   indexersResponse,
   topMovie,
-  topMoviesResponse,
+  topMoviesResponseForSource,
   userSettings,
   userFile,
 } from "./support/seeds";
@@ -44,13 +45,17 @@ test.describe("settings and rss", () => {
     mockRpc,
   }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: true }),
-      GetTopMovies: topMoviesResponse([
+      GetUserSettings: userSettings({
+        showTopMovies: true,
+        topMoviesSource: TopMoviesSource.TRAKT,
+      }),
+      GetTopMovies: topMoviesResponseForSource(TopMoviesSource.TRAKT, [
         topMovie({
           id: "m1",
           title: "Inception",
           titlePretty: "Inception",
           link: "magnet:?xt=urn:btih:inception",
+          source: TopMoviesSource.TRAKT,
         }),
       ]),
     });
@@ -58,10 +63,8 @@ test.describe("settings and rss", () => {
     await authenticatedPage.goto("/");
     await authenticatedPage.getByRole("button", { name: "Open RSS feed link" }).click();
 
-    await expect(
-      authenticatedPage.locator('input[readonly][value*="/rss/top-movies/"]'),
-    ).toHaveValue(
-      "https://api.binge.institute/rss/top-movies/imdb/moviemeter?auth_token=test-token",
+    await expect(authenticatedPage.getByRole("dialog").getByRole("textbox")).toHaveValue(
+      "https://api.binge.institute/rss/top-movies/trakt?auth_token=test-token",
     );
   });
 

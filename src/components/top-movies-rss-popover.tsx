@@ -8,22 +8,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAuth } from "@/lib/auth";
-import { getPublicAPIBaseURL } from "@/lib/env";
 import { publicLinks } from "@/lib/public-links";
-import { getTopMoviesSourceLabel, getTopMoviesSourcePath, type TopMoviesSource } from "@/lib/types";
+import { getTopMoviesSourceLabel, type TopMoviesSource } from "@/lib/types";
 
-export function TopMoviesRSSPopover({ source }: { source: TopMoviesSource }) {
-  const { authToken } = useAuth();
-  const feedURL = new URL(
-    `/rss/top-movies/${getTopMoviesSourcePath(source)}`,
-    getPublicAPIBaseURL(),
-  );
-  const trimmedToken = authToken?.trim() ?? "";
-  if (trimmedToken !== "") {
-    feedURL.searchParams.set("auth_token", trimmedToken);
-  }
-  const feedUrl = feedURL.toString();
+export function TopMoviesRSSPopover({
+  source,
+  feedUrl,
+}: {
+  source: TopMoviesSource;
+  feedUrl: string;
+}) {
   const sourceName = getTopMoviesSourceLabel(source);
 
   return (
