@@ -49,7 +49,7 @@ That said, please do not bother put.io support when the Institute is down. They 
 
 ### Why do I need an active put.io account?
 
-The Institute is designed to complement put.io, not act like a general-purpose torrent aggregator. 
+The Institute is designed to complement put.io, not act like a general-purpose torrent aggregator.
 
 If you want a fully self-managed setup, running your own search stack is probably a better fit.
 
@@ -57,7 +57,7 @@ If you want a fully self-managed setup, running your own search stack is probabl
 
 The Institute helps you find content and send it to put.io, but it does not control transfer health on the put.io side.
 
-If only a few transfers are failing, try a different indexer or release before reporting it. 
+If only a few transfers are failing, try a different indexer or release before reporting it.
 
 If transfers are consistently failing across the board, that is worth reporting.
 

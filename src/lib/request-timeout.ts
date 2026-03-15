@@ -1,4 +1,4 @@
-export type TimeoutSignal = {
+type TimeoutSignal = {
   cleanup: () => void;
   didTimeout: () => boolean;
   signal: AbortSignal;
