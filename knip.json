@@ -1,4 +1,4 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["e2e/**/*.ts", "src/lib/env.test.ts", "functions/**/*.js"]
+  "entry": ["e2e/**/*.ts", "src/lib/*.test.ts", "functions/**/*.js"]
 }

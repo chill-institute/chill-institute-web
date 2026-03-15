@@ -14,6 +14,7 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DebugCrashRouteImport } from './routes/debug.crash'
 import { Route as AuthSuccessRouteImport } from './routes/auth/success'
 
 const SignOutRoute = SignOutRouteImport.update({
@@ -41,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DebugCrashRoute = DebugCrashRouteImport.update({
+  id: '/debug/crash',
+  path: '/debug/crash',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSuccessRoute = AuthSuccessRouteImport.update({
   id: '/auth/success',
   path: '/auth/success',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-out': typeof SignOutRoute
   '/auth/success': typeof AuthSuccessRoute
+  '/debug/crash': typeof DebugCrashRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-out': typeof SignOutRoute
   '/auth/success': typeof AuthSuccessRoute
+  '/debug/crash': typeof DebugCrashRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-out': typeof SignOutRoute
   '/auth/success': typeof AuthSuccessRoute
+  '/debug/crash': typeof DebugCrashRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +90,16 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-out'
     | '/auth/success'
+    | '/debug/crash'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search' | '/settings' | '/sign-in' | '/sign-out' | '/auth/success'
+  to:
+    | '/'
+    | '/search'
+    | '/settings'
+    | '/sign-in'
+    | '/sign-out'
+    | '/auth/success'
+    | '/debug/crash'
   id:
     | '__root__'
     | '/'
@@ -91,6 +108,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-out'
     | '/auth/success'
+    | '/debug/crash'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +118,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignOutRoute: typeof SignOutRoute
   AuthSuccessRoute: typeof AuthSuccessRoute
+  DebugCrashRoute: typeof DebugCrashRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -139,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/debug/crash': {
+      id: '/debug/crash'
+      path: '/debug/crash'
+      fullPath: '/debug/crash'
+      preLoaderRoute: typeof DebugCrashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/success': {
       id: '/auth/success'
       path: '/auth/success'
@@ -156,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignOutRoute: SignOutRoute,
   AuthSuccessRoute: AuthSuccessRoute,
+  DebugCrashRoute: DebugCrashRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
