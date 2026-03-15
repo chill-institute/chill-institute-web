@@ -10,6 +10,7 @@ import {
 import { useAuth } from "./auth";
 import { SESSION_EXPIRED_ERROR } from "./auth-errors";
 import { getPublicAPIBaseURL } from "./env";
+import { withTimeoutSignal } from "./request-timeout";
 import {
   SearchResultDisplayBehavior,
   SearchResultTitleBehavior,
@@ -44,6 +45,7 @@ const transport = createConnectTransport({
 });
 
 const userClient = createClient(UserService, transport);
+const SEARCH_TIMEOUT_MS = 5000;
 
 function authHeader(authToken?: string): HeadersInit | undefined {
   if (!authToken) {
@@ -157,17 +159,23 @@ async function search(
   indexerId?: string,
   signal?: AbortSignal,
 ): Promise<SearchResponse> {
+  const timed = withTimeoutSignal(signal, SEARCH_TIMEOUT_MS);
   try {
     return await userClient.search(
       {
         query,
         indexerId: indexerId || undefined,
       },
-      { headers: authHeader(authToken), signal },
+      { headers: authHeader(authToken), signal: timed.signal },
     );
   } catch (error) {
+    if (timed.didTimeout()) {
+      throw new ConnectError("Search timed out", Code.DeadlineExceeded);
+    }
     redirectToSignInOnAuthFailure(error);
     throw error;
+  } finally {
+    timed.cleanup();
   }
 }
 
