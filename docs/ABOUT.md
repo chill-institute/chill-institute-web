@@ -31,7 +31,9 @@ If you run into issues, have feedback, or want to ask about something, reach out
 
 Spread the word.
 
-If you want to support the broader ecosystem, consider contributing to or supporting the open-source tools you rely on most.
+If you want to contribute to the web client itself, please read the [contributing guide](../CONTRIBUTING.md).
+
+If you want to support the broader ecosystem, consider supporting the open-source tools you rely on most.
 
 ### Can I access the code or API?
 
@@ -40,14 +42,6 @@ Yep.
 The web client is developed in the open at [chill-institute/web](https://github.com/chill-institute/web), and contributions are welcome.
 
 If you want to build on top of the API or integrate with the service, reach out and say what you have in mind.
-
-## Contributing
-
-If you want to help:
-
-- open an issue if you found a bug or have a feature idea
-- open a pull request if you want to contribute code or docs
-- reach out directly if you want to discuss API access or a bigger integration
 
 ### Which browsers and devices are supported?
 
