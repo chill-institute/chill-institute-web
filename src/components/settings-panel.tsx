@@ -17,6 +17,7 @@ import { useDownloadFolderQuery } from "@/queries/download-folder";
 import { useIndexersQuery } from "@/queries/indexers";
 import { useProfileQuery } from "@/queries/profile";
 import { useTheme } from "@/hooks/use-theme";
+import { publicLinks } from "@/lib/public-links";
 import {
   defaultUserSettings,
   searchResultDisplayBehaviorLabels,
@@ -27,9 +28,8 @@ import {
 } from "@/lib/types";
 
 const LINKS = [
-  { title: "About the Institute", url: "/about" },
-  { title: "Chilly changelog", url: "/changelog" },
-  { title: "Chilly guides", url: "/guides" },
+  { title: "About the Institute", url: publicLinks.about },
+  { title: "Chilly guides", url: publicLinks.guides },
   { title: "Status page", url: "https://status.chill.institute" },
   { title: "X (Twitter)", url: "https://x.com/chill_institute" },
   { title: "Email", url: "mailto:chill-institute@proton.me" },
@@ -188,14 +188,7 @@ export function SettingsPanel() {
 
       const downloadFolderContent = match(downloadFolderQuery)
         .with({ status: "pending" }, () => <Skeleton className="h-10 w-full" />)
-        .with({ status: "error" }, () => (
-          <div className="flex flex-row space-x-2 p-2 items-center rounded border border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900">
-            <div className="w-full flex items-center space-x-2">
-              <Folder />
-              <span>Unknown</span>
-            </div>
-          </div>
-        ))
+        .with({ status: "error" }, (dq) => <ErrorAlert>{toErrorMessage(dq.error)}</ErrorAlert>)
         .with({ status: "success" }, (dq) => {
           const hasMatchingFolder =
             effective.downloadFolderId === undefined ||

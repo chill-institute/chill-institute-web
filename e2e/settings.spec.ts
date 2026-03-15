@@ -267,6 +267,30 @@ test.describe("settings and rss", () => {
     await expect(authenticatedPage.getByText("Movies").last()).toBeVisible({ timeout: 2000 });
   });
 
+  test("download folder errors show a real error message", async ({
+    authenticatedPage,
+    mockRpc,
+  }) => {
+    await mockRpc(baseSettingsMethods());
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetDownloadFolder", async (route) => {
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({}),
+      });
+    });
+
+    await authenticatedPage.goto("/settings");
+
+    await expect(
+      authenticatedPage
+        .getByRole("alert")
+        .filter({ hasText: "Service temporarily unavailable. Please try again shortly." })
+        .last(),
+    ).toBeVisible({ timeout: 5000 });
+  });
+
   test("shows username from profile", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(baseSettingsMethods());
     await authenticatedPage.goto("/settings");

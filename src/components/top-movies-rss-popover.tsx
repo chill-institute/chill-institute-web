@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { useAuth } from "@/lib/auth";
 import { getPublicAPIBaseURL } from "@/lib/env";
+import { publicLinks } from "@/lib/public-links";
 import { getTopMoviesSourceLabel, getTopMoviesSourcePath, type TopMoviesSource } from "@/lib/types";
 
 export function TopMoviesRSSPopover({ source }: { source: TopMoviesSource }) {
@@ -55,7 +56,7 @@ export function TopMoviesRSSPopover({ source }: { source: TopMoviesSource }) {
             You can add it to put.io by following{" "}
             <a
               className="dark:hover:text-stone-100 hover:text-stone-950 underline"
-              href="/guides"
+              href={publicLinks.guides}
               target="_blank"
               rel="noreferrer"
             >

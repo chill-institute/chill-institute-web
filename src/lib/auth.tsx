@@ -65,3 +65,27 @@ export function useAuth() {
   }
   return context;
 }
+
+export function normalizeCallbackPath(raw: null | string): null | string {
+  const trimmed = raw?.trim() ?? "";
+  if (trimmed.length === 0) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(trimmed, window.location.origin);
+    if (parsed.origin !== window.location.origin) {
+      return null;
+    }
+    if (
+      parsed.pathname === "/sign-in" ||
+      parsed.pathname === "/sign-out" ||
+      parsed.pathname.startsWith("/auth/")
+    ) {
+      return null;
+    }
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return null;
+  }
+}

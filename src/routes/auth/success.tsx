@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
-import { useAuth } from "@/lib/auth";
+import { normalizeCallbackPath, useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth/success")({
   component: AuthSuccessPage,
@@ -55,30 +55,4 @@ function AuthSuccessPage() {
       )}
     </>
   );
-}
-
-function normalizeCallbackPath(raw: null | string): null | string {
-  if (!raw) {
-    return null;
-  }
-  const trimmed = raw.trim();
-  if (trimmed.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = new URL(trimmed, window.location.origin);
-    if (parsed.origin !== window.location.origin) {
-      return null;
-    }
-    if (
-      parsed.pathname === "/sign-in" ||
-      parsed.pathname === "/sign-out" ||
-      parsed.pathname.startsWith("/auth/")
-    ) {
-      return null;
-    }
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return null;
-  }
 }

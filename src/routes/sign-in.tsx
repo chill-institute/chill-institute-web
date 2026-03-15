@@ -4,7 +4,8 @@ import { Loader } from "lucide-react";
 
 import { getPutioStartURL } from "@/lib/api";
 import { ACCESS_DENIED_ERROR, SESSION_EXPIRED_ERROR, UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
-import { useAuth } from "@/lib/auth";
+import { normalizeCallbackPath, useAuth } from "@/lib/auth";
+import { publicLinks } from "@/lib/public-links";
 
 export const Route = createFileRoute("/sign-in")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -31,8 +32,7 @@ function SignInPage() {
     if (search.error === ACCESS_DENIED_ERROR) {
       return {
         actionLabel: "learn more",
-        actionURL:
-          "https://www.notion.so/chill-institute/About-the-Institute-5ef08a1494ea438d87ab23d4870015c6?pvs=4#1c3613a322bf4ad29240e3a294b42f37",
+        actionURL: publicLinks.about,
         message: (
           <p>
             The Institute is an exclusive extension for put.io users and it requires an active
@@ -153,27 +153,4 @@ function AuthButton({
       </span>
     </button>
   );
-}
-
-function normalizeCallbackPath(raw: string): null | string {
-  const trimmed = raw.trim();
-  if (trimmed.length === 0) {
-    return null;
-  }
-  try {
-    const parsed = new URL(trimmed, window.location.origin);
-    if (parsed.origin !== window.location.origin) {
-      return null;
-    }
-    if (
-      parsed.pathname === "/sign-in" ||
-      parsed.pathname === "/sign-out" ||
-      parsed.pathname.startsWith("/auth/")
-    ) {
-      return null;
-    }
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return null;
-  }
 }
