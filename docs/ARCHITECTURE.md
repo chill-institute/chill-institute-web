@@ -18,14 +18,14 @@ graph LR
 
 ## Components
 
-| Component     | Responsibility                                                     | Talks to                             |
-| ------------- | ------------------------------------------------------------------ | ------------------------------------ |
-| Router layer  | Route matching, loaders, navigation, auth-aware redirects          | query client, route components       |
-| API layer     | Connect-Web transport, auth headers, request IDs, response mapping | `chill.institute` API                |
-| Edge layer    | Redirect legacy non-SPA `/api/*` and `/rss/*` paths to the API host | Cloudflare Pages, hosted API       |
-| Query layer   | Cache and request lifecycle for route screens                      | API layer                            |
-| Auth layer    | Persist auth token and callback state in browser storage           | sign-in/sign-out/auth success routes |
-| UI components | Render search, settings, shell, and top-movies flows               | route state, query state             |
+| Component     | Responsibility                                                      | Talks to                             |
+| ------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| Router layer  | Route matching, loaders, navigation, auth-aware redirects           | query client, route components       |
+| API layer     | Connect-Web transport, auth headers, request IDs, response mapping  | `chill.institute` API                |
+| Edge layer    | Redirect legacy non-SPA `/api/*` and `/rss/*` paths to the API host | Cloudflare Pages, hosted API         |
+| Query layer   | Cache and request lifecycle for route screens                       | API layer                            |
+| Auth layer    | Persist auth token and callback state in browser storage            | sign-in/sign-out/auth success routes |
+| UI components | Render search, settings, shell, and top-movies flows                | route state, query state             |
 
 ## Runtime Model
 
