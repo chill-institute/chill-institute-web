@@ -1,6 +1,7 @@
 import { useQueries } from "@tanstack/react-query";
 
 import { useApi } from "@/lib/api";
+import { isIgnorableAbortError } from "@/lib/errors";
 import type { SearchResult, UserIndexer } from "@/lib/types";
 
 export function useSearchQueries(query: string, enabledIndexers: UserIndexer[]) {
@@ -16,7 +17,8 @@ export function useSearchQueries(query: string, enabledIndexers: UserIndexer[]) 
       const nonEmptyResolvedCount = queries.filter(
         (q) => !q.isLoading && (q.data?.results?.length ?? 0) > 0,
       ).length;
-      const firstError = queries.find((q) => q.error)?.error ?? null;
+      const firstError =
+        queries.find((q) => q.error && !isIgnorableAbortError(q.error))?.error ?? null;
 
       const seen = new Set<string>();
       const results: SearchResult[] = [];

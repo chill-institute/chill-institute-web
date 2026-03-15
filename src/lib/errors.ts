@@ -1,5 +1,21 @@
 import { ConnectError, Code } from "@connectrpc/connect";
 
+export function isIgnorableAbortError(error: unknown) {
+  if (error instanceof ConnectError) {
+    return error.code === Code.Canceled;
+  }
+  if (error instanceof DOMException) {
+    return error.name === "AbortError";
+  }
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes("aborted") || message.includes("canceled") || message.includes("cancelled")
+    );
+  }
+  return false;
+}
+
 export function toErrorMessage(error: unknown) {
   if (error instanceof ConnectError) {
     if (error.code === Code.Unauthenticated || error.code === Code.PermissionDenied) {

@@ -45,7 +45,7 @@ const transport = createConnectTransport({
 });
 
 const userClient = createClient(UserService, transport);
-const SEARCH_TIMEOUT_MS = 5000;
+const SEARCH_TIMEOUT_MS = 10000;
 
 function authHeader(authToken?: string): HeadersInit | undefined {
   if (!authToken) {
