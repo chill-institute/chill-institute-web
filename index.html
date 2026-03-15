@@ -9,6 +9,41 @@
     />
     <meta name="application-name" content="chill.institute" />
     <meta name="theme-color" content="#d6d3d1" />
+    <style>
+      html {
+        background: #d6d3d1;
+        color-scheme: light;
+      }
+
+      html.dark {
+        background: #292524;
+        color-scheme: dark;
+      }
+
+      body {
+        background: inherit;
+      }
+    </style>
+    <script>
+      (() => {
+        const storageKey = "chill.theme";
+        const lightColor = "#d6d3d1";
+        const darkColor = "#292524";
+        const storedTheme = window.localStorage.getItem(storageKey);
+        const theme =
+          storedTheme === "light" || storedTheme === "dark" || storedTheme === "system"
+            ? storedTheme
+            : "system";
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const isDark = theme === "dark" || (theme === "system" && systemDark);
+        const color = isDark ? darkColor : lightColor;
+        const root = document.documentElement;
+        root.classList.toggle("dark", isDark);
+        root.style.colorScheme = isDark ? "dark" : "light";
+        root.style.backgroundColor = color;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", color);
+      })();
+    </script>
     <meta property="og:title" content="chill.institute" />
     <meta
       property="og:description"

@@ -14,16 +14,6 @@ const Devtools = import.meta.env.DEV
     })
   : null;
 
-const storedTheme = window.localStorage.getItem("chill.theme");
-if (storedTheme === "dark") {
-  document.documentElement.classList.add("dark");
-} else if (storedTheme !== "light") {
-  // "system" or unset — check system preference
-  if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    document.documentElement.classList.add("dark");
-  }
-}
-
 const container = document.getElementById("app");
 if (!container) {
   throw new Error("Missing #app container");
