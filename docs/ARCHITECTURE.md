@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes how `chill-institute/web` is built.
+This document describes how `chill-institute/chill-institute-web` is built.
 
 ## System Context
 

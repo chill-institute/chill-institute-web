@@ -86,7 +86,9 @@ describe("buildGitHubIssueURL", () => {
 
     const url = new URL(buildGitHubIssueURL(report));
 
-    expect(url.origin + url.pathname).toBe("https://github.com/chill-institute/web/issues/new");
+    expect(url.origin + url.pathname).toBe(
+      "https://github.com/chill-institute/chill-institute-web/issues/new",
+    );
     expect(url.searchParams.get("template")).toBe("bug_report.md");
     expect(url.searchParams.get("title")).toContain("[bug] Crash on /search");
     expect(url.searchParams.get("body")).toContain("## Crash report");
