@@ -12,7 +12,7 @@ import { TopMoviesRSSPopover } from "@/components/top-movies-rss-popover";
 import { TopMoviesSourceSelect } from "@/components/top-movies-source-select";
 import { useAuth, readStoredToken } from "@/lib/auth";
 import { toErrorMessage } from "@/lib/errors";
-import { useSettingsQuery, useSaveSettings } from "@/queries/settings";
+import { usePendingTopMoviesRefresh, useSettingsQuery, useSaveSettings } from "@/queries/settings";
 import { useTopMoviesQuery } from "@/queries/top-movies";
 import { settingsQueryOptions, topMoviesQueryOptions } from "@/queries/options";
 import { TopMoviesDisplayType, type TopMovie, type UserSettings } from "@/lib/types";
@@ -38,6 +38,7 @@ function HomePage() {
   const configQuery = useSettingsQuery();
 
   const saveConfigMutation = useSaveSettings();
+  const pendingTopMoviesRefresh = usePendingTopMoviesRefresh();
 
   const topMoviesQuery = useTopMoviesQuery(configQuery.data?.showTopMovies === true);
 
@@ -81,47 +82,55 @@ function HomePage() {
           ? topMoviesQuery.data
           : undefined;
 
-      const topMoviesContent = match(topMoviesQuery)
-        .with({ status: "pending" }, () => (
-          <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
-        ))
-        .with({ status: "error" }, (tq) => (
-          <ErrorAlert className="mt-2">{toErrorMessage(tq.error)}</ErrorAlert>
-        ))
-        .with({ status: "success" }, (tq) => {
-          const movies = tq.data.movies;
-          const hasMatchingSource = tq.data.source === config.topMoviesSource;
-          if (!hasMatchingSource) {
-            return <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />;
-          }
-
-          if (movies.length === 0) {
-            if (tq.isFetching) {
+      const topMoviesContent = pendingTopMoviesRefresh ? (
+        <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+      ) : (
+        match(topMoviesQuery)
+          .with({ status: "pending" }, () => (
+            <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+          ))
+          .with({ status: "error" }, (tq) =>
+            tq.isFetching ? (
+              <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+            ) : (
+              <ErrorAlert className="mt-2">{toErrorMessage(tq.error)}</ErrorAlert>
+            ),
+          )
+          .with({ status: "success" }, (tq) => {
+            const movies = tq.data.movies;
+            const hasMatchingSource = tq.data.source === config.topMoviesSource;
+            if (!hasMatchingSource) {
               return <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />;
             }
-            return (
-              <div className="mt-2">{`Couldn't fetch any movies from the selected source, please try another one.`}</div>
-            );
-          }
 
-          return match(config.topMoviesDisplayType)
-            .with(TopMoviesDisplayType.COMPACT, () => (
-              <div className="mt-2 gap-4 grid sm:grid-cols-2 md:grid-cols-3">
-                {movies.map((movie) => (
-                  <MovieCompactRow key={movie.id} movie={movie} />
-                ))}
-              </div>
-            ))
-            .with(TopMoviesDisplayType.EXPANDED, () => (
-              <div className="mt-2 gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-                {movies.map((movie) => (
-                  <MovieExpandedCard key={movie.id} movie={movie} />
-                ))}
-              </div>
-            ))
-            .otherwise(() => null);
-        })
-        .exhaustive();
+            if (movies.length === 0) {
+              if (tq.isFetching) {
+                return <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />;
+              }
+              return (
+                <div className="mt-2">{`Couldn't fetch any movies from the selected source, please try another one.`}</div>
+              );
+            }
+
+            return match(config.topMoviesDisplayType)
+              .with(TopMoviesDisplayType.COMPACT, () => (
+                <div className="mt-2 gap-4 grid sm:grid-cols-2 md:grid-cols-3">
+                  {movies.map((movie) => (
+                    <MovieCompactRow key={movie.id} movie={movie} />
+                  ))}
+                </div>
+              ))
+              .with(TopMoviesDisplayType.EXPANDED, () => (
+                <div className="mt-2 gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+                  {movies.map((movie) => (
+                    <MovieExpandedCard key={movie.id} movie={movie} />
+                  ))}
+                </div>
+              ))
+              .otherwise(() => null);
+          })
+          .exhaustive()
+      );
 
       return (
         <div data-page="home" className="w-full max-w-5xl mx-auto my-6 md:my-12 px-4 xl:px-0">
