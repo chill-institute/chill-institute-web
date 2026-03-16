@@ -7,7 +7,6 @@ Deployment model for `chill-institute-web`.
 Production shape:
 
 - static assets on Cloudflare Pages
-- Pages Functions for legacy non-SPA forwarding
 - API on `https://api.chill.institute`
 
 Build output:
@@ -24,18 +23,11 @@ Hosted environments resolve the API like this:
 - `localhost` and `*.web-8vr.pages.dev` -> `https://api.chill.institute`
 - `chill.institute` -> `https://api.chill.institute`
 
-## Legacy Route Forwarding
+## Public Endpoints
 
-Cloudflare Pages Functions handle hosted non-SPA forwarding:
+Authenticated app traffic should call `https://api.chill.institute` directly.
 
-- `/api/*` strips `/api` and redirects to the API host
-- `/rss/*` preserves the full `/rss/...` path and redirects to the API host
-
-Cloudflare redirect rules on `chill.institute` should forward:
-
-- `/api/*` -> `https://api.chill.institute/*`
-- `/rss/*` -> `https://api.chill.institute/rss/*`
-- `/download/*` -> `https://api.chill.institute/download/*`
+Public RSS and download URLs should also use `https://api.chill.institute` directly.
 
 Keep `/auth/success` on the web host.
 
@@ -46,7 +38,5 @@ After a hosted web change, verify:
 - `https://chill.institute/`
 - one real app load in the SPA
 - one real auth redirect start URL
-- one `/api/*` redirect path
-- one `/rss/*` redirect path
 
-Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts) and hosted forwarding resolution centralized in [functions/\_lib/api-origin.js](../functions/_lib/api-origin.js).
+Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts).

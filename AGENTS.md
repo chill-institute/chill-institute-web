@@ -1,12 +1,11 @@
 # Web
 
-`web` is the `chill.institute` React SPA plus a small Cloudflare Pages Functions layer for legacy non-SPA route forwarding.
+`web` is the `chill.institute` React SPA hosted on Cloudflare Pages.
 
 ## Stack
 
 - React SPA with TanStack Router and TanStack Query
 - Vite-based workflow through `vp`
-- Cloudflare Pages Functions for hosted legacy forwarding
 
 ## Commands
 
@@ -22,11 +21,10 @@
 
 - Keep repo entrypoints in `package.json`; they should call `vp` underneath.
 - Keep browser-side API resolution centralized in [src/lib/env.ts](./src/lib/env.ts).
-- Keep hosted legacy route forwarding resolution centralized in [functions/\_lib/api-origin.js](./functions/_lib/api-origin.js).
 - Keep Vite and hook/config changes minimal and intentional.
 
 ## Read More
 
-- SPA and Pages Functions split: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- SPA architecture and API integration: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 - hosted deployment and redirect behavior: [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 - day-to-day workflow: [CONTRIBUTING.md](./CONTRIBUTING.md)
