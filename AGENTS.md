@@ -22,7 +22,7 @@
 
 - Keep repo entrypoints in `package.json`; they should call `vp` underneath.
 - Keep browser-side API resolution centralized in [src/lib/env.ts](./src/lib/env.ts).
-- Keep hosted legacy route forwarding resolution centralized in [functions/_lib/api-origin.js](./functions/_lib/api-origin.js).
+- Keep hosted legacy route forwarding resolution centralized in [functions/\_lib/api-origin.js](./functions/_lib/api-origin.js).
 - Keep Vite and hook/config changes minimal and intentional.
 
 ## Read More

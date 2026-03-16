@@ -49,4 +49,4 @@ After a hosted web change, verify:
 - one `/api/*` redirect path
 - one `/rss/*` redirect path
 
-Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts) and hosted forwarding resolution centralized in [functions/_lib/api-origin.js](../functions/_lib/api-origin.js).
+Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts) and hosted forwarding resolution centralized in [functions/\_lib/api-origin.js](../functions/_lib/api-origin.js).
