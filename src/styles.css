@@ -65,6 +65,12 @@
 @layer base {
   :root {
     @apply antialiased;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --duration-press: 120ms;
+    --duration-fast: 140ms;
+    --duration-base: 180ms;
   }
 
   body {
@@ -111,8 +117,11 @@
     @apply inline-flex min-h-[30px] cursor-pointer select-none items-center justify-center gap-1 rounded border border-stone-950 bg-stone-100 px-2 py-1.5 text-sm leading-none hover:bg-stone-200 hover:transition-colors disabled:cursor-not-allowed disabled:opacity-70 dark:border-stone-700 dark:bg-stone-900 dark:hover:bg-stone-800;
     box-shadow: 1px 1px rgba(12, 10, 9, 1);
     transition:
-      transform 100ms cubic-bezier(0.32, 0.72, 0, 1),
-      background-color 150ms;
+      transform var(--duration-press) var(--ease-out),
+      background-color var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease;
   }
 
   .dark .btn {
@@ -130,6 +139,79 @@
 
   .input {
     @apply min-h-[30px] rounded border border-stone-950 bg-stone-100 px-2 py-1 text-sm outline-none hover:bg-stone-200 hover:transition-colors focus:bg-stone-200 dark:border-stone-700 dark:bg-stone-900 dark:hover:bg-stone-800 dark:focus:bg-stone-800;
+    transition:
+      background-color var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      box-shadow var(--duration-base) var(--ease-out);
+  }
+
+  .ui-popup {
+    transform-origin: var(--transform-origin, center);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out),
+      filter var(--duration-base) ease;
+    will-change: opacity, transform, filter;
+  }
+
+  .ui-popup[data-side="top"] {
+    --popup-shift-y: 0.4rem;
+  }
+
+  .ui-popup[data-side="right"] {
+    --popup-shift-x: -0.4rem;
+  }
+
+  .ui-popup[data-side="bottom"] {
+    --popup-shift-y: -0.4rem;
+  }
+
+  .ui-popup[data-side="left"] {
+    --popup-shift-x: 0.4rem;
+  }
+
+  .ui-popup[data-starting-style],
+  .ui-popup[data-ending-style] {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translate3d(var(--popup-shift-x, 0), var(--popup-shift-y, 0), 0) scale(0.96);
+  }
+
+  .ui-tooltip {
+    transform-origin: var(--transform-origin, center);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out),
+      filter var(--duration-fast) ease;
+    will-change: opacity, transform, filter;
+  }
+
+  .ui-tooltip[data-side="top"] {
+    --tooltip-shift-y: 0.2rem;
+  }
+
+  .ui-tooltip[data-side="right"] {
+    --tooltip-shift-x: -0.2rem;
+  }
+
+  .ui-tooltip[data-side="bottom"] {
+    --tooltip-shift-y: -0.2rem;
+  }
+
+  .ui-tooltip[data-side="left"] {
+    --tooltip-shift-x: 0.2rem;
+  }
+
+  .ui-tooltip[data-starting-style],
+  .ui-tooltip[data-ending-style] {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translate3d(var(--tooltip-shift-x, 0), var(--tooltip-shift-y, 0), 0) scale(0.98);
+  }
+
+  .ui-tooltip[data-instant] {
+    transition-duration: 0.01ms;
+    filter: none;
   }
 }
 
@@ -300,15 +382,15 @@
 }
 
 @utility animate-reveal {
-  animation: content-reveal 180ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation: content-reveal 180ms var(--ease-out) both;
 }
 
 @utility animate-feedback-in {
-  animation: feedback-in 160ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation: feedback-in 160ms var(--ease-out) both;
 }
 
 @utility animate-soft-pop {
-  animation: soft-pop 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: soft-pop 220ms var(--ease-out) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -322,6 +404,19 @@
 
   .animate-soft-pop {
     animation: none;
+  }
+
+  .ui-popup,
+  .ui-tooltip {
+    transition-duration: 0.01ms;
+  }
+
+  .ui-popup[data-starting-style],
+  .ui-popup[data-ending-style],
+  .ui-tooltip[data-starting-style],
+  .ui-tooltip[data-ending-style] {
+    filter: none;
+    transform: none;
   }
 
   .animate-in {

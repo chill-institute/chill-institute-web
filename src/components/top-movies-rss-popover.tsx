@@ -23,7 +23,7 @@ export function TopMoviesRSSPopover({
   const trigger = (
     <button
       type="button"
-      className="cursor-pointer text-stone-950 transition-opacity hover:text-stone-500 disabled:cursor-not-allowed disabled:opacity-40 dark:text-stone-100 dark:hover:text-stone-400"
+      className="inline-flex items-center justify-center rounded-sm p-1 text-stone-950 transition-[transform,color,opacity,background-color] duration-[140ms] ease-[var(--ease-out)] hover:bg-stone-200/70 hover:text-stone-700 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-40 dark:text-stone-100 dark:hover:bg-stone-800/80 dark:hover:text-stone-300"
       aria-label="Open RSS feed link"
       aria-busy={disabled || undefined}
       disabled={disabled}
@@ -71,7 +71,7 @@ export function TopMoviesRSSPopover({
 
         <PopoverClose
           aria-label="Close"
-          className="absolute top-2 right-2 cursor-pointer dark:text-stone-500 dark:hover:text-stone-100 text-stone-600 hover:text-stone-950 text-sm"
+          className="absolute top-2 right-2 inline-flex cursor-pointer items-center justify-center rounded-sm p-1 text-sm text-stone-600 transition-[transform,color,background-color] duration-[140ms] ease-[var(--ease-out)] hover:bg-stone-200/80 hover:text-stone-950 active:scale-[0.95] dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-100"
         >
           <X />
         </PopoverClose>

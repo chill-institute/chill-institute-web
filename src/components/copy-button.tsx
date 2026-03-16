@@ -18,7 +18,7 @@ export function CopyButton({ value, className = "" }: { value: string; className
   return (
     <button
       type="button"
-      className={`btn cursor-copy ${className}`}
+      className={`btn min-w-8 cursor-copy px-2 ${className}`}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -29,7 +29,9 @@ export function CopyButton({ value, className = "" }: { value: string; className
       }}
       title={state === "copied" ? "copied" : state === "error" ? "failed to copy" : "copy link"}
     >
-      {icon}
+      <span key={state} className="flex items-center justify-center animate-feedback-in">
+        {icon}
+      </span>
     </button>
   );
 }

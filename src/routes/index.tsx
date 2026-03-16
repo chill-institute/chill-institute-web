@@ -1,4 +1,4 @@
-import { type SyntheticEvent, useCallback } from "react";
+import { useState } from "react";
 import { Navigate, createFileRoute, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, Star } from "lucide-react";
 import { match } from "ts-pattern";
@@ -114,14 +114,14 @@ function HomePage() {
 
             return match(config.topMoviesDisplayType)
               .with(TopMoviesDisplayType.COMPACT, () => (
-                <div className="mt-2 gap-4 grid sm:grid-cols-2 md:grid-cols-3">
+                <div className="mt-2 grid gap-4 animate-reveal sm:grid-cols-2 md:grid-cols-3">
                   {movies.map((movie) => (
                     <MovieCompactRow key={movie.id} movie={movie} />
                   ))}
                 </div>
               ))
               .with(TopMoviesDisplayType.EXPANDED, () => (
-                <div className="mt-2 gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+                <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
                   {movies.map((movie) => (
                     <MovieExpandedCard key={movie.id} movie={movie} />
                   ))}
@@ -169,9 +169,7 @@ function HomePage() {
 }
 
 function LazyImage({ src, alt, className }: { src: string; alt: string; className: string }) {
-  const onLoad = useCallback((e: SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.classList.remove("opacity-0");
-  }, []);
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <img
@@ -179,8 +177,8 @@ function LazyImage({ src, alt, className }: { src: string; alt: string; classNam
       alt={alt}
       loading="lazy"
       decoding="async"
-      className={`${className} opacity-0 transition-opacity duration-200 motion-reduce:opacity-100 motion-reduce:transition-none`}
-      onLoad={onLoad}
+      className={`${className} transition-[opacity,transform,filter] duration-200 ease-[var(--ease-out)] motion-reduce:transition-none ${loaded ? "opacity-100 translate-y-0 scale-100 blur-0" : "opacity-0 translate-y-1 scale-[0.985] blur-[6px] motion-reduce:opacity-100 motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:blur-0"}`}
+      onLoad={() => setLoaded(true)}
     />
   );
 }
