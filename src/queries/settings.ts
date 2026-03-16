@@ -34,7 +34,11 @@ export function useSaveSettings() {
     mutationFn: (next: UserSettings) => api.saveUserSettings(next),
     onSuccess: (_data, variables) => {
       const prev = previousRef.current;
-      if (prev && prev.topMoviesSource !== variables.topMoviesSource) {
+      if (
+        prev &&
+        (prev.topMoviesSource !== variables.topMoviesSource ||
+          prev.showTopMovies !== variables.showTopMovies)
+      ) {
         void queryClient.invalidateQueries({ queryKey: ["top-movies"] });
       }
       if (prev && prev.downloadFolderId !== variables.downloadFolderId) {

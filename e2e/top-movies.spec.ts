@@ -404,6 +404,148 @@ test.describe("top movies", () => {
     await expect.poll(() => topMoviesRequests).toBe(2);
   });
 
+  test("waits for real settings before fetching top movies from cached settings", async ({
+    authenticatedPage,
+  }) => {
+    await authenticatedPage.addInitScript(
+      (cachedSettings) => {
+        window.localStorage.setItem("chill.settings", cachedSettings);
+      },
+      JSON.stringify({
+        codecFilters: [],
+        disabledIndexerIds: [],
+        filterNastyResults: true,
+        filterResultsWithNoSeeders: false,
+        otherFilters: [],
+        rememberQuickFilters: false,
+        resolutionFilters: [],
+        searchResultDisplayBehavior: 1,
+        searchResultTitleBehavior: 2,
+        showPrettyNamesForTopMovies: true,
+        showTopMovies: true,
+        sortBy: 2,
+        sortDirection: 2,
+        topMoviesDisplayType: 1,
+        topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+      }),
+    );
+
+    let releaseSettingsResponse: (() => void) | undefined;
+    let topMoviesRequests = 0;
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetUserSettings", async (route) => {
+      await new Promise<void>((resolve) => {
+        releaseSettingsResponse = resolve;
+      });
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          userSettings({
+            showTopMovies: true,
+            topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          }),
+        ),
+      });
+    });
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
+      topMoviesRequests += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(topMoviesResponse(movies)),
+      });
+    });
+
+    await authenticatedPage.goto("/");
+
+    await expect.poll(() => topMoviesRequests, { timeout: 300 }).toBe(0);
+
+    releaseSettingsResponse?.();
+
+    await expect(authenticatedPage.getByText("Inception")).toBeVisible({ timeout: 2000 });
+    await expect.poll(() => topMoviesRequests).toBe(1);
+  });
+
+  test("enabling top movies refetches after settings save succeeds", async ({
+    authenticatedPage,
+    mockRpc,
+  }) => {
+    let showTopMoviesEnabled = false;
+    let releaseSaveSettingsResponse: (() => void) | undefined;
+    let resolveSaveRequestSeen: (() => void) | undefined;
+    const saveRequestSeen = new Promise<void>((resolve) => {
+      resolveSaveRequestSeen = resolve;
+    });
+    let topMoviesRequests = 0;
+
+    await mockRpc(
+      homeMethods({
+        GetUserSettings: userSettings({
+          showTopMovies: false,
+          topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+        }),
+      }),
+    );
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
+      topMoviesRequests += 1;
+      const response = showTopMoviesEnabled ? topMoviesResponse(movies) : topMoviesResponse([]);
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(response),
+      });
+    });
+
+    await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
+      const body = route.request().postDataJSON() as {
+        settings?: { showTopMovies?: boolean | string };
+      };
+      resolveSaveRequestSeen?.();
+
+      await new Promise<void>((resolve) => {
+        releaseSaveSettingsResponse = () => {
+          showTopMoviesEnabled =
+            body.settings?.showTopMovies === true || body.settings?.showTopMovies === "true";
+          resolve();
+        };
+      });
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          userSettings({
+            showTopMovies: showTopMoviesEnabled,
+            topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          }),
+        ),
+      });
+    });
+
+    await authenticatedPage.goto("/");
+
+    await authenticatedPage.getByRole("button", { name: "Show settings" }).click();
+    await authenticatedPage
+      .getByRole("switch", { name: "Show top movies in the home page" })
+      .click();
+
+    await expect(authenticatedPage.getByText("Couldn't fetch any movies")).toBeVisible({
+      timeout: 2000,
+    });
+    await expect.poll(() => topMoviesRequests).toBe(1);
+    await saveRequestSeen;
+
+    releaseSaveSettingsResponse?.();
+
+    await expect.poll(() => topMoviesRequests).toBe(2);
+    await expect(authenticatedPage.getByText("Inception")).toBeVisible({ timeout: 2000 });
+  });
+
   test("error state shows error message", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
