@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `chill-institute/chill-institute-web`.
+Thanks for contributing to `chill-institute-web`.
 
 ## Setup
 

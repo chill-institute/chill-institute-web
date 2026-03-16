@@ -1,4 +1,4 @@
-# chill-institute/chill-institute-web
+# chill-institute-web
 
 ![chill.institute web](https://binge.institute/banner.png)
 
