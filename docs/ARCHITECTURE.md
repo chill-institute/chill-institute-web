@@ -116,7 +116,6 @@ Hosted environments resolve the API from the current hostname:
 
 - `localhost` and `*.web-8vr.pages.dev` -> `https://api.chill.institute`
 - `chill.institute` -> `https://api.chill.institute`
-- `chill.institute` -> `https://api.chill.institute`
 
 Hosted legacy forwarding uses the same host split:
 
@@ -131,5 +130,5 @@ Typical production shape:
 
 - static assets on Cloudflare Pages
 - Pages Functions for legacy non-SPA forwarding
-- API on a separate `chill.institute` origin
+- API on a separate `api.chill.institute` origin
 - browser -> API communication over Connect-Web
