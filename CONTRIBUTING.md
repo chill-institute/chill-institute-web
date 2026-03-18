@@ -21,11 +21,21 @@ vp dev
 Run the full repo checks before opening or updating a pull request:
 
 ```bash
-vp check
-vp run test
-vp run knip
-vp build
+vp run verify
 vp run e2e
+```
+
+## Git Hooks
+
+`vp install` runs the repo's `prepare` script, which configures Vite+ hooks from `.vite-hooks/`.
+
+The repo also ships matching `.githooks/` shims so older local clones that still have `core.hooksPath=.githooks` keep enforcing the same checks.
+
+If your local Git config points somewhere else and hooks are not firing, re-install them with:
+
+```bash
+git config --unset core.hooksPath
+vp config --hooks-dir .vite-hooks
 ```
 
 ## Development Notes

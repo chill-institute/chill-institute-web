@@ -27,21 +27,9 @@ jobs:
       - name: Install Playwright browser
         run: vp exec playwright install --with-deps chromium
 
-      - name: Verify
+      - name: Run core verify checks
         run: |
-          vp check
-
-      - name: Run unit tests
-        run: |
-          vp run test
-
-      - name: Detect unused files and dependencies
-        run: |
-          vp run knip
-
-      - name: Build
-        run: |
-          vp build
+          vp run verify
 
       - name: End-to-end tests
         run: |

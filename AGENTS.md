@@ -11,6 +11,7 @@
 
 - `vp install`
 - `vp dev`
+- `vp run verify`
 - `vp check`
 - `vp run test`
 - `vp run knip`
@@ -22,6 +23,7 @@
 - Keep repo entrypoints in `package.json`; they should call `vp` underneath.
 - Keep browser-side API resolution centralized in [src/lib/env.ts](./src/lib/env.ts).
 - Keep Vite and hook/config changes minimal and intentional.
+- Keep `.vite-hooks/` as the canonical hook path; `.githooks/` exists only as a compatibility shim for stale local Git config.
 
 ## Read More
 
