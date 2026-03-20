@@ -4,7 +4,7 @@ If you believe you have found a security or privacy issue in the `chill.institut
 
 ## Contact
 
-- email: [chill-institute@proton.me](mailto:chill-institute@proton.me)
+- email: [chillardinho@chill.institute](mailto:chillardinho@chill.institute)
 
 Private reports are preferred for security or privacy issues.
 

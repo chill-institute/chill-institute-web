@@ -6,6 +6,6 @@ export const publicLinks = {
   guides: `${WEB_REPOSITORY_URL}/blob/main/docs/GUIDES.md`,
   github: GITHUB_ORG_URL,
   x: "https://x.com/chill_institute",
-  email: "mailto:chill-institute@proton.me",
+  email: "mailto:chillardinho@chill.institute",
   reddit: "https://www.reddit.com/r/chillInstitute/",
 } as const;

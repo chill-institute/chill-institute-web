@@ -17,7 +17,7 @@
 
 ## Contact
 
-For everything, please reach out via [chill-institute@proton.me](mailto:chill-institute@proton.me)
+For everything, please reach out via [chillardinho@chill.institute](mailto:chillardinho@chill.institute)
 
 X (Twitter) or Reddit DMs are also fine but I barely check them.
 
