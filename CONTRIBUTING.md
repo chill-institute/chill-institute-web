@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `chill-institute-web`.
+Thanks for contributing to `chill-institute-web`
 
 ## Setup
 
@@ -27,7 +27,7 @@ vp run e2e
 
 ## Git Hooks
 
-`vp install` runs the repo's `prepare` script, which configures Vite+ hooks from `.vite-hooks/`.
+`vp install` runs the repo's `prepare` script, which configures Vite+ hooks from `.vite-hooks/`
 
 The repo also ships matching `.githooks/` shims so older local clones that still have `core.hooksPath=.githooks` keep enforcing the same checks.
 

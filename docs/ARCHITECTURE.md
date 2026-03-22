@@ -28,7 +28,7 @@ graph LR
 
 - This is a client-rendered SPA.
 - The browser calls the hosted API directly for normal app traffic.
-- Shared contract types come from `@chill-institute/contracts`.
+- Shared contract types come from `@chill-institute/contracts`
 
 ## Route Model
 
@@ -110,7 +110,7 @@ Hosted environments resolve the API from the current hostname:
 
 ## Deployment Model
 
-The build output is a static bundle in `dist/`.
+The build output is a static bundle in `dist/`
 
 Typical production shape:
 

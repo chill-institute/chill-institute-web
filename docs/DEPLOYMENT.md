@@ -1,6 +1,6 @@
 # Deployment
 
-Deployment model for `chill-institute-web`.
+Deployment model for `chill-institute-web`
 
 ## Hosting Shape
 
