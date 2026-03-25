@@ -61,6 +61,7 @@ function SignInPage() {
       type: UNKNOWN_AUTH_ERROR,
     };
   }, [search.error]);
+  const visibleError = loading === "sign-in" ? null : error;
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -84,18 +85,18 @@ function SignInPage() {
 
   return (
     <AuthPage centered>
-      {error ? (
+      {visibleError ? (
         <div className="flex flex-col items-center space-y-4">
-          <div className="flex flex-col items-center text-center">{error.message}</div>
+          <div className="flex flex-col items-center text-center">{visibleError?.message}</div>
           <div className="flex flex-row space-x-4">
             <AuthButton
               busy={loading === "help"}
               onClick={() => {
                 setLoading("help");
-                window.location.href = error.actionURL ?? "/about";
+                window.location.href = visibleError?.actionURL ?? "/about";
               }}
             >
-              {error.actionLabel ?? "get help"}
+              {visibleError?.actionLabel ?? "get help"}
             </AuthButton>
             <AuthButton
               busy={loading === "sign-in"}
@@ -111,7 +112,7 @@ function SignInPage() {
                 window.location.href = getPutioStartURL(authSuccessURL);
               }}
             >
-              {error.type === SESSION_EXPIRED_ERROR ? "sign in again" : "try again"}
+              {visibleError?.type === SESSION_EXPIRED_ERROR ? "sign in again" : "try again"}
             </AuthButton>
           </div>
         </div>

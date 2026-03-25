@@ -104,7 +104,7 @@ test.describe("settings and rss", () => {
     const moviesSection = authenticatedPage
       .locator("div")
       .filter({
-        has: authenticatedPage.getByRole("heading", { name: "Movies" }),
+        has: authenticatedPage.getByRole("heading", { name: "Home page" }),
       })
       .first();
     const showMoviesSwitch = moviesSection.getByRole("switch").first();

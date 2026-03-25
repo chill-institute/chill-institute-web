@@ -1,188 +1,509 @@
-import { useEffect, useRef } from "react";
-import { ArrowUpRight, CloudUpload, Star, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowUpRight, CloudUpload, Loader2, Star, X } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
 import { SearchInTheInstituteButton } from "@/components/search-in-the-institute-button";
-import type { MockTvShow } from "@/data/mock-tv-shows";
+import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { ErrorAlert } from "@/components/ui/error-alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/cn";
+import { toErrorMessage } from "@/lib/errors";
+import { formatBytes } from "@/lib/format";
+import { type TVShow } from "@/lib/types";
+import {
+  useTVShowDetailQuery,
+  useTVShowSeasonDownloadsQuery,
+  useTVShowSeasonQuery,
+} from "@/queries/tv-shows";
 
 type Props = {
-  show: MockTvShow;
-  activeSeason: number;
+  imdbId: string;
+  fallbackShow?: TVShow;
+  activeSeason?: number;
   onSeasonChange: (season: number) => void;
   onClose: () => void;
 };
 
-export function TvShowDetailModal({ show, activeSeason, onSeasonChange, onClose }: Props) {
-  const overlayRef = useRef<HTMLDivElement>(null);
+function formatAirDate(value?: string) {
+  if (!value) {
+    return "TBA";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function EpisodeActionSkeleton() {
+  return <Skeleton className="h-8 w-8 shrink-0 rounded-md" />;
+}
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 640px)").matches : false,
+  );
 
   useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+    if (typeof window === "undefined") {
+      return;
     }
-    document.addEventListener("keydown", onKeyDown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
+
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDesktop(event.matches);
     };
-  }, [onClose]);
 
-  const season = show.seasons.find((s) => s.number === activeSeason) ?? show.seasons[0];
+    setIsDesktop(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
-  const seasonPad = String(season.number).padStart(2, "0");
-  const magnetDn = `${show.title} S${seasonPad} 1080p`;
+  return isDesktop;
+}
+
+type DetailData = NonNullable<ReturnType<typeof useTVShowDetailQuery>["data"]>;
+type SeasonData = NonNullable<ReturnType<typeof useTVShowSeasonQuery>["data"]>;
+type SeasonDownloadsData = NonNullable<ReturnType<typeof useTVShowSeasonDownloadsQuery>["data"]>;
+
+type ContentProps = {
+  isDesktop: boolean;
+  show?: TVShow | DetailData["show"];
+  genres: string[];
+  backdropUrl?: string;
+  posterUrl?: string;
+  detailQuery: ReturnType<typeof useTVShowDetailQuery>;
+  downloadsQuery: ReturnType<typeof useTVShowSeasonDownloadsQuery>;
+  seasonQuery: ReturnType<typeof useTVShowSeasonQuery>;
+  seasons: DetailData["seasons"];
+  resolvedSeasonNumber: number;
+  selectedSeason?: SeasonData["season"] | DetailData["seasons"][number];
+  downloadsByEpisode: Map<number, SeasonDownloadsData["episodes"][number]["download"]>;
+  onClose: () => void;
+  onSeasonChange: (season: number) => void;
+};
+
+function TvShowDetailContent({
+  isDesktop,
+  show,
+  genres,
+  backdropUrl,
+  posterUrl,
+  detailQuery,
+  downloadsQuery,
+  seasonQuery,
+  seasons,
+  resolvedSeasonNumber,
+  selectedSeason,
+  downloadsByEpisode,
+  onClose,
+  onSeasonChange,
+}: ContentProps) {
+  const [backdropLoaded, setBackdropLoaded] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(!posterUrl);
+
+  useEffect(() => {
+    setBackdropLoaded(false);
+  }, [backdropUrl]);
+
+  useEffect(() => {
+    setPosterLoaded(!posterUrl);
+  }, [posterUrl]);
+
+  const seasonRefreshing =
+    (seasonQuery.isFetching && seasonQuery.status === "success") ||
+    (downloadsQuery.isFetching && downloadsQuery.status === "success");
+
+  const closeButton = (
+    <button
+      type="button"
+      onClick={onClose}
+      className="absolute right-3 top-3 z-20 flex size-8 items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
+      aria-label="Close TV show details"
+    >
+      <X className="h-4 w-4" />
+    </button>
+  );
+
+  const shellClassName = isDesktop
+    ? "max-h-[90vh] w-full max-w-[940px] overflow-y-auto rounded-xl border border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+    : "max-h-[92vh] w-full overflow-y-auto rounded-t-2xl border-x-0 border-b-0 border-t border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_-24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100";
 
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 dark:bg-black/80 p-0 sm:p-4"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
-      }}
-    >
-      <div className="relative w-full sm:max-w-[640px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-t-xl sm:rounded-lg border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 shadow-[0_24px_48px_rgba(0,0,0,0.3)] animate-in fade-in-0 slide-in-from-bottom-2 sm:zoom-in-95 sm:slide-in-from-bottom-1">
-        {/* Hero */}
-        <div className="relative min-h-[220px] sm:min-h-[280px] overflow-hidden rounded-t-xl sm:rounded-t-lg flex items-end">
-          {/* Backdrop (poster used as bg, not blurry) */}
-          <div
-            className="absolute inset-0 bg-cover bg-[center_20%]"
-            style={{ backgroundImage: `url(${show.posterUrl.replace("w342", "w780")})` }}
-          />
-          {/* Gradient fade to card bg */}
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-100 via-transparent to-transparent dark:from-stone-900" />
-
-          {/* Hero content */}
-          <div className="relative z-10 flex items-end gap-5 px-6 pb-5 w-full">
-            <img
-              src={show.posterUrl}
-              alt={show.title}
-              className="w-[90px] h-[135px] sm:w-[120px] sm:h-[180px] object-cover rounded-md shrink-0 border border-stone-950 dark:border-stone-700 shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+    <div className={shellClassName}>
+      <div className="relative flex min-h-[240px] items-end overflow-hidden rounded-t-xl sm:min-h-[360px]">
+        {backdropUrl ? (
+          <>
+            <Skeleton
+              className={cn(
+                "absolute inset-0 h-full w-full rounded-none transition-opacity duration-200 ease-out",
+                backdropLoaded ? "opacity-0" : "opacity-100",
+              )}
             />
-            <div className="flex flex-col gap-1.5 min-w-0">
-              <h3 className="font-serif text-xl sm:text-2xl leading-tight [text-shadow:0_1px_3px_rgba(0,0,0,0.2)]">
-                {show.title}
-              </h3>
-              <div className="flex flex-row flex-wrap items-center gap-2 text-sm">
-                <span className="flex items-center gap-0.5">
-                  <Star className="text-xs fill-amber-400" strokeWidth={0} />
-                  <span>{show.rating.toFixed(1)}</span>
-                </span>
-                <span className="text-stone-500 dark:text-stone-400">&middot;</span>
-                <span className="text-stone-600 dark:text-stone-400">{show.year}</span>
-              </div>
-              <div className="flex flex-row flex-wrap gap-1">
-                <span
-                  className={`px-1.5 py-0.5 rounded text-[11px] font-medium tracking-wide ${
-                    show.status === "Returning"
-                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                      : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                  }`}
-                >
-                  {show.status}
-                </span>
-                {show.networks.map((n) => (
-                  <span
-                    key={n}
-                    className="px-1.5 py-0.5 rounded text-[11px] bg-stone-200 text-stone-600 border border-stone-950 dark:bg-stone-800 dark:text-stone-400 dark:border-stone-700"
-                  >
-                    {n}
-                  </span>
-                ))}
-              </div>
+            <img
+              src={backdropUrl}
+              alt=""
+              aria-hidden="true"
+              onLoad={() => setBackdropLoaded(true)}
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300 ease-out",
+                backdropLoaded ? "opacity-100" : "opacity-0",
+              )}
+            />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-100 via-stone-100/10 via-35% to-black/45 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
+
+        <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
+          {posterUrl ? (
+            <div className="relative h-[180px] w-[120px] shrink-0">
+              <Skeleton
+                className={cn(
+                  "absolute inset-0 h-full w-full rounded-md transition-opacity duration-200 ease-out",
+                  posterLoaded ? "opacity-0" : "opacity-100",
+                )}
+              />
+              <img
+                src={posterUrl}
+                alt={show?.title ?? "TV show poster"}
+                onLoad={() => setPosterLoaded(true)}
+                className={cn(
+                  "absolute inset-0 h-full w-full rounded-md border border-stone-950 object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] dark:border-stone-700 transition-opacity duration-300 ease-out",
+                  posterLoaded ? "opacity-100" : "opacity-0",
+                )}
+              />
             </div>
+          ) : (
+            <Skeleton className="h-[180px] w-[120px] shrink-0 rounded-md" />
+          )}
+
+          <div className="min-w-0 flex-1">
+            {show ? (
+              <div className="max-w-[520px] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
+                <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{show.title}</h3>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/88">
+                  <span className="flex items-center gap-1">
+                    <Star className="fill-amber-400 text-xs" strokeWidth={0} />
+                    <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
+                  </span>
+                  <span className="text-white/45">&middot;</span>
+                  <span className="text-white/72">{show.year || "Unknown year"}</span>
+                  <span className="text-white/45">&middot;</span>
+                  <span className="text-white/72">
+                    {detailQuery.data?.show?.seasonCount ?? show.seasonCount} seasons
+                  </span>
+                  {show.externalUrl ? (
+                    <>
+                      <span className="text-white/45">&middot;</span>
+                      <a
+                        href={show.externalUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-0.5 text-white/88 transition-colors hover:text-white"
+                      >
+                        <span>IMDb</span>
+                        <ArrowUpRight className="text-xs" strokeWidth={1.25} />
+                      </a>
+                    </>
+                  ) : null}
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <TVShowStatusBadge status={detailQuery.data?.show?.status ?? show.status} />
+                  {genres.length > 0 ? (
+                    <>
+                      <span className="text-white/45">&middot;</span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {genres.map((genre) => (
+                          <span
+                            key={genre}
+                            className="rounded-md border border-white/16 bg-black/14 px-2 py-1 text-[11px] leading-none text-white/76"
+                          >
+                            {genre}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-56" />
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-6 w-52" />
+              </div>
+            )}
           </div>
-
-          {/* Close button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
         </div>
+        {closeButton}
+      </div>
 
-        {/* Body */}
-        <div className="px-6 pb-6">
-          {/* Overview */}
-          <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed mb-5">
+      <div className="px-6 pb-6">
+        {detailQuery.status === "error" ? (
+          <ErrorAlert className="mt-5">{toErrorMessage(detailQuery.error)}</ErrorAlert>
+        ) : null}
+
+        {show?.overview ? (
+          <p className="mt-5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
             {show.overview}
           </p>
-
-          {/* IMDb link */}
-          <div className="flex flex-row gap-2 mb-5">
-            <a
-              href={show.imdbUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-secondary text-sm"
-            >
-              <span>IMDb</span>
-              <ArrowUpRight className="text-xs" strokeWidth={1.25} />
-            </a>
+        ) : detailQuery.isPending ? (
+          <div className="mt-5 flex flex-col gap-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[92%]" />
+            <Skeleton className="h-4 w-[80%]" />
           </div>
+        ) : null}
 
-          {/* Season section */}
-          <div className="border-t border-stone-950 dark:border-stone-700 pt-5">
-            {/* Season tabs */}
-            <div className="flex flex-row flex-wrap gap-0.5 mb-4">
-              {show.seasons.map((s) => (
+        <div
+          className={cn(
+            "mt-5 border-t border-stone-950 pt-5 transition-opacity duration-200 ease-out dark:border-stone-700",
+            seasonRefreshing ? "opacity-75" : "opacity-100",
+          )}
+        >
+          {seasons.length > 1 ? (
+            <div className="mb-4 flex flex-wrap gap-1">
+              {seasons.map((season) => (
                 <button
-                  key={s.number}
+                  key={season.seasonNumber}
                   type="button"
-                  onClick={() => onSeasonChange(s.number)}
-                  className={`px-3 py-1.5 rounded text-xs cursor-pointer border transition-colors ${
-                    s.number === activeSeason
-                      ? "bg-stone-100 dark:bg-stone-900 text-stone-950 dark:text-stone-100 border-stone-950 dark:border-stone-700 shadow-[1px_1px_rgba(12,10,9,1)] dark:shadow-[1px_1px_rgba(68,64,60,1)]"
-                      : "bg-transparent text-stone-600 dark:text-stone-400 border-transparent hover:bg-stone-200 dark:hover:bg-stone-800 hover:text-stone-950 dark:hover:text-stone-100"
+                  onClick={() => onSeasonChange(season.seasonNumber)}
+                  className={`rounded border px-3 py-1.5 text-xs transition-colors ${
+                    season.seasonNumber === resolvedSeasonNumber
+                      ? "border-stone-950 bg-stone-950 text-stone-100 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950"
+                      : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
                   }`}
                 >
-                  {s.name}
+                  {season.name || `Season ${season.seasonNumber}`}
                 </button>
               ))}
             </div>
-
-            {/* Season actions */}
-            <div className="flex flex-row flex-wrap gap-1.5 mb-4">
-              <AddTransferButton url={`magnet:?dn=${encodeURIComponent(magnetDn)}`}>
-                <CloudUpload className="text-xs" />
-                <span>Send Season {season.number} to put.io</span>
-              </AddTransferButton>
-              <SearchInTheInstituteButton title={`${show.title} S${seasonPad}`} />
+          ) : detailQuery.isPending ? (
+            <div className="mb-4 flex gap-1">
+              {Array.from({ length: 3 }, (_, index) => (
+                <Skeleton key={index} className="h-8 w-24" />
+              ))}
             </div>
+          ) : null}
 
-            {/* Episode list */}
-            <div className="flex flex-col gap-0.5">
-              {season.episodes.map((ep) => {
-                const epPad = String(ep.number).padStart(2, "0");
-                const epMagnet = `${show.title} S${seasonPad}E${epPad} 1080p`;
+          {selectedSeason ? (
+            <div className="mb-4 flex flex-col gap-3 rounded-lg border border-stone-950 bg-stone-50 p-3 sm:flex-row sm:items-center sm:justify-between dark:border-stone-700 dark:bg-stone-950/40">
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium">
+                  {selectedSeason.name || `Season ${selectedSeason.seasonNumber}`}
+                </div>
+                <div className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+                  {selectedSeason.episodeCount} episodes
+                  <span className="mx-1.5">&middot;</span>
+                  {formatAirDate(selectedSeason.airDate)}
+                  {downloadsQuery.data?.seasonPack?.size ? (
+                    <>
+                      <span className="mx-1.5">&middot;</span>
+                      {formatBytes(downloadsQuery.data.seasonPack.size)}
+                    </>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:flex-nowrap">
+                {downloadsQuery.isPending ? (
+                  <button type="button" className="btn btn-secondary text-sm" disabled>
+                    <Loader2 className="animate-spin text-xs" />
+                    <span>loading downloads</span>
+                  </button>
+                ) : downloadsQuery.data?.seasonPack?.link ? (
+                  <AddTransferButton
+                    url={downloadsQuery.data.seasonPack.link}
+                    leadingIcon={<CloudUpload className="text-xs" />}
+                  >
+                    send season to put.io
+                  </AddTransferButton>
+                ) : (
+                  <button type="button" className="btn btn-secondary text-sm opacity-70" disabled>
+                    <CloudUpload className="text-xs" />
+                    <span>season pack unavailable</span>
+                  </button>
+                )}
+                <SearchInTheInstituteButton
+                  title={`${show?.title ?? "TV Show"} S${String(resolvedSeasonNumber).padStart(2, "0")}`}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {seasonQuery.status === "error" ? (
+            <ErrorAlert>{toErrorMessage(seasonQuery.error)}</ErrorAlert>
+          ) : seasonQuery.isPending ? (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-2 dark:border-stone-700/30"
+                >
+                  <Skeleton className="h-7 w-7 rounded-md" />
+                  <div className="flex-1 space-y-1">
+                    <Skeleton className="h-4 w-44" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                  <EpisodeActionSkeleton />
+                  <EpisodeActionSkeleton />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {(seasonQuery.data?.episodes ?? []).map((episode) => {
+                const episodeDownload = downloadsByEpisode.get(episode.episodeNumber);
+                const paddedSeason = String(episode.seasonNumber).padStart(2, "0");
+                const paddedEpisode = String(episode.episodeNumber).padStart(2, "0");
+
                 return (
                   <div
-                    key={ep.number}
-                    className="flex flex-row items-center gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-stone-200 dark:hover:bg-stone-800"
+                    key={`${episode.seasonNumber}-${episode.episodeNumber}`}
+                    className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-2.5 dark:border-stone-700/30"
                   >
-                    <span className="shrink-0 w-7 h-7 flex items-center justify-center rounded bg-stone-200 dark:bg-stone-800 text-xs text-stone-600 dark:text-stone-400 font-medium">
-                      {epPad}
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-stone-200 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-400">
+                      {paddedEpisode}
                     </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm truncate">{ep.title}</div>
-                      <div className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                        {ep.runtime} &middot; {ep.date}
+
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm">
+                        {episode.name || `Episode ${episode.episodeNumber}`}
+                      </div>
+                      <div className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-stone-500 dark:text-stone-400">
+                        <span>{formatAirDate(episode.airDate)}</span>
+                        {episode.runtime ? <span>{episode.runtime} min</span> : null}
+                        {episode.rating ? <span>{episode.rating.toFixed(1)} IMDb</span> : null}
                       </div>
                     </div>
-                    <div className="flex flex-row gap-1 shrink-0">
-                      <AddTransferButton url={`magnet:?dn=${encodeURIComponent(epMagnet)}`}>
-                        <CloudUpload />
-                      </AddTransferButton>
-                      <SearchInTheInstituteButton title={`${show.title} S${seasonPad}E${epPad}`} />
+
+                    <div className="flex shrink-0 gap-1">
+                      {downloadsQuery.isPending ? (
+                        <EpisodeActionSkeleton />
+                      ) : episodeDownload?.link ? (
+                        <AddTransferButton url={episodeDownload.link}>
+                          <CloudUpload />
+                        </AddTransferButton>
+                      ) : (
+                        <button type="button" className="btn px-2 opacity-60" disabled>
+                          <CloudUpload />
+                        </button>
+                      )}
+                      <SearchInTheInstituteButton
+                        title={`${show?.title ?? "TV Show"} S${paddedSeason}E${paddedEpisode}`}
+                      />
                     </div>
                   </div>
                 );
               })}
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+export function TvShowDetailModal({
+  imdbId,
+  fallbackShow,
+  activeSeason,
+  onSeasonChange,
+  onClose,
+}: Props) {
+  const isDesktop = useIsDesktop();
+  const detailQuery = useTVShowDetailQuery(imdbId, true);
+  const show = detailQuery.data?.show ?? fallbackShow;
+  const seasons = detailQuery.data?.seasons ?? [];
+  const resolvedSeasonNumber = activeSeason ?? seasons[0]?.seasonNumber ?? 1;
+
+  const seasonQuery = useTVShowSeasonQuery(imdbId, resolvedSeasonNumber, seasons.length > 0);
+  const downloadsQuery = useTVShowSeasonDownloadsQuery(
+    imdbId,
+    resolvedSeasonNumber,
+    seasons.length > 0,
+  );
+
+  const downloadsByEpisode = useMemo(
+    () =>
+      new Map(
+        (downloadsQuery.data?.episodes ?? []).map((episode) => [
+          episode.episodeNumber,
+          episode.download,
+        ]),
+      ),
+    [downloadsQuery.data?.episodes],
+  );
+
+  const selectedSeason =
+    seasonQuery.data?.season ??
+    seasons.find((season) => season.seasonNumber === resolvedSeasonNumber);
+  const backdropUrl = detailQuery.data?.show?.backdropUrl;
+  const posterUrl = show?.posterUrl;
+  const genres = detailQuery.data?.show?.genres ?? [];
+
+  const content = (
+    <TvShowDetailContent
+      isDesktop={isDesktop}
+      show={show}
+      genres={genres}
+      backdropUrl={backdropUrl}
+      posterUrl={posterUrl}
+      detailQuery={detailQuery}
+      downloadsQuery={downloadsQuery}
+      seasonQuery={seasonQuery}
+      seasons={seasons}
+      resolvedSeasonNumber={resolvedSeasonNumber}
+      selectedSeason={selectedSeason}
+      downloadsByEpisode={downloadsByEpisode}
+      onClose={onClose}
+      onSeasonChange={onSeasonChange}
+    />
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog open onOpenChange={(open) => !open && onClose()}>
+        <DialogDescription className="sr-only">
+          Browse TV show metadata, seasons, and episode download actions.
+        </DialogDescription>
+        <DialogTitle className="sr-only">{show?.title ?? "TV show details"}</DialogTitle>
+        <DialogContent
+          showCloseButton={false}
+          className="top-1/2 left-1/2 w-full max-w-[940px] -translate-x-1/2 -translate-y-1/2 gap-0 p-0"
+        >
+          {content}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer
+      open
+      direction="bottom"
+      onOpenChange={(open) => !open && onClose()}
+      modal
+      shouldScaleBackground={false}
+    >
+      <DrawerTitle className="sr-only">{show?.title ?? "TV show details"}</DrawerTitle>
+      <DrawerDescription className="sr-only">
+        Browse TV show metadata, seasons, and episode download actions.
+      </DrawerDescription>
+      <DrawerContent className="border-x-0 border-b-0 border-t-0 bg-transparent p-0 shadow-none">
+        {content}
+      </DrawerContent>
+    </Drawer>
   );
 }

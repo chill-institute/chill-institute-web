@@ -20,12 +20,15 @@ const displayTypeOptions = [
 export function CardDisplayTypeToggle({
   value,
   onChange,
+  className,
 }: {
   value: UserSettings["cardDisplayType"];
   onChange: (value: UserSettings["cardDisplayType"]) => void;
+  className?: string;
 }) {
   return (
     <ToggleGroup
+      className={className}
       onValueChange={(v) => {
         if (v.length === 0) return;
         onChange(Number(v[0]) as UserSettings["cardDisplayType"]);

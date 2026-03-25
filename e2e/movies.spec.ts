@@ -37,7 +37,7 @@ const ytsMovies = [
 ];
 
 const homeMethods = (overrides?: Record<string, unknown>) => ({
-  GetUserSettings: userSettings({ showMovies: true }),
+  GetUserSettings: userSettings({ showMovies: true, showTvShows: false }),
   GetMovies: moviesResponse(movies),
   ...overrides,
 });
@@ -86,7 +86,7 @@ test.describe("movies", () => {
   test("hidden when disabled", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
-        GetUserSettings: userSettings({ showMovies: false }),
+        GetUserSettings: userSettings({ showMovies: false, showTvShows: false }),
       }),
     );
 
@@ -247,8 +247,7 @@ test.describe("movies", () => {
 
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
 
-    await authenticatedPage.getByRole("combobox").click();
-    await authenticatedPage.getByRole("option", { name: "Trending movies from YTS" }).click();
+    await authenticatedPage.getByRole("button", { name: "YTS" }).click();
 
     await expect(authenticatedPage.getByText("Inception")).toBeHidden({ timeout: 400 });
     await expect(authenticatedPage.getByText("The Raid")).toBeVisible({ timeout: 2000 });
@@ -322,8 +321,7 @@ test.describe("movies", () => {
     await expect(rssButton).toBeVisible();
     await expect(rssButton).toBeEnabled();
 
-    await authenticatedPage.getByRole("combobox").click();
-    await authenticatedPage.getByRole("option", { name: "Trending movies from YTS" }).click();
+    await authenticatedPage.getByRole("button", { name: "YTS" }).click();
 
     await ytsRequestSeen;
     await expect(rssButton).toBeVisible();
@@ -392,8 +390,7 @@ test.describe("movies", () => {
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
     await expect.poll(() => moviesRequests).toBe(1);
 
-    await authenticatedPage.getByRole("combobox").click();
-    await authenticatedPage.getByRole("option", { name: "Trending movies from YTS" }).click();
+    await authenticatedPage.getByRole("button", { name: "YTS" }).click();
 
     await expect(authenticatedPage.getByText("The Raid")).toBeVisible({ timeout: 2000 });
     await expect.poll(() => moviesRequests).toBe(2);
@@ -490,6 +487,7 @@ test.describe("movies", () => {
       homeMethods({
         GetUserSettings: userSettings({
           showMovies: false,
+          showTvShows: false,
           moviesSource: MoviesSource.IMDB_MOVIEMETER,
         }),
       }),
@@ -526,6 +524,7 @@ test.describe("movies", () => {
         body: JSON.stringify(
           userSettings({
             showMovies: showMoviesEnabled,
+            showTvShows: false,
             moviesSource: MoviesSource.IMDB_MOVIEMETER,
           }),
         ),

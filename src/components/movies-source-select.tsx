@@ -1,11 +1,14 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { moviesSourceLabels, moviesSources, type UserSettings } from "@/lib/types";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { moviesSourceLabels, moviesSources, MoviesSource, type UserSettings } from "@/lib/types";
+
+const moviesSourceTabLabels: Record<UserSettings["moviesSource"], string> = {
+  [MoviesSource.UNSPECIFIED]: "IMDb Moviemeter",
+  [MoviesSource.IMDB_MOVIEMETER]: "IMDb Moviemeter",
+  [MoviesSource.IMDB_TOP_250]: "IMDb Top 250",
+  [MoviesSource.YTS]: "YTS",
+  [MoviesSource.ROTTEN_TOMATOES]: "Rotten Tomatoes",
+  [MoviesSource.TRAKT]: "Trakt",
+};
 
 export function MoviesSourceSelect({
   value,
@@ -15,24 +18,26 @@ export function MoviesSourceSelect({
   onChange: (value: UserSettings["moviesSource"]) => void;
 }) {
   return (
-    <Select
-      onValueChange={(v) => {
-        onChange(Number(v) as UserSettings["moviesSource"]);
+    <ToggleGroup
+      className="w-full justify-start gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      onValueChange={(next) => {
+        if (next.length === 0) {
+          return;
+        }
+        onChange(Number(next[0]) as UserSettings["moviesSource"]);
       }}
-      value={String(value)}
-      items={Object.fromEntries(moviesSources.map((s) => [String(s), moviesSourceLabels[s]]))}
+      value={[String(value)]}
     >
-      <SelectTrigger className="min-w-[160px]">
-        <SelectValue />
-      </SelectTrigger>
-
-      <SelectContent>
-        {moviesSources.map((source) => (
-          <SelectItem key={source} value={String(source)}>
-            {moviesSourceLabels[source]}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+      {moviesSources.map((source) => (
+        <ToggleGroupItem
+          key={source}
+          value={String(source)}
+          aria-label={moviesSourceLabels[source]}
+          className="h-7.5 shrink-0 rounded-md px-2 text-[13px] whitespace-nowrap border border-transparent data-[pressed]:border-stone-950 data-[pressed]:shadow-[1px_1px_rgba(12,10,9,1)] dark:data-[pressed]:border-stone-700 dark:data-[pressed]:shadow-[1px_1px_rgba(68,64,60,1)]"
+        >
+          {moviesSourceTabLabels[source]}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
   );
 }
