@@ -9,16 +9,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { publicLinks } from "@/lib/public-links";
-import { getTopMoviesSourceLabel, type TopMoviesSource } from "@/lib/types";
+import { getMoviesSourceLabel, type MoviesSource } from "@/lib/types";
 
-export function TopMoviesRSSPopover({
-  source,
-  feedUrl,
-}: {
-  source: TopMoviesSource;
-  feedUrl?: string;
-}) {
-  const sourceName = getTopMoviesSourceLabel(source);
+export function MoviesRSSPopover({ source, feedUrl }: { source: MoviesSource; feedUrl?: string }) {
+  const sourceName = getMoviesSourceLabel(source);
   const disabled = !feedUrl;
   const trigger = (
     <button

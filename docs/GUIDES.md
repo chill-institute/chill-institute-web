@@ -2,16 +2,16 @@
 
 ## Table of contents
 
-- [Add a top-movies RSS feed to put.io](#add-a-top-movies-rss-feed-to-putio)
+- [Add a movies RSS feed to put.io](#add-a-movies-rss-feed-to-putio)
 - [Reporting a crash](#reporting-a-crash)
 
-## Add a top-movies RSS feed to put.io
+## Add a movies RSS feed to put.io
 
 Want a little more institutional power? Here you go.
 
-1. Pick a top-movies source on the home page.
+1. Pick a movies source on the home page.
 
-![Choose a top-movies source](./assets/guides/rss-source.jpg)
+![Choose a movies source](./assets/guides/rss-source.jpg)
 
 2. Click the RSS icon next to the source selector and copy the generated feed URL.
 

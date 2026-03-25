@@ -7,7 +7,7 @@ test.describe("crash report fallback", () => {
     mockRpc,
   }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
     });
 
     await authenticatedPage.addInitScript(() => {
@@ -49,7 +49,7 @@ test.describe("crash report fallback", () => {
     mockRpc,
   }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
     });
 
     await authenticatedPage.goto("/debug/crash");

@@ -86,7 +86,7 @@ function SettingsSkeleton() {
       </div>
 
       <div>
-        <SectionTitle>Top movies</SectionTitle>
+        <SectionTitle>Movies</SectionTitle>
         <SectionBody>
           <Skeleton className="h-5 w-full" />
         </SectionBody>
@@ -277,33 +277,17 @@ export function SettingsPanel() {
           </div>
 
           <div>
-            <SectionTitle>Top movies</SectionTitle>
+            <SectionTitle>Movies</SectionTitle>
             <SectionBody>
               <div className="flex items-center justify-between space-x-1">
-                <Label htmlFor="show-top-movies">Show top movies in the home page</Label>
+                <Label htmlFor="show-movies">Show movies in the home page</Label>
                 <Switch
-                  id="show-top-movies"
-                  checked={effective.showTopMovies}
-                  onCheckedChange={(checked) => persistPatch({ showTopMovies: checked === true })}
+                  id="show-movies"
+                  checked={effective.showMovies}
+                  onCheckedChange={(checked) => persistPatch({ showMovies: checked === true })}
                 />
               </div>
             </SectionBody>
-            {effective.showTopMovies ? (
-              <SectionBody>
-                <div className="flex items-center justify-between space-x-1">
-                  <Label htmlFor="pretty-names">
-                    Show simplified names instead of torrent titles
-                  </Label>
-                  <Switch
-                    id="pretty-names"
-                    checked={effective.showPrettyNamesForTopMovies}
-                    onCheckedChange={(checked) =>
-                      persistPatch({ showPrettyNamesForTopMovies: checked === true })
-                    }
-                  />
-                </div>
-              </SectionBody>
-            ) : null}
             <div className="h-0.5" />
           </div>
 

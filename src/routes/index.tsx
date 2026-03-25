@@ -6,16 +6,16 @@ import { match } from "ts-pattern";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddTransferButton } from "@/components/add-transfer-button";
+import { CardDisplayTypeToggle } from "@/components/card-display-type-toggle";
+import { MoviesRSSPopover } from "@/components/movies-rss-popover";
+import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { SearchInTheInstituteButton } from "@/components/search-in-the-institute-button";
-import { TopMoviesDisplayTypeToggle } from "@/components/top-movies-display-type-toggle";
-import { TopMoviesRSSPopover } from "@/components/top-movies-rss-popover";
-import { TopMoviesSourceSelect } from "@/components/top-movies-source-select";
 import { useAuth, readStoredToken } from "@/lib/auth";
 import { toErrorMessage } from "@/lib/errors";
-import { usePendingTopMoviesRefresh, useSettingsQuery, useSaveSettings } from "@/queries/settings";
-import { useTopMoviesQuery } from "@/queries/top-movies";
-import { settingsQueryOptions, topMoviesQueryOptions } from "@/queries/options";
-import { TopMoviesDisplayType, type TopMovie, type UserSettings } from "@/lib/types";
+import { CardDisplayType, type Movie, type UserSettings } from "@/lib/types";
+import { moviesQueryOptions, settingsQueryOptions } from "@/queries/options";
+import { useMoviesQuery } from "@/queries/movies";
+import { usePendingMoviesRefresh, useSettingsQuery, useSaveSettings } from "@/queries/settings";
 
 export const Route = createFileRoute("/")({
   loader: ({ context: { queryClient } }) => {
@@ -23,8 +23,8 @@ export const Route = createFileRoute("/")({
     if (!token) return;
     const settingsPromise = queryClient.ensureQueryData(settingsQueryOptions(token));
     void settingsPromise.then((settings) => {
-      if (settings.showTopMovies) {
-        void queryClient.ensureQueryData(topMoviesQueryOptions(token));
+      if (settings.showMovies) {
+        void queryClient.ensureQueryData(moviesQueryOptions(token));
       }
     });
   },
@@ -38,9 +38,9 @@ function HomePage() {
   const configQuery = useSettingsQuery();
 
   const saveConfigMutation = useSaveSettings();
-  const pendingTopMoviesRefresh = usePendingTopMoviesRefresh();
+  const pendingMoviesRefresh = usePendingMoviesRefresh();
 
-  const topMoviesQuery = useTopMoviesQuery(configQuery.data?.showTopMovies === true);
+  const moviesQuery = useMoviesQuery(configQuery.data?.showMovies === true);
 
   function patchConfig(patch: Partial<UserSettings>) {
     if (!configQuery.data) {
@@ -66,7 +66,7 @@ function HomePage() {
             <Skeleton className="h-5 w-5 bg-stone-100 dark:bg-stone-900" />
           </div>
         </div>
-        <TopMoviesSkeleton displayType={TopMoviesDisplayType.COMPACT} />
+        <MoviesSkeleton displayType={CardDisplayType.COMPACT} />
       </div>
     ))
     .with({ status: "error" }, (q) => (
@@ -76,51 +76,51 @@ function HomePage() {
     ))
     .with({ status: "success" }, (q) => {
       const config = q.data;
-      if (!config.showTopMovies) return null;
-      const currentTopMoviesResponse =
-        topMoviesQuery.status === "success" && topMoviesQuery.data.source === config.topMoviesSource
-          ? topMoviesQuery.data
+      if (!config.showMovies) return null;
+      const currentMoviesResponse =
+        moviesQuery.status === "success" && moviesQuery.data.source === config.moviesSource
+          ? moviesQuery.data
           : undefined;
 
-      const topMoviesContent = pendingTopMoviesRefresh ? (
-        <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+      const moviesContent = pendingMoviesRefresh ? (
+        <MoviesSkeleton displayType={config.cardDisplayType} />
       ) : (
-        match(topMoviesQuery)
+        match(moviesQuery)
           .with({ status: "pending" }, () => (
-            <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+            <MoviesSkeleton displayType={config.cardDisplayType} />
           ))
-          .with({ status: "error" }, (tq) =>
-            tq.isFetching ? (
-              <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />
+          .with({ status: "error" }, (mq) =>
+            mq.isFetching ? (
+              <MoviesSkeleton displayType={config.cardDisplayType} />
             ) : (
-              <ErrorAlert className="mt-2">{toErrorMessage(tq.error)}</ErrorAlert>
+              <ErrorAlert className="mt-2">{toErrorMessage(mq.error)}</ErrorAlert>
             ),
           )
-          .with({ status: "success" }, (tq) => {
-            const movies = tq.data.movies;
-            const hasMatchingSource = tq.data.source === config.topMoviesSource;
+          .with({ status: "success" }, (mq) => {
+            const movies = mq.data.movies;
+            const hasMatchingSource = mq.data.source === config.moviesSource;
             if (!hasMatchingSource) {
-              return <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />;
+              return <MoviesSkeleton displayType={config.cardDisplayType} />;
             }
 
             if (movies.length === 0) {
-              if (tq.isFetching) {
-                return <TopMoviesSkeleton displayType={config.topMoviesDisplayType} />;
+              if (mq.isFetching) {
+                return <MoviesSkeleton displayType={config.cardDisplayType} />;
               }
               return (
                 <div className="mt-2">{`Couldn't fetch any movies from the selected source, please try another one.`}</div>
               );
             }
 
-            return match(config.topMoviesDisplayType)
-              .with(TopMoviesDisplayType.COMPACT, () => (
+            return match(config.cardDisplayType)
+              .with(CardDisplayType.COMPACT, () => (
                 <div className="mt-2 grid gap-4 animate-reveal sm:grid-cols-2 md:grid-cols-3">
                   {movies.map((movie) => (
                     <MovieCompactRow key={movie.id} movie={movie} />
                   ))}
                 </div>
               ))
-              .with(TopMoviesDisplayType.EXPANDED, () => (
+              .with(CardDisplayType.EXPANDED, () => (
                 <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
                   {movies.map((movie) => (
                     <MovieExpandedCard key={movie.id} movie={movie} />
@@ -136,28 +136,28 @@ function HomePage() {
         <div data-page="home" className="w-full max-w-5xl mx-auto my-6 md:my-12 px-4 xl:px-0">
           <div className="flex flex-col space-y-2 xs:space-y-0 xs:flex-row xs:justify-between xs:items-end">
             <div>
-              <TopMoviesSourceSelect
-                value={config.topMoviesSource}
-                onChange={(topMoviesSource) => patchConfig({ topMoviesSource })}
+              <MoviesSourceSelect
+                value={config.moviesSource}
+                onChange={(moviesSource) => patchConfig({ moviesSource })}
               />
             </div>
 
             <div className="flex flex-row items-center space-x-3">
-              <TopMoviesDisplayTypeToggle
-                value={config.topMoviesDisplayType}
-                onChange={(topMoviesDisplayType) => patchConfig({ topMoviesDisplayType })}
+              <CardDisplayTypeToggle
+                value={config.cardDisplayType}
+                onChange={(cardDisplayType) => patchConfig({ cardDisplayType })}
               />
               <div className="w-px h-5 bg-stone-400 dark:bg-stone-700" />
               <div className="flex items-center">
-                <TopMoviesRSSPopover
-                  source={config.topMoviesSource}
-                  feedUrl={currentTopMoviesResponse?.rssFeedUrl}
+                <MoviesRSSPopover
+                  source={config.moviesSource}
+                  feedUrl={currentMoviesResponse?.rssFeedUrl}
                 />
               </div>
             </div>
           </div>
 
-          {topMoviesContent}
+          {moviesContent}
 
           {saveConfigMutation.error ? (
             <ErrorAlert className="mt-4">{toErrorMessage(saveConfigMutation.error)}</ErrorAlert>
@@ -183,7 +183,7 @@ function LazyImage({ src, alt, className }: { src: string; alt: string; classNam
   );
 }
 
-function MovieCompactRow({ movie }: { movie: TopMovie }) {
+function MovieCompactRow({ movie }: { movie: Movie }) {
   return (
     <article className="relative rounded overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900">
       <div className="flex flex-row items-center p-3 gap-3 h-full">
@@ -242,8 +242,8 @@ function MovieCompactRow({ movie }: { movie: TopMovie }) {
   );
 }
 
-function TopMoviesSkeleton({ displayType }: { displayType: TopMoviesDisplayType }) {
-  if (displayType === TopMoviesDisplayType.EXPANDED) {
+function MoviesSkeleton({ displayType }: { displayType: CardDisplayType }) {
+  if (displayType === CardDisplayType.EXPANDED) {
     return (
       <div className="mt-2 gap-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
         {Array.from({ length: 24 }, (_, i) => (
@@ -284,7 +284,7 @@ function TopMoviesSkeleton({ displayType }: { displayType: TopMoviesDisplayType 
   );
 }
 
-function MovieExpandedCard({ movie }: { movie: TopMovie }) {
+function MovieExpandedCard({ movie }: { movie: Movie }) {
   return (
     <article className="relative rounded overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 flex flex-col">
       {movie.posterUrl ? (

@@ -49,12 +49,13 @@ describe("cached settings", () => {
       resolutionFilters: [],
       searchResultDisplayBehavior: 2,
       searchResultTitleBehavior: 2,
-      showPrettyNamesForTopMovies: true,
-      showTopMovies: false,
+      showMovies: false,
+      showTvShows: true,
       sortBy: 2,
       sortDirection: 2,
-      topMoviesDisplayType: 1,
-      topMoviesSource: 1,
+      cardDisplayType: 1,
+      moviesSource: 1,
+      tvShowsSource: 1,
     });
 
     writeCachedSettings(settings);

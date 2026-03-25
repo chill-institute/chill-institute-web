@@ -2,33 +2,33 @@ import { LayoutGrid, LayoutList } from "lucide-react";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { TopMoviesDisplayType, type UserSettings } from "@/lib/types";
+import { CardDisplayType, type UserSettings } from "@/lib/types";
 
 const displayTypeOptions = [
   {
     icon: <LayoutGrid />,
     label: "Expanded",
-    value: TopMoviesDisplayType.EXPANDED,
+    value: CardDisplayType.EXPANDED,
   },
   {
     icon: <LayoutList />,
     label: "Compact",
-    value: TopMoviesDisplayType.COMPACT,
+    value: CardDisplayType.COMPACT,
   },
 ] as const;
 
-export function TopMoviesDisplayTypeToggle({
+export function CardDisplayTypeToggle({
   value,
   onChange,
 }: {
-  value: UserSettings["topMoviesDisplayType"];
-  onChange: (value: UserSettings["topMoviesDisplayType"]) => void;
+  value: UserSettings["cardDisplayType"];
+  onChange: (value: UserSettings["cardDisplayType"]) => void;
 }) {
   return (
     <ToggleGroup
       onValueChange={(v) => {
         if (v.length === 0) return;
-        onChange(Number(v[0]) as UserSettings["topMoviesDisplayType"]);
+        onChange(Number(v[0]) as UserSettings["cardDisplayType"]);
       }}
       value={[String(value)]}
     >

@@ -1,12 +1,12 @@
 import { test, expect } from "./support/fixtures";
-import { TopMoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
+import { MoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
 import {
   downloadFolderResponse,
   folderResponse,
   indexer,
   indexersResponse,
-  topMovie,
-  topMoviesResponseForSource,
+  movie,
+  moviesResponseForSource,
   userSettings,
   userFile,
 } from "./support/seeds";
@@ -19,7 +19,7 @@ const profileResponse = {
 };
 
 type RequestSettingsPayload = Record<string, unknown> & {
-  showTopMovies?: boolean;
+  showMovies?: boolean;
   downloadFolderId?: string | number;
   disabledIndexerIds?: string[];
   searchResultDisplayBehavior?: number;
@@ -29,7 +29,7 @@ type RequestSettingsPayload = Record<string, unknown> & {
 };
 
 const baseSettingsMethods = (overrides?: Record<string, unknown>) => ({
-  GetUserSettings: userSettings({ showTopMovies: true }),
+  GetUserSettings: userSettings({ showMovies: true }),
   GetIndexers: indexersResponse([
     indexer({ id: "yts", name: "YTS" }),
     indexer({ id: "rarbg", name: "RARBG" }),
@@ -46,16 +46,16 @@ test.describe("settings and rss", () => {
   }) => {
     await mockRpc({
       GetUserSettings: userSettings({
-        showTopMovies: true,
-        topMoviesSource: TopMoviesSource.TRAKT,
+        showMovies: true,
+        moviesSource: MoviesSource.TRAKT,
       }),
-      GetTopMovies: topMoviesResponseForSource(TopMoviesSource.TRAKT, [
-        topMovie({
+      GetMovies: moviesResponseForSource(MoviesSource.TRAKT, [
+        movie({
           id: "m1",
           title: "Inception",
           titlePretty: "Inception",
           link: "magnet:?xt=urn:btih:inception",
-          source: TopMoviesSource.TRAKT,
+          source: MoviesSource.TRAKT,
         }),
       ]),
     });
@@ -64,13 +64,13 @@ test.describe("settings and rss", () => {
     await authenticatedPage.getByRole("button", { name: "Open RSS feed link" }).click();
 
     await expect(authenticatedPage.getByRole("dialog").getByRole("textbox")).toHaveValue(
-      "https://api.chill.institute/rss/top-movies/trakt?auth_token=test-token",
+      "https://api.chill.institute/rss/movies/trakt?auth_token=test-token",
     );
   });
 
   test("settings edits persist via SaveUserSettings", async ({ authenticatedPage, mockRpc }) => {
-    let settingsState = userSettings({ showTopMovies: true });
-    let savedShowTopMovies: boolean | undefined;
+    let settingsState = userSettings({ showMovies: true });
+    let savedShowMovies: boolean | undefined;
     let saveCalls = 0;
 
     await mockRpc(baseSettingsMethods({ GetUserSettings: settingsState }));
@@ -90,7 +90,7 @@ test.describe("settings and rss", () => {
       };
       if (body.settings) {
         settingsState = body.settings as typeof settingsState;
-        savedShowTopMovies = body.settings.showTopMovies ?? false;
+        savedShowMovies = body.settings.showMovies ?? false;
       }
       await route.fulfill({
         status: 200,
@@ -101,27 +101,27 @@ test.describe("settings and rss", () => {
 
     await authenticatedPage.goto("/settings");
 
-    const topMoviesSection = authenticatedPage
+    const moviesSection = authenticatedPage
       .locator("div")
       .filter({
-        has: authenticatedPage.getByRole("heading", { name: "Top movies" }),
+        has: authenticatedPage.getByRole("heading", { name: "Movies" }),
       })
       .first();
-    const showTopMoviesSwitch = topMoviesSection.getByRole("switch").first();
-    await expect(showTopMoviesSwitch).toHaveAttribute("aria-checked", "true");
+    const showMoviesSwitch = moviesSection.getByRole("switch").first();
+    await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "true");
 
-    await showTopMoviesSwitch.click();
+    await showMoviesSwitch.click();
 
     await expect.poll(() => saveCalls).toBeGreaterThan(0);
-    await expect.poll(() => savedShowTopMovies).toBe(false);
-    await expect(showTopMoviesSwitch).toHaveAttribute("aria-checked", "false");
+    await expect.poll(() => savedShowMovies).toBe(false);
+    await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "false");
   });
 
   test("folder picker loads via GetFolder and saves selected folder id", async ({
     authenticatedPage,
     mockRpc,
   }) => {
-    let settingsState = userSettings({ showTopMovies: true, downloadFolderId: 1n });
+    let settingsState = userSettings({ showMovies: true, downloadFolderId: 1n });
     let selectedFolderID = "1";
     let savedDownloadFolderID = "";
     const folderRequests: string[] = [];
@@ -201,7 +201,7 @@ test.describe("settings and rss", () => {
     authenticatedPage,
     mockRpc,
   }) => {
-    let settingsState = userSettings({ showTopMovies: true, downloadFolderId: 1n });
+    let settingsState = userSettings({ showMovies: true, downloadFolderId: 1n });
     let selectedFolderID = "1";
 
     const root = userFile({ id: 1n, name: "your files" });
@@ -360,7 +360,7 @@ test.describe("settings and rss", () => {
     authenticatedPage,
     mockRpc,
   }) => {
-    let settingsState = userSettings({ showTopMovies: true });
+    let settingsState = userSettings({ showMovies: true });
     let savedDisabledIds: string[] = [];
     let saveCalls = 0;
 
@@ -404,7 +404,7 @@ test.describe("settings and rss", () => {
 
   test("search settings toggles persist", async ({ authenticatedPage, mockRpc }) => {
     let settingsState = userSettings({
-      showTopMovies: true,
+      showMovies: true,
       filterNastyResults: true,
       filterResultsWithNoSeeders: false,
     });

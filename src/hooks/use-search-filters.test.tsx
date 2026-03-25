@@ -30,12 +30,13 @@ describe("useSearchFilters", () => {
       resolutionFilters: [ResolutionFilter.RESOLUTION_FILTER_2160P],
       searchResultDisplayBehavior: 2,
       searchResultTitleBehavior: 2,
-      showPrettyNamesForTopMovies: true,
-      showTopMovies: false,
+      showMovies: false,
+      showTvShows: true,
       sortBy: SortBy.TITLE,
       sortDirection: SortDirection.ASC,
-      topMoviesDisplayType: 1,
-      topMoviesSource: 1,
+      cardDisplayType: 1,
+      moviesSource: 1,
+      tvShowsSource: 1,
     });
 
     const html = renderToString(<SearchFiltersHarness settings={settings} />);

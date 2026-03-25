@@ -43,12 +43,13 @@ function isValidCachedSettings(value: unknown): value is UserSettings {
     isNumberArray(value.resolutionFilters) &&
     typeof value.searchResultDisplayBehavior === "number" &&
     typeof value.searchResultTitleBehavior === "number" &&
-    isBoolean(value.showPrettyNamesForTopMovies) &&
-    isBoolean(value.showTopMovies) &&
+    isBoolean(value.showMovies) &&
+    isBoolean(value.showTvShows) &&
     typeof value.sortBy === "number" &&
     typeof value.sortDirection === "number" &&
-    typeof value.topMoviesDisplayType === "number" &&
-    typeof value.topMoviesSource === "number"
+    typeof value.cardDisplayType === "number" &&
+    typeof value.moviesSource === "number" &&
+    typeof value.tvShowsSource === "number"
   );
 }
 
@@ -145,11 +146,11 @@ export function indexersQueryOptions(token: string) {
   });
 }
 
-export function topMoviesQueryOptions(token: string) {
+export function moviesQueryOptions(token: string) {
   const api = createApi(token);
   return queryOptions({
-    queryKey: ["top-movies"],
-    queryFn: ({ signal }) => api.getTopMovies(signal),
+    queryKey: ["movies"],
+    queryFn: ({ signal }) => api.getMovies(signal),
     staleTime: FIVE_MINUTES,
   });
 }

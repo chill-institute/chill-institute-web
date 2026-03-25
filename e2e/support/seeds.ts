@@ -2,51 +2,51 @@ import { create, toJson, type MessageInitShape } from "@bufbuild/protobuf";
 import {
   type UserIndexer,
   type SearchResult,
-  type TopMovie,
+  type Movie,
   type UserFile,
   GetDownloadFolderResponseSchema,
   GetFolderResponseSchema,
   UserSettingsSchema,
   UserGetIndexersResponseSchema,
-  UserGetTopMoviesResponseSchema,
+  GetMoviesResponseSchema,
   UserIndexerSchema,
   SearchResultSchema,
   SearchResponseSchema,
-  TopMovieSchema,
+  MovieSchema,
   UserFileSchema,
   SearchResultDisplayBehavior,
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  TopMoviesDisplayType,
-  TopMoviesSource,
+  CardDisplayType,
+  MoviesSource,
 } from "@chill-institute/contracts/chill/v4/api_pb";
 
 type ConfigInit = MessageInitShape<typeof UserSettingsSchema>;
 type IndexerInit = MessageInitShape<typeof UserIndexerSchema>;
 type ResultInit = MessageInitShape<typeof SearchResultSchema>;
-type TopMovieInit = MessageInitShape<typeof TopMovieSchema>;
+type MovieInit = MessageInitShape<typeof MovieSchema>;
 type UserFileInit = MessageInitShape<typeof UserFileSchema>;
 
-function topMoviesSourcePath(source: TopMoviesSource): string {
+function moviesSourcePath(source: MoviesSource): string {
   switch (source) {
-    case TopMoviesSource.IMDB_TOP_250:
+    case MoviesSource.IMDB_TOP_250:
       return "imdb/top-250";
-    case TopMoviesSource.YTS:
+    case MoviesSource.YTS:
       return "yts";
-    case TopMoviesSource.ROTTEN_TOMATOES:
+    case MoviesSource.ROTTEN_TOMATOES:
       return "rotten-tomatoes";
-    case TopMoviesSource.TRAKT:
+    case MoviesSource.TRAKT:
       return "trakt";
-    case TopMoviesSource.UNSPECIFIED:
-    case TopMoviesSource.IMDB_MOVIEMETER:
+    case MoviesSource.UNSPECIFIED:
+    case MoviesSource.IMDB_MOVIEMETER:
     default:
       return "imdb/moviemeter";
   }
 }
 
-function topMoviesRSSFeedURL(source: TopMoviesSource, authToken = "test-token"): string {
-  return `https://api.chill.institute/rss/top-movies/${topMoviesSourcePath(source)}?auth_token=${encodeURIComponent(authToken)}`;
+function moviesRSSFeedURL(source: MoviesSource, authToken = "test-token"): string {
+  return `https://api.chill.institute/rss/movies/${moviesSourcePath(source)}?auth_token=${encodeURIComponent(authToken)}`;
 }
 
 export function userSettings(init?: ConfigInit) {
@@ -57,8 +57,8 @@ export function userSettings(init?: ConfigInit) {
       searchResultTitleBehavior: SearchResultTitleBehavior.TEXT,
       sortBy: SortBy.SEEDERS,
       sortDirection: SortDirection.DESC,
-      topMoviesDisplayType: TopMoviesDisplayType.COMPACT,
-      topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+      cardDisplayType: CardDisplayType.COMPACT,
+      moviesSource: MoviesSource.IMDB_MOVIEMETER,
       filterNastyResults: true,
       ...init,
     }),
@@ -97,8 +97,8 @@ export function searchResponse(query: string, results: SearchResult[]) {
   return toJson(SearchResponseSchema, create(SearchResponseSchema, { query, results }));
 }
 
-export function topMovie(init?: TopMovieInit) {
-  return create(TopMovieSchema, {
+export function movie(init?: MovieInit) {
+  return create(MovieSchema, {
     id: "movie-1",
     title: "Inception",
     year: 2010,
@@ -107,21 +107,21 @@ export function topMovie(init?: TopMovieInit) {
     externalUrl: "https://imdb.com/title/tt1375666",
     link: "magnet:?xt=urn:btih:movie123",
     seeders: 500n,
-    source: TopMoviesSource.IMDB_MOVIEMETER,
+    source: MoviesSource.IMDB_MOVIEMETER,
     ...init,
   });
 }
 
-export function topMoviesResponse(movies: TopMovie[]) {
-  return topMoviesResponseForSource(TopMoviesSource.IMDB_MOVIEMETER, movies);
+export function moviesResponse(movies: Movie[]) {
+  return moviesResponseForSource(MoviesSource.IMDB_MOVIEMETER, movies);
 }
 
-export function topMoviesResponseForSource(source: TopMoviesSource, movies: TopMovie[]) {
+export function moviesResponseForSource(source: MoviesSource, movies: Movie[]) {
   return toJson(
-    UserGetTopMoviesResponseSchema,
-    create(UserGetTopMoviesResponseSchema, {
+    GetMoviesResponseSchema,
+    create(GetMoviesResponseSchema, {
       source,
-      rssFeedUrl: topMoviesRSSFeedURL(source),
+      rssFeedUrl: moviesRSSFeedURL(source),
       movies,
     }),
   );

@@ -4,7 +4,7 @@ import { indexer, indexersResponse, searchResponse, userSettings } from "./suppo
 test.describe("shell search form", () => {
   test("/ keyboard shortcut focuses search input", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
     });
 
     await authenticatedPage.goto("/");
@@ -27,7 +27,7 @@ test.describe("shell search form", () => {
     mockRpc,
   }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
     });
 
     await authenticatedPage.goto("/");
@@ -45,7 +45,7 @@ test.describe("shell search form", () => {
     mockRpc,
   }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
       GetIndexers: indexersResponse([indexer()]),
       Search: searchResponse("test query", []),
     });
@@ -65,7 +65,7 @@ test.describe("shell search form", () => {
 
   test("empty search is not submitted", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc({
-      GetUserSettings: userSettings({ showTopMovies: false }),
+      GetUserSettings: userSettings({ showMovies: false }),
     });
 
     await authenticatedPage.goto("/");

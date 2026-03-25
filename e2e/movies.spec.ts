@@ -1,14 +1,9 @@
 import { test, expect } from "./support/fixtures";
-import {
-  topMovie,
-  topMoviesResponse,
-  topMoviesResponseForSource,
-  userSettings,
-} from "./support/seeds";
-import { TopMoviesDisplayType, TopMoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
+import { movie, moviesResponse, moviesResponseForSource, userSettings } from "./support/seeds";
+import { CardDisplayType, MoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
 
 const movies = [
-  topMovie({
+  movie({
     id: "m1",
     title: "Inception",
     titlePretty: "Inception",
@@ -17,7 +12,7 @@ const movies = [
     link: "magnet:?xt=urn:btih:inception",
     posterUrl: "/test/baggio.jpg",
   }),
-  topMovie({
+  movie({
     id: "m2",
     title: "Interstellar",
     titlePretty: "Interstellar",
@@ -29,7 +24,7 @@ const movies = [
 ];
 
 const ytsMovies = [
-  topMovie({
+  movie({
     id: "y1",
     title: "The Raid",
     titlePretty: "The Raid",
@@ -37,23 +32,23 @@ const ytsMovies = [
     rating: 7.6,
     link: "magnet:?xt=urn:btih:raid",
     posterUrl: "/test/baggio.jpg",
-    source: TopMoviesSource.YTS,
+    source: MoviesSource.YTS,
   }),
 ];
 
 const homeMethods = (overrides?: Record<string, unknown>) => ({
-  GetUserSettings: userSettings({ showTopMovies: true }),
-  GetTopMovies: topMoviesResponse(movies),
+  GetUserSettings: userSettings({ showMovies: true }),
+  GetMovies: moviesResponse(movies),
   ...overrides,
 });
 
-test.describe("top movies", () => {
+test.describe("movies", () => {
   test("shows movies in compact view", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesDisplayType: TopMoviesDisplayType.COMPACT,
+          showMovies: true,
+          cardDisplayType: CardDisplayType.COMPACT,
         }),
       }),
     );
@@ -74,8 +69,8 @@ test.describe("top movies", () => {
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesDisplayType: TopMoviesDisplayType.EXPANDED,
+          showMovies: true,
+          cardDisplayType: CardDisplayType.EXPANDED,
         }),
       }),
     );
@@ -91,7 +86,7 @@ test.describe("top movies", () => {
   test("hidden when disabled", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
-        GetUserSettings: userSettings({ showTopMovies: false }),
+        GetUserSettings: userSettings({ showMovies: false }),
       }),
     );
 
@@ -103,7 +98,7 @@ test.describe("top movies", () => {
   test("empty state", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
-        GetTopMovies: topMoviesResponse([]),
+        GetMovies: moviesResponse([]),
       }),
     );
 
@@ -165,8 +160,8 @@ test.describe("top movies", () => {
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesDisplayType: TopMoviesDisplayType.COMPACT,
+          showMovies: true,
+          cardDisplayType: CardDisplayType.COMPACT,
         }),
       }),
     );
@@ -176,7 +171,7 @@ test.describe("top movies", () => {
         settings?: Record<string, unknown>;
       };
       if (body.settings) {
-        savedDisplayType = body.settings.topMoviesDisplayType;
+        savedDisplayType = body.settings.cardDisplayType;
       }
       await route.fulfill({
         status: 200,
@@ -195,29 +190,29 @@ test.describe("top movies", () => {
     await unpressedToggle.first().click();
 
     // Proto JSON serializes enums as strings
-    await expect.poll(() => savedDisplayType).toBe("TOP_MOVIES_DISPLAY_TYPE_EXPANDED");
+    await expect.poll(() => savedDisplayType).toBe("CARD_DISPLAY_TYPE_EXPANDED");
   });
 
   test("changing source does not re-show stale movies while waiting for the new source", async ({
     authenticatedPage,
     mockRpc,
   }) => {
-    let currentSource = TopMoviesSource.IMDB_MOVIEMETER;
+    let currentSource = MoviesSource.IMDB_MOVIEMETER;
 
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          showMovies: true,
+          moviesSource: MoviesSource.IMDB_MOVIEMETER,
         }),
       }),
     );
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
       const response =
-        currentSource === TopMoviesSource.YTS
-          ? topMoviesResponseForSource(TopMoviesSource.YTS, ytsMovies)
-          : topMoviesResponseForSource(TopMoviesSource.IMDB_MOVIEMETER, movies);
+        currentSource === MoviesSource.YTS
+          ? moviesResponseForSource(MoviesSource.YTS, ytsMovies)
+          : moviesResponseForSource(MoviesSource.IMDB_MOVIEMETER, movies);
 
       await route.fulfill({
         status: 200,
@@ -228,12 +223,12 @@ test.describe("top movies", () => {
 
     await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
       const body = route.request().postDataJSON() as {
-        settings?: { topMoviesSource?: string | number };
+        settings?: { moviesSource?: string | number };
       };
 
-      const nextSource = String(body.settings?.topMoviesSource ?? "");
-      if (nextSource.includes("YTS") || nextSource === String(TopMoviesSource.YTS)) {
-        currentSource = TopMoviesSource.YTS;
+      const nextSource = String(body.settings?.moviesSource ?? "");
+      if (nextSource.includes("YTS") || nextSource === String(MoviesSource.YTS)) {
+        currentSource = MoviesSource.YTS;
       }
 
       await route.fulfill({
@@ -241,8 +236,8 @@ test.describe("top movies", () => {
         contentType: "application/json",
         body: JSON.stringify(
           userSettings({
-            showTopMovies: true,
-            topMoviesSource: currentSource,
+            showMovies: true,
+            moviesSource: currentSource,
           }),
         ),
       });
@@ -263,7 +258,7 @@ test.describe("top movies", () => {
     authenticatedPage,
     mockRpc,
   }) => {
-    let currentSource = TopMoviesSource.IMDB_MOVIEMETER;
+    let currentSource = MoviesSource.IMDB_MOVIEMETER;
     let releaseYtsResponse: (() => void) | undefined;
     let resolveYtsRequestSeen: (() => void) | undefined;
     const ytsRequestSeen = new Promise<void>((resolve) => {
@@ -273,14 +268,14 @@ test.describe("top movies", () => {
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          showMovies: true,
+          moviesSource: MoviesSource.IMDB_MOVIEMETER,
         }),
       }),
     );
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
-      if (currentSource === TopMoviesSource.YTS) {
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
+      if (currentSource === MoviesSource.YTS) {
         resolveYtsRequestSeen?.();
         await new Promise<void>((resolve) => {
           releaseYtsResponse = resolve;
@@ -288,9 +283,9 @@ test.describe("top movies", () => {
       }
 
       const response =
-        currentSource === TopMoviesSource.YTS
-          ? topMoviesResponseForSource(TopMoviesSource.YTS, ytsMovies)
-          : topMoviesResponseForSource(TopMoviesSource.IMDB_MOVIEMETER, movies);
+        currentSource === MoviesSource.YTS
+          ? moviesResponseForSource(MoviesSource.YTS, ytsMovies)
+          : moviesResponseForSource(MoviesSource.IMDB_MOVIEMETER, movies);
 
       await route.fulfill({
         status: 200,
@@ -301,12 +296,12 @@ test.describe("top movies", () => {
 
     await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
       const body = route.request().postDataJSON() as {
-        settings?: { topMoviesSource?: string | number };
+        settings?: { moviesSource?: string | number };
       };
 
-      const nextSource = String(body.settings?.topMoviesSource ?? "");
-      if (nextSource.includes("YTS") || nextSource === String(TopMoviesSource.YTS)) {
-        currentSource = TopMoviesSource.YTS;
+      const nextSource = String(body.settings?.moviesSource ?? "");
+      if (nextSource.includes("YTS") || nextSource === String(MoviesSource.YTS)) {
+        currentSource = MoviesSource.YTS;
       }
 
       await route.fulfill({
@@ -314,8 +309,8 @@ test.describe("top movies", () => {
         contentType: "application/json",
         body: JSON.stringify(
           userSettings({
-            showTopMovies: true,
-            topMoviesSource: currentSource,
+            showMovies: true,
+            moviesSource: currentSource,
           }),
         ),
       });
@@ -340,29 +335,29 @@ test.describe("top movies", () => {
     await expect(rssButton).toBeEnabled();
   });
 
-  test("changing source only refetches top movies once after save", async ({
+  test("changing source only refetches movies once after save", async ({
     authenticatedPage,
     mockRpc,
   }) => {
-    let currentSource = TopMoviesSource.IMDB_MOVIEMETER;
-    let topMoviesRequests = 0;
+    let currentSource = MoviesSource.IMDB_MOVIEMETER;
+    let moviesRequests = 0;
 
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: true,
-          topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          showMovies: true,
+          moviesSource: MoviesSource.IMDB_MOVIEMETER,
         }),
       }),
     );
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
-      topMoviesRequests += 1;
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
+      moviesRequests += 1;
 
       const response =
-        currentSource === TopMoviesSource.YTS
-          ? topMoviesResponseForSource(TopMoviesSource.YTS, ytsMovies)
-          : topMoviesResponseForSource(TopMoviesSource.IMDB_MOVIEMETER, movies);
+        currentSource === MoviesSource.YTS
+          ? moviesResponseForSource(MoviesSource.YTS, ytsMovies)
+          : moviesResponseForSource(MoviesSource.IMDB_MOVIEMETER, movies);
 
       await route.fulfill({
         status: 200,
@@ -373,12 +368,12 @@ test.describe("top movies", () => {
 
     await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
       const body = route.request().postDataJSON() as {
-        settings?: { topMoviesSource?: string | number };
+        settings?: { moviesSource?: string | number };
       };
 
-      const nextSource = String(body.settings?.topMoviesSource ?? "");
-      if (nextSource.includes("YTS") || nextSource === String(TopMoviesSource.YTS)) {
-        currentSource = TopMoviesSource.YTS;
+      const nextSource = String(body.settings?.moviesSource ?? "");
+      if (nextSource.includes("YTS") || nextSource === String(MoviesSource.YTS)) {
+        currentSource = MoviesSource.YTS;
       }
 
       await route.fulfill({
@@ -386,8 +381,8 @@ test.describe("top movies", () => {
         contentType: "application/json",
         body: JSON.stringify(
           userSettings({
-            showTopMovies: true,
-            topMoviesSource: currentSource,
+            showMovies: true,
+            moviesSource: currentSource,
           }),
         ),
       });
@@ -395,16 +390,16 @@ test.describe("top movies", () => {
 
     await authenticatedPage.goto("/");
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
-    await expect.poll(() => topMoviesRequests).toBe(1);
+    await expect.poll(() => moviesRequests).toBe(1);
 
     await authenticatedPage.getByRole("combobox").click();
     await authenticatedPage.getByRole("option", { name: "Trending movies from YTS" }).click();
 
     await expect(authenticatedPage.getByText("The Raid")).toBeVisible({ timeout: 2000 });
-    await expect.poll(() => topMoviesRequests).toBe(2);
+    await expect.poll(() => moviesRequests).toBe(2);
   });
 
-  test("waits for real settings before fetching top movies from cached settings", async ({
+  test("waits for real settings before fetching movies from cached settings", async ({
     authenticatedPage,
   }) => {
     await authenticatedPage.addInitScript(
@@ -421,17 +416,18 @@ test.describe("top movies", () => {
         resolutionFilters: [],
         searchResultDisplayBehavior: 1,
         searchResultTitleBehavior: 2,
-        showPrettyNamesForTopMovies: true,
-        showTopMovies: true,
+        showMovies: true,
+        showTvShows: true,
         sortBy: 2,
         sortDirection: 2,
-        topMoviesDisplayType: 1,
-        topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+        cardDisplayType: 1,
+        moviesSource: MoviesSource.IMDB_MOVIEMETER,
+        tvShowsSource: 1,
       }),
     );
 
     let releaseSettingsResponse: (() => void) | undefined;
-    let topMoviesRequests = 0;
+    let moviesRequests = 0;
 
     await authenticatedPage.route("**/chill.v4.UserService/GetUserSettings", async (route) => {
       await new Promise<void>((resolve) => {
@@ -443,56 +439,56 @@ test.describe("top movies", () => {
         contentType: "application/json",
         body: JSON.stringify(
           userSettings({
-            showTopMovies: true,
-            topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+            showMovies: true,
+            moviesSource: MoviesSource.IMDB_MOVIEMETER,
           }),
         ),
       });
     });
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
-      topMoviesRequests += 1;
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
+      moviesRequests += 1;
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(topMoviesResponse(movies)),
+        body: JSON.stringify(moviesResponse(movies)),
       });
     });
 
     await authenticatedPage.goto("/");
 
-    await expect.poll(() => topMoviesRequests, { timeout: 300 }).toBe(0);
+    await expect.poll(() => moviesRequests, { timeout: 300 }).toBe(0);
 
     releaseSettingsResponse?.();
 
     await expect(authenticatedPage.getByText("Inception")).toBeVisible({ timeout: 2000 });
-    await expect.poll(() => topMoviesRequests).toBe(1);
+    await expect.poll(() => moviesRequests).toBe(1);
   });
 
-  test("enabling top movies hides the stale empty state while retrying", async ({
+  test("enabling movies hides the stale empty state while retrying", async ({
     authenticatedPage,
     mockRpc,
   }) => {
-    let showTopMoviesEnabled = false;
+    let showMoviesEnabled = false;
     let releaseSaveSettingsResponse: (() => void) | undefined;
     let resolveSaveRequestSeen: (() => void) | undefined;
     const saveRequestSeen = new Promise<void>((resolve) => {
       resolveSaveRequestSeen = resolve;
     });
-    let topMoviesRequests = 0;
+    let moviesRequests = 0;
 
     await mockRpc(
       homeMethods({
         GetUserSettings: userSettings({
-          showTopMovies: false,
-          topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+          showMovies: false,
+          moviesSource: MoviesSource.IMDB_MOVIEMETER,
         }),
       }),
     );
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
-      topMoviesRequests += 1;
-      const response = showTopMoviesEnabled ? topMoviesResponse(movies) : topMoviesResponse([]);
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
+      moviesRequests += 1;
+      const response = showMoviesEnabled ? moviesResponse(movies) : moviesResponse([]);
 
       await route.fulfill({
         status: 200,
@@ -503,14 +499,14 @@ test.describe("top movies", () => {
 
     await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
       const body = route.request().postDataJSON() as {
-        settings?: { showTopMovies?: boolean | string };
+        settings?: { showMovies?: boolean | string };
       };
       resolveSaveRequestSeen?.();
 
       await new Promise<void>((resolve) => {
         releaseSaveSettingsResponse = () => {
-          showTopMoviesEnabled =
-            body.settings?.showTopMovies === true || body.settings?.showTopMovies === "true";
+          showMoviesEnabled =
+            body.settings?.showMovies === true || body.settings?.showMovies === "true";
           resolve();
         };
       });
@@ -520,8 +516,8 @@ test.describe("top movies", () => {
         contentType: "application/json",
         body: JSON.stringify(
           userSettings({
-            showTopMovies: showTopMoviesEnabled,
-            topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+            showMovies: showMoviesEnabled,
+            moviesSource: MoviesSource.IMDB_MOVIEMETER,
           }),
         ),
       });
@@ -530,29 +526,27 @@ test.describe("top movies", () => {
     await authenticatedPage.goto("/");
 
     await authenticatedPage.getByRole("button", { name: "Show settings" }).click();
-    await authenticatedPage
-      .getByRole("switch", { name: "Show top movies in the home page" })
-      .click();
+    await authenticatedPage.getByRole("switch", { name: "Show movies in the home page" }).click();
 
     await expect(authenticatedPage.getByText("Couldn't fetch any movies")).toBeHidden();
-    await expect.poll(() => topMoviesRequests).toBe(1);
+    await expect.poll(() => moviesRequests).toBe(1);
     await saveRequestSeen;
 
     releaseSaveSettingsResponse?.();
 
-    await expect.poll(() => topMoviesRequests).toBe(2);
+    await expect.poll(() => moviesRequests).toBe(2);
     await expect(authenticatedPage.getByText("Inception")).toBeVisible({ timeout: 2000 });
   });
 
-  test("re-enabling top movies hides the stale error while retrying", async ({
+  test("re-enabling movies hides the stale error while retrying", async ({
     authenticatedPage,
     mockRpc,
   }) => {
     let settingsState = userSettings({
-      showTopMovies: true,
-      topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+      showMovies: true,
+      moviesSource: MoviesSource.IMDB_MOVIEMETER,
     });
-    let topMoviesRequests = 0;
+    let moviesRequests = 0;
     let releaseRetryResponse: (() => void) | undefined;
 
     await mockRpc(
@@ -569,10 +563,10 @@ test.describe("top movies", () => {
       });
     });
 
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
-      topMoviesRequests += 1;
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
+      moviesRequests += 1;
 
-      if (topMoviesRequests < 5) {
+      if (moviesRequests < 5) {
         await route.fulfill({
           status: 400,
           contentType: "application/json",
@@ -591,7 +585,7 @@ test.describe("top movies", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(topMoviesResponse(movies)),
+        body: JSON.stringify(moviesResponse(movies)),
       });
     });
 
@@ -617,7 +611,7 @@ test.describe("top movies", () => {
 
     await authenticatedPage.getByRole("button", { name: "Show settings" }).click();
     const toggle = authenticatedPage.getByRole("switch", {
-      name: "Show top movies in the home page",
+      name: "Show movies in the home page",
     });
 
     await toggle.click();
@@ -626,7 +620,7 @@ test.describe("top movies", () => {
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-checked", "true");
 
-    await expect.poll(() => topMoviesRequests).toBe(5);
+    await expect.poll(() => moviesRequests).toBe(5);
     await expect(authenticatedPage.getByText("indexer is down")).toBeHidden();
 
     releaseRetryResponse?.();
@@ -637,12 +631,12 @@ test.describe("top movies", () => {
   test("error state shows error message", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(
       homeMethods({
-        GetUserSettings: userSettings({ showTopMovies: true }),
+        GetUserSettings: userSettings({ showMovies: true }),
       }),
     );
 
-    // Override GetTopMovies to return an error
-    await authenticatedPage.route("**/chill.v4.UserService/GetTopMovies", async (route) => {
+    // Override GetMovies to return an error
+    await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
       await route.fulfill({
         status: 400,
         contentType: "application/json",

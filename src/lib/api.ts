@@ -16,14 +16,13 @@ import {
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  TopMoviesDisplayType,
-  TopMoviesSource,
+  CardDisplayType,
   defaultUserSettings,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
+  type GetMoviesResponse,
   type SearchResponse,
-  type UserGetTopMoviesResponse,
   type UserIndexer,
 } from "./types";
 
@@ -112,14 +111,14 @@ function withSettingsDefaults(settings: UserSettings): UserSettings {
       settings.sortDirection === SortDirection.UNSPECIFIED
         ? defaultUserSettings.sortDirection
         : settings.sortDirection,
-    topMoviesDisplayType:
-      settings.topMoviesDisplayType === TopMoviesDisplayType.UNSPECIFIED
-        ? defaultUserSettings.topMoviesDisplayType
-        : settings.topMoviesDisplayType,
-    topMoviesSource:
-      settings.topMoviesSource === TopMoviesSource.UNSPECIFIED
-        ? defaultUserSettings.topMoviesSource
-        : settings.topMoviesSource,
+    cardDisplayType:
+      settings.cardDisplayType === CardDisplayType.UNSPECIFIED
+        ? defaultUserSettings.cardDisplayType
+        : settings.cardDisplayType,
+    moviesSource:
+      settings.moviesSource === 0 ? defaultUserSettings.moviesSource : settings.moviesSource,
+    tvShowsSource:
+      settings.tvShowsSource === 0 ? defaultUserSettings.tvShowsSource : settings.tvShowsSource,
   };
 }
 
@@ -141,12 +140,9 @@ async function getUserProfile(authToken: string, signal?: AbortSignal): Promise<
   }
 }
 
-async function getTopMovies(
-  authToken: string,
-  signal?: AbortSignal,
-): Promise<UserGetTopMoviesResponse> {
+async function getMovies(authToken: string, signal?: AbortSignal): Promise<GetMoviesResponse> {
   try {
-    return await userClient.getTopMovies({}, { headers: authHeader(authToken), signal });
+    return await userClient.getMovies({}, { headers: authHeader(authToken), signal });
   } catch (error) {
     redirectToSignInOnAuthFailure(error);
     throw error;
@@ -252,7 +248,7 @@ async function getFolder(
 export function createApi(authToken: string) {
   return {
     getUserProfile: (signal?: AbortSignal) => getUserProfile(authToken, signal),
-    getTopMovies: (signal?: AbortSignal) => getTopMovies(authToken, signal),
+    getMovies: (signal?: AbortSignal) => getMovies(authToken, signal),
     search: (query: string, indexerId?: string, signal?: AbortSignal) =>
       search(authToken, query, indexerId, signal),
     getIndexers: (signal?: AbortSignal) => getIndexers(authToken, signal),

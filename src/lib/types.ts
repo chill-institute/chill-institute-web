@@ -6,16 +6,17 @@ import {
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  TopMoviesDisplayType,
-  TopMoviesSource,
+  CardDisplayType,
+  MoviesSource,
+  TVShowsSource,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
+  type GetMoviesResponse,
+  type Movie,
   type SearchResponse,
   type SearchResult,
-  type TopMovie,
   type UserSettings,
-  type UserGetTopMoviesResponse,
   type UserIndexer,
 } from "@chill-institute/contracts/chill/v4/api_pb";
 
@@ -27,43 +28,43 @@ export {
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  TopMoviesDisplayType,
-  TopMoviesSource,
+  CardDisplayType,
+  MoviesSource,
 };
 
 export type {
   AddTransferResponse,
   GetDownloadFolderResponse,
   GetFolderResponse,
+  GetMoviesResponse,
+  Movie,
   SearchResponse,
   SearchResult,
-  TopMovie,
   UserSettings,
-  UserGetTopMoviesResponse,
   UserIndexer,
 };
 
 type UserSettingsDefaults = Omit<UserSettings, "$typeName">;
 
-export const topMoviesSources = [
-  TopMoviesSource.IMDB_MOVIEMETER,
-  TopMoviesSource.IMDB_TOP_250,
-  TopMoviesSource.YTS,
-  TopMoviesSource.ROTTEN_TOMATOES,
-  TopMoviesSource.TRAKT,
+export const moviesSources = [
+  MoviesSource.IMDB_MOVIEMETER,
+  MoviesSource.IMDB_TOP_250,
+  MoviesSource.YTS,
+  MoviesSource.ROTTEN_TOMATOES,
+  MoviesSource.TRAKT,
 ] as const;
 
-export const topMoviesSourceLabels: Record<TopMoviesSource, string> = {
-  [TopMoviesSource.UNSPECIFIED]: "Trending movies from IMDb",
-  [TopMoviesSource.IMDB_MOVIEMETER]: "Trending movies from IMDb",
-  [TopMoviesSource.IMDB_TOP_250]: "Top 250 movies from IMDb",
-  [TopMoviesSource.YTS]: "Trending movies from YTS",
-  [TopMoviesSource.ROTTEN_TOMATOES]: "Trending movies from Rotten Tomatoes",
-  [TopMoviesSource.TRAKT]: "Trending movies from Trakt",
+export const moviesSourceLabels: Record<MoviesSource, string> = {
+  [MoviesSource.UNSPECIFIED]: "Trending movies from IMDb",
+  [MoviesSource.IMDB_MOVIEMETER]: "Trending movies from IMDb",
+  [MoviesSource.IMDB_TOP_250]: "Top 250 movies from IMDb",
+  [MoviesSource.YTS]: "Trending movies from YTS",
+  [MoviesSource.ROTTEN_TOMATOES]: "Trending movies from Rotten Tomatoes",
+  [MoviesSource.TRAKT]: "Trending movies from Trakt",
 };
 
-export function getTopMoviesSourceLabel(source: TopMoviesSource): string {
-  return topMoviesSourceLabels[source];
+export function getMoviesSourceLabel(source: MoviesSource): string {
+  return moviesSourceLabels[source];
 }
 
 export const resolutionFilters = [
@@ -143,10 +144,11 @@ export const defaultUserSettings: UserSettingsDefaults = {
   resolutionFilters: [],
   searchResultDisplayBehavior: SearchResultDisplayBehavior.FASTEST,
   searchResultTitleBehavior: SearchResultTitleBehavior.TEXT,
-  showPrettyNamesForTopMovies: true,
-  showTopMovies: false,
+  showMovies: true,
+  showTvShows: true,
   sortBy: SortBy.SEEDERS,
   sortDirection: SortDirection.DESC,
-  topMoviesDisplayType: TopMoviesDisplayType.COMPACT,
-  topMoviesSource: TopMoviesSource.IMDB_MOVIEMETER,
+  cardDisplayType: CardDisplayType.COMPACT,
+  moviesSource: MoviesSource.IMDB_MOVIEMETER,
+  tvShowsSource: TVShowsSource.TV_SHOWS_SOURCE_NETFLIX,
 };

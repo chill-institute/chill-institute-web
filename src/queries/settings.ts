@@ -6,7 +6,7 @@ import type { UserSettings } from "@/lib/types";
 import { readCachedSettings, writeCachedSettings } from "@/queries/options";
 
 const SAVE_DEBOUNCE_MS = 500;
-const TOP_MOVIES_REFRESH_PENDING_QUERY_KEY = ["top-movies-refresh-pending"] as const;
+const MOVIES_REFRESH_PENDING_QUERY_KEY = ["movies-refresh-pending"] as const;
 
 export function useSettingsQuery() {
   const api = useApi();
@@ -23,9 +23,9 @@ export function useSettingsQuery() {
   });
 }
 
-export function usePendingTopMoviesRefresh() {
+export function usePendingMoviesRefresh() {
   const query = useQuery({
-    queryKey: TOP_MOVIES_REFRESH_PENDING_QUERY_KEY,
+    queryKey: MOVIES_REFRESH_PENDING_QUERY_KEY,
     queryFn: async () => false,
     initialData: false,
     staleTime: Infinity,
@@ -49,10 +49,9 @@ export function useSaveSettings() {
       const prev = previousRef.current;
       if (
         prev &&
-        (prev.topMoviesSource !== variables.topMoviesSource ||
-          prev.showTopMovies !== variables.showTopMovies)
+        (prev.moviesSource !== variables.moviesSource || prev.showMovies !== variables.showMovies)
       ) {
-        void queryClient.resetQueries({ queryKey: ["top-movies"] });
+        void queryClient.resetQueries({ queryKey: ["movies"] });
       }
       if (prev && prev.downloadFolderId !== variables.downloadFolderId) {
         void queryClient.invalidateQueries({ queryKey: ["download-folder"] });
@@ -63,7 +62,7 @@ export function useSaveSettings() {
     },
     onSettled: () => {
       pendingRef.current = null;
-      queryClient.setQueryData(TOP_MOVIES_REFRESH_PENDING_QUERY_KEY, false);
+      queryClient.setQueryData(MOVIES_REFRESH_PENDING_QUERY_KEY, false);
     },
   });
 
@@ -85,11 +84,10 @@ export function useSaveSettings() {
       const current = queryClient.getQueryData<UserSettings>(["user-settings"]);
       if (current) {
         previousRef.current = current;
-        const topMoviesChanged =
-          current.topMoviesSource !== next.topMoviesSource ||
-          current.showTopMovies !== next.showTopMovies;
-        if (topMoviesChanged) {
-          queryClient.setQueryData(TOP_MOVIES_REFRESH_PENDING_QUERY_KEY, true);
+        const moviesChanged =
+          current.moviesSource !== next.moviesSource || current.showMovies !== next.showMovies;
+        if (moviesChanged) {
+          queryClient.setQueryData(MOVIES_REFRESH_PENDING_QUERY_KEY, true);
         }
       }
       queryClient.setQueryData(["user-settings"], next);

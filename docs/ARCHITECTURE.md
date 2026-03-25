@@ -22,7 +22,7 @@ graph LR
 | API layer     | Connect-Web transport, auth headers, request IDs, response mapping | `chill.institute` API                |
 | Query layer   | Cache and request lifecycle for route screens                      | API layer                            |
 | Auth layer    | Persist auth token and callback state in browser storage           | sign-in/sign-out/auth success routes |
-| UI components | Render search, settings, shell, and top-movies flows               | route state, query state             |
+| UI components | Render search, settings, shell, and movies flows                   | route state, query state             |
 
 ## Runtime Model
 
