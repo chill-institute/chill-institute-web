@@ -283,6 +283,7 @@ export function SettingsPanel() {
                 <Label htmlFor="show-movies">Show movies in the home page</Label>
                 <Switch
                   id="show-movies"
+                  aria-label="Show movies in the home page"
                   checked={effective.showMovies}
                   onCheckedChange={(checked) => persistPatch({ showMovies: checked === true })}
                 />
@@ -298,6 +299,7 @@ export function SettingsPanel() {
                 <Label htmlFor="filter-nasty">Try to filter out nasty stuff</Label>
                 <Switch
                   id="filter-nasty"
+                  aria-label="Try to filter out nasty stuff"
                   checked={effective.filterNastyResults}
                   onCheckedChange={(checked) =>
                     persistPatch({ filterNastyResults: checked === true })
@@ -310,6 +312,7 @@ export function SettingsPanel() {
                 <Label htmlFor="filter-no-seeders">Hide results with no seeders</Label>
                 <Switch
                   id="filter-no-seeders"
+                  aria-label="Hide results with no seeders"
                   checked={effective.filterResultsWithNoSeeders}
                   onCheckedChange={(checked) =>
                     persistPatch({ filterResultsWithNoSeeders: checked === true })
@@ -322,6 +325,7 @@ export function SettingsPanel() {
                 <Label htmlFor="remember-filters">Remember quick filters</Label>
                 <Switch
                   id="remember-filters"
+                  aria-label="Remember quick filters"
                   checked={effective.rememberQuickFilters}
                   onCheckedChange={(checked) => {
                     if (!checked) {

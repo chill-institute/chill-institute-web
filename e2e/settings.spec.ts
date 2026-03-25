@@ -101,13 +101,9 @@ test.describe("settings and rss", () => {
 
     await authenticatedPage.goto("/settings");
 
-    const moviesSection = authenticatedPage
-      .locator("div")
-      .filter({
-        has: authenticatedPage.getByRole("heading", { name: "Home page" }),
-      })
-      .first();
-    const showMoviesSwitch = moviesSection.getByRole("switch").first();
+    const showMoviesSwitch = authenticatedPage.getByRole("switch", {
+      name: "Show movies in the home page",
+    });
     await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "true");
 
     await showMoviesSwitch.click();
