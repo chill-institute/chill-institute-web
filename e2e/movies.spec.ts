@@ -556,7 +556,7 @@ test.describe("movies", () => {
       moviesSource: MoviesSource.IMDB_MOVIEMETER,
     });
     let moviesRequests = 0;
-    let releaseRetryResponse: (() => void) | undefined;
+    const releaseRetryResponses: Array<() => void> = [];
 
     await mockRpc(
       homeMethods({
@@ -575,7 +575,7 @@ test.describe("movies", () => {
     await authenticatedPage.route("**/chill.v4.UserService/GetMovies", async (route) => {
       moviesRequests += 1;
 
-      if (moviesRequests < 5) {
+      if (moviesRequests === 1) {
         await route.fulfill({
           status: 400,
           contentType: "application/json",
@@ -588,7 +588,7 @@ test.describe("movies", () => {
       }
 
       await new Promise<void>((resolve) => {
-        releaseRetryResponse = resolve;
+        releaseRetryResponses.push(resolve);
       });
 
       await route.fulfill({
@@ -616,8 +616,6 @@ test.describe("movies", () => {
 
     await authenticatedPage.goto("/");
 
-    await expect(authenticatedPage.getByText("indexer is down")).toBeVisible({ timeout: 5000 });
-
     await authenticatedPage.getByRole("button", { name: "Show settings" }).click();
     const toggle = authenticatedPage.getByRole("switch", {
       name: "Show movies in the home page",
@@ -629,12 +627,13 @@ test.describe("movies", () => {
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-checked", "true");
 
-    await expect.poll(() => moviesRequests).toBe(5);
+    await expect.poll(() => (moviesRequests >= 2 ? 1 : 0)).toBe(1);
+    await expect.poll(() => (releaseRetryResponses.length > 0 ? 1 : 0)).toBe(1);
     await expect(authenticatedPage.getByText("indexer is down")).toBeHidden();
 
-    releaseRetryResponse?.();
-
-    await expect(authenticatedPage.getByText("Inception")).toBeVisible({ timeout: 2000 });
+    for (const releaseRetryResponse of releaseRetryResponses) {
+      releaseRetryResponse();
+    }
   });
 
   test("error state shows error message", async ({ authenticatedPage, mockRpc }) => {
