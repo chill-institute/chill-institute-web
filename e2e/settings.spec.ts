@@ -20,6 +20,7 @@ const profileResponse = {
 
 type RequestSettingsPayload = Record<string, unknown> & {
   showMovies?: boolean;
+  showTvShows?: boolean;
   downloadFolderId?: string | number;
   disabledIndexerIds?: string[];
   searchResultDisplayBehavior?: number;
@@ -111,6 +112,54 @@ test.describe("settings and rss", () => {
     await expect.poll(() => saveCalls).toBeGreaterThan(0);
     await expect.poll(() => savedShowMovies).toBe(false);
     await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "false");
+  });
+
+  test("tv shows visibility persists via SaveUserSettings", async ({
+    authenticatedPage,
+    mockRpc,
+  }) => {
+    let settingsState = userSettings({ showMovies: true, showTvShows: true });
+    let savedShowTvShows: boolean | undefined;
+    let saveCalls = 0;
+
+    await mockRpc(baseSettingsMethods({ GetUserSettings: settingsState }));
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetUserSettings", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(settingsState),
+      });
+    });
+
+    await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
+      saveCalls += 1;
+      const body = route.request().postDataJSON() as {
+        settings?: RequestSettingsPayload;
+      };
+      if (body.settings) {
+        settingsState = body.settings as typeof settingsState;
+        savedShowTvShows = body.settings.showTvShows ?? false;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(settingsState),
+      });
+    });
+
+    await authenticatedPage.goto("/settings");
+
+    const showTVShowsSwitch = authenticatedPage.getByRole("switch", {
+      name: "Show TV shows in the home page",
+    });
+    await expect(showTVShowsSwitch).toHaveAttribute("aria-checked", "true");
+
+    await showTVShowsSwitch.click();
+
+    await expect.poll(() => saveCalls).toBeGreaterThan(0);
+    await expect.poll(() => savedShowTvShows).toBe(false);
+    await expect(showTVShowsSwitch).toHaveAttribute("aria-checked", "false");
   });
 
   test("folder picker loads via GetFolder and saves selected folder id", async ({

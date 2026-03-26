@@ -277,7 +277,7 @@ export function SettingsPanel() {
           </div>
 
           <div>
-            <SectionTitle>Movies</SectionTitle>
+            <SectionTitle>Home page</SectionTitle>
             <SectionBody>
               <div className="flex items-center justify-between space-x-1">
                 <Label htmlFor="show-movies">Show movies in the home page</Label>
@@ -286,6 +286,17 @@ export function SettingsPanel() {
                   aria-label="Show movies in the home page"
                   checked={effective.showMovies}
                   onCheckedChange={(checked) => persistPatch({ showMovies: checked === true })}
+                />
+              </div>
+            </SectionBody>
+            <SectionBody>
+              <div className="flex items-center justify-between space-x-1">
+                <Label htmlFor="show-tv-shows">Show TV shows in the home page</Label>
+                <Switch
+                  id="show-tv-shows"
+                  aria-label="Show TV shows in the home page"
+                  checked={effective.showTvShows}
+                  onCheckedChange={(checked) => persistPatch({ showTvShows: checked === true })}
                 />
               </div>
             </SectionBody>
