@@ -121,8 +121,3 @@ export function consumeCallbackToken(): string | null {
 
   return callbackPath ?? "/";
 }
-
-export function clearSession(): void {
-  window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-  window.sessionStorage.removeItem(AUTH_CALLBACK_STORAGE_KEY);
-}
