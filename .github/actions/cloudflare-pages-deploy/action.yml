@@ -44,7 +44,8 @@ runs:
       shell: bash
       run: |
         corepack enable
-        corepack prepare "$(node -p \"require('./package.json').packageManager\")" --activate
+        package_manager=$(node -p 'require("./package.json").packageManager')
+        corepack prepare "$package_manager" --activate
         pnpm --version
 
     - name: Deploy to Cloudflare Pages
