@@ -6,10 +6,9 @@ import { SearchInTheInstituteButton } from "@/components/search-in-the-institute
 import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
-import { ErrorAlert } from "@/components/ui/error-alert";
+import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/cn";
-import { toErrorMessage } from "@/lib/errors";
 import { formatBytes } from "@/lib/format";
 import { type TVShow } from "@/lib/types";
 import {
@@ -251,7 +250,7 @@ function TvShowDetailContent({
 
       <div className="px-6 pb-6">
         {detailQuery.status === "error" ? (
-          <ErrorAlert className="mt-5">{toErrorMessage(detailQuery.error)}</ErrorAlert>
+          <UserErrorAlert className="mt-5" error={detailQuery.error} />
         ) : null}
 
         {show?.overview ? (
@@ -343,7 +342,7 @@ function TvShowDetailContent({
           ) : null}
 
           {seasonQuery.status === "error" ? (
-            <ErrorAlert>{toErrorMessage(seasonQuery.error)}</ErrorAlert>
+            <UserErrorAlert error={seasonQuery.error} />
           ) : seasonQuery.isPending ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 6 }, (_, index) => (

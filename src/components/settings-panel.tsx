@@ -5,12 +5,11 @@ import { match } from "ts-pattern";
 
 import { useAuth } from "@/lib/auth";
 import { DownloadFolderPicker } from "@/components/download-folder-picker";
-import { ErrorAlert } from "@/components/ui/error-alert";
+import { UserErrorAlert } from "@/components/user-error-alert";
 import { CheckboxGroup } from "@/components/ui/checkbox-group";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { toErrorMessage } from "@/lib/errors";
 import { combineQueries } from "@/queries/combine";
 import { useSettingsQuery, useSaveSettings } from "@/queries/settings";
 import { useDownloadFolderQuery } from "@/queries/download-folder";
@@ -182,13 +181,13 @@ export function SettingsPanel() {
 
   return match(combined)
     .with({ status: "pending" }, () => <SettingsSkeleton />)
-    .with({ status: "error" }, (q) => <ErrorAlert>{toErrorMessage(q.error)}</ErrorAlert>)
+    .with({ status: "error" }, (q) => <UserErrorAlert error={q.error} />)
     .with({ status: "success" }, ({ data: [config] }) => {
       const effective = draft ?? config;
 
       const downloadFolderContent = match(downloadFolderQuery)
         .with({ status: "pending" }, () => <Skeleton className="h-10 w-full" />)
-        .with({ status: "error" }, (dq) => <ErrorAlert>{toErrorMessage(dq.error)}</ErrorAlert>)
+        .with({ status: "error" }, (dq) => <UserErrorAlert error={dq.error} />)
         .with({ status: "success" }, (dq) => {
           const hasMatchingFolder =
             effective.downloadFolderId === undefined ||
@@ -433,9 +432,7 @@ export function SettingsPanel() {
             </SectionBody>
           </div>
 
-          {saveMutation.error ? (
-            <ErrorAlert>{toErrorMessage(saveMutation.error)}</ErrorAlert>
-          ) : null}
+          {saveMutation.error ? <UserErrorAlert error={saveMutation.error} /> : null}
 
           <div className="dark:text-stone-400 text-stone-600 text-xs font-mono">
             release: {import.meta.env.VITE_PUBLIC_RELEASE ?? "dev"}

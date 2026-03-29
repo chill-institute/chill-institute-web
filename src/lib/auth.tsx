@@ -20,6 +20,14 @@ export function readStoredToken() {
   return token.length > 0 ? token : null;
 }
 
+export function storePendingCallbackURL(url: string) {
+  const normalized = normalizeCallbackPath(url);
+  if (!normalized) {
+    return;
+  }
+  window.sessionStorage.setItem(AUTH_CALLBACK_STORAGE_KEY, normalized);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authToken, setAuthTokenState] = useState<string | null>(() => readStoredToken());
 
@@ -36,11 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuthTokenState(trimmed);
       },
       setPendingCallbackURL: (url: string) => {
-        const trimmed = url.trim();
-        if (trimmed.length === 0) {
-          return;
-        }
-        window.sessionStorage.setItem(AUTH_CALLBACK_STORAGE_KEY, trimmed);
+        storePendingCallbackURL(url);
       },
       consumePendingCallbackURL: () => {
         const value = window.sessionStorage.getItem(AUTH_CALLBACK_STORAGE_KEY)?.trim() ?? "";

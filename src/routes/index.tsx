@@ -11,11 +11,10 @@ import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { SearchInTheInstituteButton } from "@/components/search-in-the-institute-button";
 import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
-import { ErrorAlert } from "@/components/ui/error-alert";
+import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { readCurrentCallbackPath, useAuth, readStoredToken } from "@/lib/auth";
-import { toErrorMessage } from "@/lib/errors";
 import { CardDisplayType, type Movie, type TVShow, type UserSettings } from "@/lib/types";
 import { moviesQueryOptions, settingsQueryOptions, tvShowsQueryOptions } from "@/queries/options";
 import { useMoviesQuery } from "@/queries/movies";
@@ -137,7 +136,7 @@ function HomePage() {
     ))
     .with({ status: "error" }, (query) => (
       <div className="mx-auto my-6 w-full max-w-5xl px-4 xl:px-0">
-        <ErrorAlert>{toErrorMessage(query.error)}</ErrorAlert>
+        <UserErrorAlert error={query.error} />
       </div>
     ))
     .with({ status: "success" }, (query) => {
@@ -204,7 +203,7 @@ function HomePage() {
             movies.isFetching ? (
               <MediaCardsSkeleton displayType={config.cardDisplayType} />
             ) : (
-              <ErrorAlert className="mt-2">{toErrorMessage(movies.error)}</ErrorAlert>
+              <UserErrorAlert className="mt-2" error={movies.error} />
             ),
           )
           .with({ status: "success" }, (movies) => {
@@ -255,7 +254,7 @@ function HomePage() {
             shows.isFetching ? (
               <MediaCardsSkeleton displayType={config.cardDisplayType} />
             ) : (
-              <ErrorAlert className="mt-2">{toErrorMessage(shows.error)}</ErrorAlert>
+              <UserErrorAlert className="mt-2" error={shows.error} />
             ),
           )
           .with({ status: "success" }, (shows) => {
@@ -350,7 +349,7 @@ function HomePage() {
           {currentTab === "movies" ? moviesContent : tvShowsContent}
 
           {saveConfigMutation.error ? (
-            <ErrorAlert className="mt-4">{toErrorMessage(saveConfigMutation.error)}</ErrorAlert>
+            <UserErrorAlert className="mt-4" error={saveConfigMutation.error} />
           ) : null}
 
           {currentTab === "tv" && selectedShowId ? (

@@ -3,12 +3,11 @@ import { Navigate, Link, createFileRoute, useRouterState } from "@tanstack/react
 import { match } from "ts-pattern";
 
 import { EmptyState } from "@/components/empty-state";
-import { ErrorAlert } from "@/components/ui/error-alert";
+import { UserErrorAlert } from "@/components/user-error-alert";
 import { SearchFilterBar } from "@/components/search-filter-bar";
 import { FilterBarLoading, SearchLoading } from "@/components/search-loading";
 import { SearchResults } from "@/components/search-results";
 import { useAuth, readStoredToken } from "@/lib/auth";
-import { toErrorMessage } from "@/lib/errors";
 import { formatSearchResults, normalizeQuery } from "@/lib/search";
 import { SearchResultDisplayBehavior, SortDirection, type UserSettings } from "@/lib/types";
 import { combineQueries } from "@/queries/combine";
@@ -131,7 +130,7 @@ function SearchPage() {
     )
     .with({ status: "error" }, (q) => (
       <div className="w-full max-w-5xl mx-auto mt-6 px-4 xl:px-0">
-        <ErrorAlert>{toErrorMessage(q.error)}</ErrorAlert>
+        <UserErrorAlert error={q.error} />
       </div>
     ))
     .with({ status: "success" }, ({ data: [config] }) => {
@@ -198,10 +197,10 @@ function SearchPage() {
           {renderContent}
 
           {searchState.firstError ? (
-            <ErrorAlert className="mt-4">{toErrorMessage(searchState.firstError)}</ErrorAlert>
+            <UserErrorAlert className="mt-4" error={searchState.firstError} />
           ) : null}
           {saveConfigMutation.error ? (
-            <ErrorAlert className="mt-4">{toErrorMessage(saveConfigMutation.error)}</ErrorAlert>
+            <UserErrorAlert className="mt-4" error={saveConfigMutation.error} />
           ) : null}
         </section>
       );

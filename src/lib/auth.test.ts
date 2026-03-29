@@ -1,10 +1,27 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import { normalizeCallbackPath, readAuthTokenFromLocation } from "./auth";
+import { normalizeCallbackPath, readAuthTokenFromLocation, storePendingCallbackURL } from "./auth";
+
+function createSessionStorage() {
+  const storage = new Map<string, string>();
+
+  return {
+    getItem(key: string) {
+      return storage.get(key) ?? null;
+    },
+    setItem(key: string, value: string) {
+      storage.set(key, value);
+    },
+    removeItem(key: string) {
+      storage.delete(key);
+    },
+  };
+}
 
 function withWindowLocation(url: string) {
   vi.stubGlobal("window", {
     location: new URL(url),
+    sessionStorage: createSessionStorage(),
   });
 }
 
@@ -31,6 +48,24 @@ describe("normalizeCallbackPath", () => {
     expect(normalizeCallbackPath("/sign-in")).toBeNull();
     expect(normalizeCallbackPath("/sign-out")).toBeNull();
     expect(normalizeCallbackPath("/auth/success")).toBeNull();
+  });
+});
+
+describe("storePendingCallbackURL", () => {
+  it("stores normalized same-origin callbacks", () => {
+    withWindowLocation("https://chill.institute/settings");
+
+    storePendingCallbackURL("/search?q=matrix#top");
+
+    expect(window.sessionStorage.getItem("chill.auth_callback")).toBe("/search?q=matrix#top");
+  });
+
+  it("does not store rejected callback paths", () => {
+    withWindowLocation("https://chill.institute/settings");
+
+    storePendingCallbackURL("/sign-in");
+
+    expect(window.sessionStorage.getItem("chill.auth_callback")).toBeNull();
   });
 });
 

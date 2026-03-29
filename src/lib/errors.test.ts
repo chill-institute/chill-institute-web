@@ -1,7 +1,13 @@
 import { ConnectError, Code } from "@connectrpc/connect";
 import { describe, expect, it } from "vite-plus/test";
 
-import { isBackendUnavailableError, isIgnorableAbortError, shouldRetryQueryError } from "./errors";
+import {
+  isBackendUnavailableError,
+  isIgnorableAbortError,
+  isPutioProviderUnavailableError,
+  shouldRetryQueryError,
+  toErrorMessage,
+} from "./errors";
 
 describe("isIgnorableAbortError", () => {
   it("treats connect cancellation as ignorable", () => {
@@ -17,6 +23,18 @@ describe("isIgnorableAbortError", () => {
   });
 });
 
+describe("isPutioProviderUnavailableError", () => {
+  it("detects put.io provider outages from connect errors", () => {
+    expect(
+      isPutioProviderUnavailableError(new ConnectError("putio provider unavailable", Code.Unknown)),
+    ).toBe(true);
+  });
+
+  it("ignores unrelated provider errors", () => {
+    expect(isPutioProviderUnavailableError(new Error("provider invalid payload"))).toBe(false);
+  });
+});
+
 describe("isBackendUnavailableError", () => {
   it("treats connect unavailable as backend downtime", () => {
     expect(isBackendUnavailableError(new ConnectError("unavailable", Code.Unavailable))).toBe(true);
@@ -26,8 +44,20 @@ describe("isBackendUnavailableError", () => {
     expect(isBackendUnavailableError(new Error("Failed to fetch"))).toBe(true);
   });
 
+  it("treats put.io provider outages as recoverable downtime", () => {
+    expect(isBackendUnavailableError(new Error("putio provider unavailable"))).toBe(true);
+  });
+
   it("does not classify normal provider payload errors as downtime", () => {
     expect(isBackendUnavailableError(new Error("provider invalid payload"))).toBe(false);
+  });
+});
+
+describe("toErrorMessage", () => {
+  it("prefers the put.io-specific recovery message", () => {
+    expect(toErrorMessage(new Error("putio provider unavailable"))).toBe(
+      "Could not connect to put.io. Please try again or sign in again.",
+    );
   });
 });
 

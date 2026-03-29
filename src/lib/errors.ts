@@ -1,5 +1,11 @@
 import { ConnectError, Code } from "@connectrpc/connect";
 
+function messageIncludesPutioProviderUnavailable(message: string) {
+  return (
+    message.includes("putio_provider_unavailable") || message.includes("putio provider unavailable")
+  );
+}
+
 function messageIncludesBackendFailure(message: string) {
   return (
     message.includes("provider unavailable") ||
@@ -35,7 +41,21 @@ export function isIgnorableAbortError(error: unknown) {
   return false;
 }
 
+export function isPutioProviderUnavailableError(error: unknown) {
+  if (error instanceof ConnectError) {
+    const message = `${error.rawMessage} ${error.message}`.toLowerCase();
+    return messageIncludesPutioProviderUnavailable(message);
+  }
+  if (error instanceof Error) {
+    return messageIncludesPutioProviderUnavailable(error.message.toLowerCase());
+  }
+  return false;
+}
+
 export function isBackendUnavailableError(error: unknown) {
+  if (isPutioProviderUnavailableError(error)) {
+    return true;
+  }
   if (error instanceof ConnectError) {
     if (error.code === Code.Unavailable || error.code === Code.DeadlineExceeded) {
       return true;
@@ -54,6 +74,9 @@ export function shouldRetryQueryError(failureCount: number, error: unknown) {
 }
 
 export function toErrorMessage(error: unknown) {
+  if (isPutioProviderUnavailableError(error)) {
+    return "Could not connect to put.io. Please try again or sign in again.";
+  }
   if (isBackendUnavailableError(error)) {
     return "Service temporarily unavailable. Please try again shortly.";
   }

@@ -378,6 +378,35 @@ test.describe("settings and rss", () => {
     ).toBeVisible({ timeout: 5000 });
   });
 
+  test("put.io provider errors show retry and sign-in actions", async ({
+    authenticatedPage,
+    mockRpc,
+  }) => {
+    await mockRpc(baseSettingsMethods());
+
+    await authenticatedPage.route("**/chill.v4.UserService/GetDownloadFolder", async (route) => {
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: "unavailable",
+          message: "putio provider unavailable",
+        }),
+      });
+    });
+
+    await authenticatedPage.goto("/settings");
+
+    const alert = authenticatedPage
+      .getByRole("alert")
+      .filter({ hasText: "Could not connect to put.io. Please try again." })
+      .last();
+
+    await expect(alert).toBeVisible({ timeout: 5000 });
+    await expect(alert.getByRole("button", { name: "retry" })).toBeVisible();
+    await expect(alert.getByRole("button", { name: "sign in again" })).toBeVisible();
+  });
+
   test("shows username from profile", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(baseSettingsMethods());
     await authenticatedPage.goto("/settings");
