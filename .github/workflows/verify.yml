@@ -38,6 +38,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
@@ -71,6 +77,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
 
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
