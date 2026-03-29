@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
@@ -15,10 +15,13 @@ function AuthSuccessPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const consumed = useRef(false);
 
   useEffect(() => {
+    if (consumed.current) return;
     const token = readAuthTokenFromLocation(window.location);
     if (token) {
+      consumed.current = true;
       auth.setAuthToken(token);
       window.history.replaceState(null, "", "/auth/success");
       const callbackURL = normalizeCallbackPath(auth.consumePendingCallbackURL());
