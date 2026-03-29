@@ -20,10 +20,28 @@ inputs:
     required: false
     default: web-8vr
 
+outputs:
+  command-output:
+    description: Wrangler command stdout
+    value: ${{ steps.deploy.outputs.command-output }}
+  deployment-url:
+    description: Cloudflare deployment URL
+    value: ${{ steps.deploy.outputs.deployment-url }}
+  pages-deployment-alias-url:
+    description: Cloudflare Pages alias URL
+    value: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+  pages-deployment-id:
+    description: Cloudflare Pages deployment ID
+    value: ${{ steps.deploy.outputs.pages-deployment-id }}
+  pages-environment:
+    description: Cloudflare Pages environment
+    value: ${{ steps.deploy.outputs.pages-environment }}
+
 runs:
   using: composite
   steps:
     - name: Deploy to Cloudflare Pages
+      id: deploy
       uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ inputs.api-token }}
