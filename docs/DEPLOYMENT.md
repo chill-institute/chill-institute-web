@@ -39,4 +39,11 @@ After a hosted web change, verify:
 - one real app load in the SPA
 - one real auth redirect start URL
 
+Repo helpers:
+
+- local smoke: `vp run smoke`
+- hosted smoke: `vp run smoke:hosted`
+
+Hosted smoke defaults to `https://chill.institute` and `https://api.chill.institute`. Override with `CHILL_WEB_BASE_URL` or `CHILL_API_BASE_URL` when checking a preview deployment.
+
 Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts).

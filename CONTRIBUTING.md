@@ -22,7 +22,14 @@ Run the full repo checks before opening or updating a pull request:
 
 ```bash
 vp run verify
+vp run smoke
 vp run e2e
+```
+
+For a real deployed-surface smoke against the hosted site:
+
+```bash
+vp run smoke:hosted
 ```
 
 ## Git Hooks
@@ -45,6 +52,7 @@ vp config --hooks-dir .vite-hooks
 - `localhost` and `*.web-8vr.pages.dev` use `https://api.chill.institute`.
 - `chill.institute` uses `https://api.chill.institute`.
 - `VITE_PUBLIC_API_BASE_URL` is only needed as an explicit local override.
+- Playwright keeps traces, screenshots, and videos on failure. Check `playwright-report/` and `test-results/` after a failing run.
 
 ## Pull Requests
 

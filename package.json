@@ -9,6 +9,8 @@
     "dev": "vp dev --host 0.0.0.0 --port 3000",
     "build": "vp build",
     "preview": "vp preview --host 0.0.0.0 --port 3000",
+    "smoke": "playwright test e2e/smoke.spec.ts",
+    "smoke:hosted": "node ./scripts/smoke-hosted.mjs",
     "knip": "vp exec knip",
     "test": "vp test src --run",
     "verify": "vp check && vp run test && vp run knip && vp build",

@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
 import { MoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
 import {
@@ -39,6 +40,10 @@ const baseSettingsMethods = (overrides?: Record<string, unknown>) => ({
   GetDownloadFolder: downloadFolderResponse(userFile({ id: 1n, name: "your files" })),
   ...overrides,
 });
+
+function settingsPage(page: Page) {
+  return page.locator('[data-page="settings"]');
+}
 
 test.describe("settings and rss", () => {
   test("rss popover includes auth_token in generated feed url", async ({
@@ -304,7 +309,7 @@ test.describe("settings and rss", () => {
     });
 
     await authenticatedPage.goto("/settings");
-    const visibleFolderName = authenticatedPage.getByText("your files").last();
+    const visibleFolderName = settingsPage(authenticatedPage).getByText("your files");
     await expect(visibleFolderName).toBeVisible();
 
     await authenticatedPage.getByRole("button", { name: "change" }).click();
@@ -312,7 +317,9 @@ test.describe("settings and rss", () => {
     await authenticatedPage.getByRole("button", { name: "download here" }).click();
 
     await expect(visibleFolderName).toBeHidden({ timeout: 400 });
-    await expect(authenticatedPage.getByText("Movies").last()).toBeVisible({ timeout: 2000 });
+    await expect(settingsPage(authenticatedPage).getByText("Movies")).toBeVisible({
+      timeout: 2000,
+    });
   });
 
   test("download folder picker reopens at the saved folder after closing without saving", async ({
@@ -371,10 +378,9 @@ test.describe("settings and rss", () => {
     await authenticatedPage.goto("/settings");
 
     await expect(
-      authenticatedPage
+      settingsPage(authenticatedPage)
         .getByRole("alert")
-        .filter({ hasText: "Service temporarily unavailable. Please try again shortly." })
-        .last(),
+        .filter({ hasText: "Service temporarily unavailable. Please try again shortly." }),
     ).toBeVisible({ timeout: 5000 });
   });
 
@@ -397,10 +403,9 @@ test.describe("settings and rss", () => {
 
     await authenticatedPage.goto("/settings");
 
-    const alert = authenticatedPage
+    const alert = settingsPage(authenticatedPage)
       .getByRole("alert")
-      .filter({ hasText: "Could not connect to put.io. Please try again." })
-      .last();
+      .filter({ hasText: "Could not connect to put.io. Please try again." });
 
     await expect(alert).toBeVisible({ timeout: 5000 });
     await expect(alert.getByRole("button", { name: "retry" })).toBeVisible();
@@ -411,16 +416,20 @@ test.describe("settings and rss", () => {
     await mockRpc(baseSettingsMethods());
     await authenticatedPage.goto("/settings");
 
-    await expect(authenticatedPage.getByText("putio-user").last()).toBeVisible({ timeout: 5000 });
+    await expect(settingsPage(authenticatedPage).getByText("putio-user")).toBeVisible({
+      timeout: 5000,
+    });
   });
 
   test("sign-out link navigates to sign-out page", async ({ authenticatedPage, mockRpc }) => {
     await mockRpc(baseSettingsMethods());
     await authenticatedPage.goto("/settings");
 
-    await expect(authenticatedPage.getByRole("heading", { name: "Signed in as" })).toBeVisible();
+    await expect(
+      settingsPage(authenticatedPage).getByRole("heading", { name: "Signed in as" }),
+    ).toBeVisible();
 
-    const signOutLink = authenticatedPage.getByRole("link", { name: "sign out" });
+    const signOutLink = settingsPage(authenticatedPage).getByRole("link", { name: "sign out" });
     await expect(signOutLink).toBeVisible();
     await signOutLink.click();
 
@@ -464,7 +473,7 @@ test.describe("settings and rss", () => {
 
     await authenticatedPage.goto("/settings");
 
-    const ytsLabel = authenticatedPage.locator("label").filter({ hasText: "YTS" }).last();
+    const ytsLabel = settingsPage(authenticatedPage).locator("label").filter({ hasText: "YTS" });
     await expect(ytsLabel).toBeVisible({ timeout: 5000 });
     await ytsLabel.click();
 
@@ -511,10 +520,9 @@ test.describe("settings and rss", () => {
 
     await authenticatedPage.goto("/settings");
 
-    const nastyRow = authenticatedPage
+    const nastyRow = settingsPage(authenticatedPage)
       .locator(".flex.items-center.justify-between")
-      .filter({ hasText: "Try to filter out nasty stuff" })
-      .last();
+      .filter({ hasText: "Try to filter out nasty stuff" });
     const nastySwitch = nastyRow.getByRole("switch");
     await expect(nastySwitch).toHaveAttribute("aria-checked", "true", { timeout: 5000 });
 
@@ -522,10 +530,9 @@ test.describe("settings and rss", () => {
     await expect.poll(() => saveCalls).toBeGreaterThan(0);
     await expect.poll(() => savedFilterNasty).not.toBe(true);
 
-    const noSeedersRow = authenticatedPage
+    const noSeedersRow = settingsPage(authenticatedPage)
       .locator(".flex.items-center.justify-between")
-      .filter({ hasText: "Hide results with no seeders" })
-      .last();
+      .filter({ hasText: "Hide results with no seeders" });
     const noSeedersSwitch = noSeedersRow.getByRole("switch");
     await expect(noSeedersSwitch).toHaveAttribute("aria-checked", "false");
 
@@ -539,9 +546,11 @@ test.describe("settings and rss", () => {
     await mockRpc(baseSettingsMethods());
     await authenticatedPage.goto("/settings");
 
-    await expect(authenticatedPage.getByText("putio-user").last()).toBeVisible({ timeout: 5000 });
+    await expect(settingsPage(authenticatedPage).getByText("putio-user")).toBeVisible({
+      timeout: 5000,
+    });
 
-    const firstSelect = authenticatedPage.locator("select").first();
+    const firstSelect = settingsPage(authenticatedPage).locator("select").first();
     await firstSelect.evaluate((el: HTMLSelectElement) => {
       el.value = "dark";
       el.dispatchEvent(new Event("change", { bubbles: true }));

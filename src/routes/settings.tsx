@@ -17,5 +17,9 @@ function SettingsPage() {
     );
   }
 
-  return <SettingsPanel />;
+  return (
+    <section data-page="settings">
+      <SettingsPanel />
+    </section>
+  );
 }
