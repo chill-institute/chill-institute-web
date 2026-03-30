@@ -127,6 +127,6 @@ jobs:
             echo
             echo "- Environment: \`production\`"
             echo "- Project: \`web\`"
-            echo "- URL: \`https://chill.institute\`"
+            echo "- URL: [https://chill.institute](https://chill.institute)"
             echo "- Flow: \`push Main workflow\`"
           } >> "${GITHUB_STEP_SUMMARY}"

@@ -112,5 +112,5 @@ jobs:
             echo
             echo "- Project: \`web\`"
             echo "- Branch: \`${PREVIEW_BRANCH}\`"
-            echo "- URL: \`${PREVIEW_URL}\`"
+            echo "- URL: [${PREVIEW_URL}](${PREVIEW_URL})"
           } >> "${GITHUB_STEP_SUMMARY}"
