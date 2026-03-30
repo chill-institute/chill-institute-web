@@ -94,13 +94,6 @@ jobs:
           name: web-dist
           path: dist
 
-      - name: Set up Vite+
-        uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version-file: ".node-version"
-          cache: true
-          run-install: false
-
       - name: Deploy preview to Cloudflare Pages
         id: deploy_preview
         uses: ./.github/actions/cloudflare-pages-deploy
