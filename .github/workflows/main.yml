@@ -111,6 +111,7 @@ jobs:
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: web
           branch: main
 
       - name: Install Playwright browser
@@ -125,7 +126,7 @@ jobs:
             echo "## Web deploy"
             echo
             echo "- Environment: \`production\`"
-            echo "- Project: \`web-8vr\`"
+            echo "- Project: \`web\`"
             echo "- URL: \`https://chill.institute\`"
             echo "- Flow: \`push Main workflow\`"
           } >> "${GITHUB_STEP_SUMMARY}"

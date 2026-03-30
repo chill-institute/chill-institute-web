@@ -54,7 +54,8 @@ GitHub Actions shape:
 
 GitHub-owned deploy configuration:
 
-- Cloudflare Pages project: `web-8vr`
+- Cloudflare Pages project: `web`
+- Cloudflare Pages default domain: `web-8vr.pages.dev`
 - required GitHub secret: `CLOUDFLARE_API_TOKEN`
 - required GitHub variable: `CLOUDFLARE_ACCOUNT_ID`
 

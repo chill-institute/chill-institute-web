@@ -100,6 +100,7 @@ jobs:
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: web
           branch: ${{ github.head_ref }}
 
       - name: Upsert preview comment
@@ -159,7 +160,7 @@ jobs:
           {
             echo "## Web preview deploy"
             echo
-            echo "- Project: \`web-8vr\`"
+            echo "- Project: \`web\`"
             echo "- Branch: \`${PREVIEW_BRANCH}\`"
             echo "- URL: \`${PREVIEW_URL}\`"
           } >> "${GITHUB_STEP_SUMMARY}"
