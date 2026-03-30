@@ -1,14 +1,15 @@
-name: Verify
+name: Main
 
 on:
-  pull_request:
-
-concurrency:
-  group: web-verify-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  push:
+    branches:
+      - main
 
 jobs:
   verify:
+    concurrency:
+      group: web-main-verify-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -37,7 +38,9 @@ jobs:
 
   e2e:
     needs: verify
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    concurrency:
+      group: web-main-e2e-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -76,12 +79,12 @@ jobs:
             test-results
           if-no-files-found: ignore
 
-  deploy-preview:
+  deploy:
     needs: [verify, e2e]
-    if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ needs.verify.result == 'success' && needs.e2e.result == 'success' }}
     concurrency:
-      group: web-preview-pr-${{ github.event.pull_request.number }}
-      cancel-in-progress: true
+      group: web-deploy-production
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -95,24 +98,32 @@ jobs:
           name: web-dist
           path: dist
 
-      - name: Deploy preview to Cloudflare Pages
-        id: deploy_preview
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          version: "0.1.14"
+          node-version-file: ".node-version"
+          cache: true
+          run-install: false
+
+      - name: Install dependencies
+        run: vp install
+
+      - name: Deploy production to Cloudflare Pages
         uses: ./.github/actions/cloudflare-pages-deploy
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           project-name: web
-          branch: ${{ github.head_ref }}
+          branch: main
 
       - name: Publish summary
-        env:
-          PREVIEW_URL: ${{ steps.deploy_preview.outputs.pages-deployment-alias-url || steps.deploy_preview.outputs.deployment-url }}
-          PREVIEW_BRANCH: ${{ github.head_ref }}
         run: |
           {
-            echo "## Web preview deploy"
+            echo "## Web deploy"
             echo
+            echo "- Environment: \`production\`"
             echo "- Project: \`web\`"
-            echo "- Branch: \`${PREVIEW_BRANCH}\`"
-            echo "- URL: [${PREVIEW_URL}](${PREVIEW_URL})"
+            echo "- URL: [https://chill.institute](https://chill.institute)"
+            echo "- Flow: \`push Main workflow\`"
           } >> "${GITHUB_STEP_SUMMARY}"

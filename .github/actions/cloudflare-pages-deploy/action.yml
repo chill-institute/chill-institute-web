@@ -1,0 +1,129 @@
+name: Cloudflare Pages Deploy
+description: Deploy a prepared static bundle to Cloudflare Pages with direct Wrangler CLI invocation
+
+inputs:
+  api-token:
+    description: Cloudflare API token with Pages deploy access
+    required: true
+  account-id:
+    description: Cloudflare account ID
+    required: true
+  branch:
+    description: Cloudflare Pages branch to deploy
+    required: true
+  dist-dir:
+    description: Static bundle directory
+    required: false
+    default: dist
+  project-name:
+    description: Cloudflare Pages project name
+    required: false
+    default: web
+
+outputs:
+  command-output:
+    description: Wrangler command stdout
+    value: ${{ steps.deploy.outputs.command-output }}
+  deployment-url:
+    description: Cloudflare deployment URL
+    value: ${{ steps.parse.outputs.deployment-url }}
+  pages-deployment-alias-url:
+    description: Cloudflare Pages alias URL
+    value: ${{ steps.parse.outputs.pages-deployment-alias-url }}
+  pages-deployment-id:
+    description: Cloudflare Pages deployment ID
+    value: ${{ steps.parse.outputs.pages-deployment-id }}
+  pages-environment:
+    description: Cloudflare Pages environment
+    value: ${{ steps.parse.outputs.pages-environment }}
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy to Cloudflare Pages
+      id: deploy
+      shell: bash
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ inputs.api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.account-id }}
+      run: |
+        set -euo pipefail
+
+        output_dir="$(mktemp -d)"
+        log_file="$output_dir/wrangler.log"
+
+        echo "output_dir=$output_dir" >> "$GITHUB_OUTPUT"
+        export WRANGLER_OUTPUT_FILE_DIRECTORY="$output_dir"
+
+        npx --yes wrangler@3.90.0 pages deploy "${{ inputs.dist-dir }}" \
+          --project-name "${{ inputs.project-name }}" \
+          --branch "${{ inputs.branch }}" 2>&1 | tee "$log_file"
+
+        {
+          echo 'command-output<<EOF'
+          cat "$log_file"
+          echo 'EOF'
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Parse deployment outputs
+      id: parse
+      shell: bash
+      env:
+        WRANGLER_OUTPUT_DIR: ${{ steps.deploy.outputs.output_dir }}
+      run: |
+        set -euo pipefail
+
+        python3 <<'PY'
+        import json
+        import os
+        import re
+        from pathlib import Path
+
+        output_dir = Path(os.environ["WRANGLER_OUTPUT_DIR"])
+        github_output = Path(os.environ["GITHUB_OUTPUT"])
+
+        deployment_url = ""
+        alias_url = ""
+        deployment_id = ""
+        environment = ""
+
+        for artifact in sorted(output_dir.glob("wrangler-output-*.json")):
+          for line in artifact.read_text().splitlines():
+            try:
+              entry = json.loads(line)
+            except json.JSONDecodeError:
+              continue
+
+            if entry.get("type") != "pages-deploy-detailed":
+              continue
+
+            deployment_url = entry.get("url") or deployment_url
+            alias_url = entry.get("alias") or alias_url
+            deployment_id = entry.get("deployment_id") or deployment_id
+            environment = entry.get("environment") or environment
+            break
+
+          if deployment_url or alias_url or deployment_id or environment:
+            break
+
+        log_file = output_dir / "wrangler.log"
+        if log_file.exists():
+          log = log_file.read_text()
+          if not deployment_url:
+            match = re.search(r"https?://[a-zA-Z0-9./_-]+", log)
+            if match:
+              deployment_url = match.group(0)
+          if not alias_url:
+            match = re.search(r"alias URL: (https?://[a-zA-Z0-9./_-]+)", log)
+            if match:
+              alias_url = match.group(1)
+
+        with github_output.open("a", encoding="utf-8") as handle:
+          for key, value in {
+            "deployment-url": deployment_url,
+            "pages-deployment-alias-url": alias_url,
+            "pages-deployment-id": deployment_id,
+            "pages-environment": environment,
+          }.items():
+            handle.write(f"{key}={value}\n")
+        PY

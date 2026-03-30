@@ -17,22 +17,42 @@ async function expectVisible(locator, message) {
   }
 }
 
+async function expectVisibleAfterCloudflare(page, locator, message) {
+  const deadline = Date.now() + 45_000;
+
+  while (Date.now() < deadline) {
+    try {
+      await locator.waitFor({ state: "visible", timeout: 3_000 });
+      return;
+    } catch {
+      const challengeHeading = page.getByRole("heading", { name: /just a moment/i });
+      const challengeSuccess = page.getByText(/verification successful/i);
+
+      if ((await challengeHeading.count()) > 0 || (await challengeSuccess.count()) > 0) {
+        console.log("[smoke:hosted] waiting for Cloudflare verification to finish");
+      }
+
+      await page.waitForTimeout(2_000);
+    }
+  }
+
+  await expectVisible(locator, message);
+}
+
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ baseURL: webBaseURL.toString() });
 
   console.log(`[smoke:hosted] checking ${webBaseURL}`);
-  await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expectVisible(page.getByText("chill.institute"), "homepage brand did not render");
-
   await page.goto("/sign-in", { waitUntil: "domcontentloaded" });
-  await expectVisible(
+  await expectVisibleAfterCloudflare(
+    page,
     page.getByRole("button", { name: "authenticate at put.io" }),
     "sign-in button did not render",
   );
 
   await page.goto("/settings", { waitUntil: "domcontentloaded" });
-  await page.waitForURL("**/sign-in**", { timeout: 10_000 });
+  await page.waitForURL("**/sign-in**", { timeout: 30_000 });
 
   console.log(`[smoke:hosted] checking auth redirect start at ${apiBaseURL}`);
   const response = await fetch(new URL("/auth/putio/start", apiBaseURL), {

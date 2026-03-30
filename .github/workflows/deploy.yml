@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to deploy
+        required: true
+        default: main
+        type: string
+
+concurrency:
+  group: web-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          version: "0.1.14"
+          node-version-file: ".node-version"
+          cache: true
+          run-install: false
+
+      - name: Install dependencies
+        run: vp install
+
+      - name: Build production bundle
+        run: vp build
+
+      - name: Deploy production to Cloudflare Pages
+        uses: ./.github/actions/cloudflare-pages-deploy
+        with:
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: web
+          branch: main
+
+      - name: Publish summary
+        run: |
+          {
+            echo "## Manual deploy"
+            echo
+            echo "- Ref: \`${{ inputs.ref }}\`"
+            echo "- Environment: \`production\`"
+            echo "- Project: \`web\`"
+            echo "- URL: [https://chill.institute](https://chill.institute)"
+          } >> "${GITHUB_STEP_SUMMARY}"

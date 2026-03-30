@@ -9,7 +9,6 @@
     "dev": "vp dev --host 0.0.0.0 --port 3000",
     "build": "vp build",
     "preview": "vp preview --host 0.0.0.0 --port 3000",
-    "smoke": "playwright test e2e/smoke.spec.ts",
     "smoke:hosted": "node ./scripts/smoke-hosted.mjs",
     "knip": "vp exec knip",
     "test": "vp test src --run",
@@ -52,14 +51,14 @@
     "@vitejs/plugin-react": "^6.0.1",
     "knip": "^6.1.0",
     "typescript": "^6.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vite-plus": "latest"
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
+    "vite-plus": "0.1.14"
   },
   "packageManager": "pnpm@10.15.1",
   "pnpm": {
     "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14"
     }
   }
 }

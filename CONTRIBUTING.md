@@ -22,9 +22,17 @@ Run the full repo checks before opening or updating a pull request:
 
 ```bash
 vp run verify
-vp run smoke
 vp run e2e
 ```
+
+CI shape:
+
+- pull requests run `Verify`
+- `Verify` runs `verify` and `e2e`
+- same-repo pull requests also publish a Cloudflare Pages preview deploy after checks pass
+- pushes to `main` run `Main`
+- `Main` runs the same checks, then deploys production through Wrangler
+- `Deploy` remains available as a manual production deploy fallback
 
 For a real deployed-surface smoke against the hosted site:
 
@@ -53,6 +61,8 @@ vp config --hooks-dir .vite-hooks
 - `chill.institute` uses `https://api.chill.institute`.
 - `VITE_PUBLIC_API_BASE_URL` is only needed as an explicit local override.
 - Playwright keeps traces, screenshots, and videos on failure. Check `playwright-report/` and `test-results/` after a failing run.
+- GitHub-owned Cloudflare deploys require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to be configured for the repo or inherited from the org.
+- Once the GitHub deploy workflow is in use, disable direct Cloudflare Pages Git integration so production deploys remain fully gated by `Main`.
 
 ## Pull Requests
 

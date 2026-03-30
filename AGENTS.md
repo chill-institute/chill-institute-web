@@ -12,7 +12,6 @@
 - `vp install`
 - `vp dev`
 - `vp run verify`
-- `vp run smoke`
 - `vp run smoke:hosted`
 - `vp check`
 - `vp run test`
