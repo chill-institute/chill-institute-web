@@ -21,7 +21,7 @@ describe("getPublicAPIBaseURL", () => {
   });
 
   it("uses production api for pages preview deployments", () => {
-    withWindowLocation("https://chore-preview-probe.web-8vr.pages.dev/");
+    withWindowLocation("https://chore-preview-probe.chill-institute.pages.dev/");
 
     expect(getPublicAPIBaseURL()).toBe("https://api.chill.institute");
   });
@@ -42,7 +42,7 @@ describe("getPublicAPIBaseURL", () => {
 describe("resolveHostedAPIBaseURL", () => {
   it("resolves localhost, previews, and app hosts to the production api", () => {
     expect(resolveHostedAPIBaseURL("localhost")).toBe("https://api.chill.institute");
-    expect(resolveHostedAPIBaseURL("chore-preview-probe.web-8vr.pages.dev")).toBe(
+    expect(resolveHostedAPIBaseURL("chore-preview-probe.chill-institute.pages.dev")).toBe(
       "https://api.chill.institute",
     );
     expect(resolveHostedAPIBaseURL("chill.institute")).toBe("https://api.chill.institute");

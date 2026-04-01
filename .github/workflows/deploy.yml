@@ -43,7 +43,7 @@ jobs:
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          project-name: web
+          project-name: chill-institute
           branch: main
 
       - name: Publish summary

@@ -1,10 +1,10 @@
 const PRODUCTION_APP_HOSTS = new Set(["chill.institute", "www.chill.institute"]);
 const PRODUCTION_API_BASE_URL = "https://api.chill.institute";
 
-const STAGING_APP_HOSTS = new Set(["binge.institute", "www.binge.institute"]);
-const STAGING_API_BASE_URL = "https://api.binge.institute";
-const PREVIEW_HOST = "web-8vr.pages.dev";
-const PREVIEW_HOST_SUFFIX = ".web-8vr.pages.dev";
+const STAGING_APP_HOSTS = new Set(["staging.chill.institute", "staging.binge.institute"]);
+const STAGING_API_BASE_URL = "https://staging-api.chill.institute";
+const PREVIEW_HOST = "chill-institute.pages.dev";
+const PREVIEW_HOST_SUFFIX = ".chill-institute.pages.dev";
 
 export function resolveHostedAPIBaseURL(hostname: string, currentOrigin?: string) {
   const host = hostname.trim().toLowerCase();
