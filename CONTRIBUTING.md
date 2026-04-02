@@ -10,10 +10,17 @@ Install [Vite+](https://viteplus.dev/guide/) and then install repo dependencies:
 vp install
 ```
 
-Start the app locally:
+Check the workspace is ready:
 
 ```bash
-vp dev
+vp run ready
+```
+
+Start the apps locally from the workspace root:
+
+```bash
+vp run dev:chill
+vp run dev:binge
 ```
 
 ## Validation
@@ -25,20 +32,20 @@ vp run verify
 vp run e2e
 ```
 
+App-specific checks are available when you only need one surface:
+
+```bash
+vp run e2e:chill
+vp run e2e:binge
+```
+
 CI shape:
 
 - pull requests run `Verify`
-- `Verify` runs `verify` and `e2e`
-- same-repo pull requests also publish a Cloudflare Pages preview deploy after checks pass
+- `Verify` runs workspace verification, both app e2e suites, and same-repo preview deploys for both Pages projects
 - pushes to `main` run `Main`
-- `Main` runs the same checks, then deploys production through Wrangler
+- `Main` runs the same checks, then deploys both production apps through Wrangler
 - `Deploy` remains available as a manual production deploy fallback
-
-For a real deployed-surface smoke against the hosted site:
-
-```bash
-vp run smoke:hosted
-```
 
 ## Git Hooks
 
@@ -55,12 +62,16 @@ vp config --hooks-dir .vite-hooks
 
 ## Development Notes
 
-- This is a client-rendered SPA.
-- The browser talks directly to the hosted API.
-- `localhost` and `*.web-8vr.pages.dev` use `https://api.chill.institute`.
-- `chill.institute` uses `https://api.chill.institute`.
+- This repo contains two client-rendered SPAs under `apps/chill/` and `apps/binge/`.
+- The workspace follows the Vite+ monorepo pattern with `apps/*`, `packages/*`, and `tools/*` package globs.
+- Shared package versions live in the workspace catalog in `pnpm-workspace.yaml`.
+- Prefer `vp` commands over calling `pnpm`, `vite`, or `playwright` directly.
+- Both apps talk directly to the hosted API.
+- `apps/chill/` serves `chill.institute`, `www.chill.institute`, `staging.chill.institute`, and `*.chill-institute.pages.dev`.
+- `apps/binge/` serves `binge.institute`, `www.binge.institute`, `staging.binge.institute`, and `*.binge-institute.pages.dev`.
+- Localhost in either app resolves to `https://api.chill.institute` unless `VITE_PUBLIC_API_BASE_URL` overrides it.
 - `VITE_PUBLIC_API_BASE_URL` is only needed as an explicit local override.
-- Playwright keeps traces, screenshots, and videos on failure. Check `playwright-report/` and `test-results/` after a failing run.
+- Playwright keeps traces, screenshots, and videos on failure. Check `apps/*/playwright-report/` and `apps/*/test-results/` after a failing run.
 - GitHub-owned Cloudflare deploys require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` to be configured for the repo or inherited from the org.
 - Once the GitHub deploy workflow is in use, disable direct Cloudflare Pages Git integration so production deploys remain fully gated by `Main`.
 

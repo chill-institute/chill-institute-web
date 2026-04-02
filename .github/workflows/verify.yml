@@ -28,11 +28,18 @@ jobs:
       - name: Run core verify checks
         run: vp run verify
 
-      - name: Upload build artifact
+      - name: Upload chill build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
+          if-no-files-found: error
+
+      - name: Upload binge build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: binge-dist
+          path: apps/binge/dist
           if-no-files-found: error
 
   e2e:
@@ -46,8 +53,14 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v8
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
+
+      - name: Download binge build artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: binge-dist
+          path: apps/binge/dist
 
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -72,8 +85,10 @@ jobs:
         with:
           name: playwright-artifacts-e2e
           path: |
-            playwright-report
-            test-results
+            apps/chill/playwright-report
+            apps/chill/test-results
+            apps/binge/playwright-report
+            apps/binge/test-results
           if-no-files-found: ignore
 
   deploy-preview:
@@ -89,30 +104,48 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Download build artifact
+      - name: Download chill build artifact
         uses: actions/download-artifact@v8
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
 
-      - name: Deploy preview to Cloudflare Pages
-        id: deploy_preview
+      - name: Download binge build artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: binge-dist
+          path: apps/binge/dist
+
+      - name: Deploy chill preview to Cloudflare Pages
+        id: deploy_chill_preview
         uses: ./.github/actions/cloudflare-pages-deploy
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           project-name: chill-institute
+          dist-dir: apps/chill/dist
+          branch: ${{ github.head_ref }}
+
+      - name: Deploy binge preview to Cloudflare Pages
+        id: deploy_binge_preview
+        uses: ./.github/actions/cloudflare-pages-deploy
+        with:
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: binge-institute
+          dist-dir: apps/binge/dist
           branch: ${{ github.head_ref }}
 
       - name: Publish summary
         env:
-          PREVIEW_URL: ${{ steps.deploy_preview.outputs.pages-deployment-alias-url || steps.deploy_preview.outputs.deployment-url }}
           PREVIEW_BRANCH: ${{ github.head_ref }}
+          CHILL_PREVIEW_URL: ${{ steps.deploy_chill_preview.outputs.pages-deployment-alias-url || steps.deploy_chill_preview.outputs.deployment-url }}
+          BINGE_PREVIEW_URL: ${{ steps.deploy_binge_preview.outputs.pages-deployment-alias-url || steps.deploy_binge_preview.outputs.deployment-url }}
         run: |
           {
             echo "## Web preview deploy"
             echo
-            echo "- Project: \`web\`"
             echo "- Branch: \`${PREVIEW_BRANCH}\`"
-            echo "- URL: [${PREVIEW_URL}](${PREVIEW_URL})"
+            echo "- Chill: [${CHILL_PREVIEW_URL}](${CHILL_PREVIEW_URL})"
+            echo "- Binge: [${BINGE_PREVIEW_URL}](${BINGE_PREVIEW_URL})"
           } >> "${GITHUB_STEP_SUMMARY}"

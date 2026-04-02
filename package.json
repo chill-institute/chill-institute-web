@@ -2,63 +2,32 @@
   "name": "@chill-institute/web",
   "private": true,
   "type": "module",
-  "imports": {
-    "#/*": "./src/*"
-  },
   "scripts": {
-    "dev": "vp dev --host 0.0.0.0 --port 3000",
-    "build": "vp build",
-    "preview": "vp preview --host 0.0.0.0 --port 3000",
-    "smoke:hosted": "node ./scripts/smoke-hosted.mjs",
-    "knip": "vp exec knip",
-    "test": "vp test src --run",
-    "verify": "vp check && vp run test && vp run knip && vp build",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui",
+    "ready": "vp fmt && vp lint && vp run -r test && vp run -r build",
+    "dev": "vp run chill#dev",
+    "dev:chill": "vp run chill#dev",
+    "dev:binge": "vp run binge#dev",
+    "build": "vp run -r build",
+    "preview:chill": "vp run chill#preview",
+    "preview:binge": "vp run binge#preview",
+    "test": "vp run -r test",
+    "check": "vp run -r check",
+    "e2e": "vp run chill#e2e && vp run binge#e2e",
+    "e2e:chill": "vp run chill#e2e",
+    "e2e:binge": "vp run binge#e2e",
     "format": "vp fmt --write",
     "format:check": "vp fmt --check",
     "lint": "vp lint",
-    "check": "vp check",
+    "knip": "vp exec knip",
+    "verify": "vp lint && vp run -r check && vp run -r test && vp run -r build",
     "prepare": "vp config"
   },
-  "dependencies": {
-    "@base-ui/react": "^1.2.0",
-    "@bufbuild/protobuf": "^2.11.0",
-    "@chill-institute/contracts": "^1.0.9",
-    "@connectrpc/connect": "^2.1.1",
-    "@connectrpc/connect-web": "^2.1.1",
-    "@tailwindcss/vite": "^4.2.2",
-    "@tanstack/react-query": "^5.96.0",
-    "@tanstack/react-query-devtools": "^5.96.0",
-    "@tanstack/react-router": "^1.168.10",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.7.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "sonner": "^2.0.7",
-    "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "ts-pattern": "^5.9.0",
-    "vaul": "^1.1.2"
-  },
   "devDependencies": {
-    "@playwright/test": "^1.59.0",
-    "@tanstack/router-plugin": "^1.167.12",
-    "@types/node": "^25.5.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "knip": "^6.1.1",
-    "typescript": "^6.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
-    "vite-plus": "0.1.15"
+    "knip": "catalog:",
+    "vite-plus": "catalog:"
   },
-  "packageManager": "pnpm@10.15.1",
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:@voidzero-dev/vite-plus-core@0.1.14",
-      "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.14"
-    }
-  }
+  "engines": {
+    "node": ">=24.14.0"
+  },
+  "packageManager": "pnpm@10.33.0"
 }

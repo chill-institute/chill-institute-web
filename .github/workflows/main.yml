@@ -29,11 +29,18 @@ jobs:
       - name: Run core verify checks
         run: vp run verify
 
-      - name: Upload build artifact
+      - name: Upload chill build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
+          if-no-files-found: error
+
+      - name: Upload binge build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: binge-dist
+          path: apps/binge/dist
           if-no-files-found: error
 
   e2e:
@@ -49,8 +56,14 @@ jobs:
       - name: Download build artifact
         uses: actions/download-artifact@v8
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
+
+      - name: Download binge build artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: binge-dist
+          path: apps/binge/dist
 
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -75,8 +88,10 @@ jobs:
         with:
           name: playwright-artifacts-e2e
           path: |
-            playwright-report
-            test-results
+            apps/chill/playwright-report
+            apps/chill/test-results
+            apps/binge/playwright-report
+            apps/binge/test-results
           if-no-files-found: ignore
 
   deploy:
@@ -92,29 +107,36 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Download build artifact
+      - name: Download chill build artifact
         uses: actions/download-artifact@v8
         with:
-          name: web-dist
-          path: dist
+          name: chill-dist
+          path: apps/chill/dist
 
-      - name: Set up Vite+
-        uses: voidzero-dev/setup-vp@v1
+      - name: Download binge build artifact
+        uses: actions/download-artifact@v8
         with:
-          version: "0.1.14"
-          node-version-file: ".node-version"
-          cache: true
-          run-install: false
+          name: binge-dist
+          path: apps/binge/dist
 
-      - name: Install dependencies
-        run: vp install
-
-      - name: Deploy production to Cloudflare Pages
+      - name: Deploy chill production to Cloudflare Pages
+        id: deploy_chill
         uses: ./.github/actions/cloudflare-pages-deploy
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           project-name: chill-institute
+          dist-dir: apps/chill/dist
+          branch: main
+
+      - name: Deploy binge production to Cloudflare Pages
+        id: deploy_binge
+        uses: ./.github/actions/cloudflare-pages-deploy
+        with:
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: binge-institute
+          dist-dir: apps/binge/dist
           branch: main
 
       - name: Publish summary
@@ -123,7 +145,7 @@ jobs:
             echo "## Web deploy"
             echo
             echo "- Environment: \`production\`"
-            echo "- Project: \`web\`"
-            echo "- URL: [https://chill.institute](https://chill.institute)"
+            echo "- Chill: [https://chill.institute](https://chill.institute)"
+            echo "- Binge: [https://binge.institute](https://binge.institute)"
             echo "- Flow: \`push Main workflow\`"
           } >> "${GITHUB_STEP_SUMMARY}"

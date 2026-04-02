@@ -11,17 +11,19 @@ Production shape:
 
 Build output:
 
-- static bundle in `dist/`
+- `apps/chill/dist/`
+- `apps/binge/dist/`
 
 ## Hostname Plan
 
-- web: `https://chill.institute`
+- chill app: `https://chill.institute`
+- binge app: `https://binge.institute`
 - API: `https://api.chill.institute`
 
 Hosted environments resolve the API like this:
 
-- `localhost` and `*.web-8vr.pages.dev` -> `https://api.chill.institute`
-- `chill.institute` -> `https://api.chill.institute`
+- `apps/chill`: `localhost`, `chill.institute`, `www.chill.institute`, `staging.chill.institute`, and `*.chill-institute.pages.dev` -> `https://api.chill.institute` or `https://staging-api.chill.institute` for staging
+- `apps/binge`: `localhost`, `binge.institute`, `www.binge.institute`, `staging.binge.institute`, and `*.binge-institute.pages.dev` -> `https://api.chill.institute` or `https://staging-api.chill.institute` for staging
 
 ## Public Endpoints
 
@@ -29,33 +31,31 @@ Authenticated app traffic should call `https://api.chill.institute` directly.
 
 Public RSS and download URLs should also use `https://api.chill.institute` directly.
 
-Keep `/auth/success` on the web host.
+Keep `/auth/success` on the app host.
 
 ## Verification
 
 After a hosted web change, verify:
 
 - `https://chill.institute/`
-- one real app load in the SPA
+- `https://binge.institute/`
+- one real app load in each SPA
 - one real auth redirect start URL
-
-Repo helpers:
-
-- hosted smoke: `vp run smoke:hosted`
 
 GitHub Actions shape:
 
 - pull requests run `Verify`
-- `Verify` runs `verify` and `e2e`
-- same-repo pull requests also publish a Cloudflare Pages preview deploy after checks pass
+- `Verify` runs workspace verification, both app e2e suites, and same-repo preview deploys for both Pages projects
 - pushes to `main` run `Main`
-- `Main` runs `verify` and `e2e`, then deploys production through Wrangler
+- `Main` runs `verify` and `e2e`, then deploys both production apps through Wrangler
 - `Deploy` remains available as a manual production deploy fallback
 
 GitHub-owned deploy configuration:
 
-- Cloudflare Pages project: `web`
-- Cloudflare Pages default domain: `web-8vr.pages.dev`
+- Cloudflare Pages project: `chill-institute`
+- Cloudflare Pages default domain: `chill-institute.pages.dev`
+- Cloudflare Pages project: `binge-institute`
+- Cloudflare Pages default domain: `binge-institute.pages.dev`
 - required GitHub secret: `CLOUDFLARE_API_TOKEN`
 - required GitHub variable: `CLOUDFLARE_ACCOUNT_ID`
 
@@ -63,6 +63,4 @@ Operator follow-up after enabling these workflows:
 
 - disable direct Cloudflare Pages Git integration for this repo so GitHub Actions is the only production deploy path
 
-Hosted smoke defaults to `https://chill.institute` and `https://api.chill.institute`. Run it manually with `vp run smoke:hosted`. Override with `CHILL_WEB_BASE_URL` or `CHILL_API_BASE_URL` when checking a preview deployment.
-
-Keep browser-side API resolution centralized in [src/lib/env.ts](../src/lib/env.ts).
+Keep browser-side API resolution app-local in `apps/*/src/lib/env.ts`

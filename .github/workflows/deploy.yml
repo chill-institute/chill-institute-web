@@ -36,14 +36,26 @@ jobs:
         run: vp install
 
       - name: Build production bundle
-        run: vp build
+        run: vp run build
 
-      - name: Deploy production to Cloudflare Pages
+      - name: Deploy chill production to Cloudflare Pages
+        id: deploy_chill
         uses: ./.github/actions/cloudflare-pages-deploy
         with:
           api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           project-name: chill-institute
+          dist-dir: apps/chill/dist
+          branch: main
+
+      - name: Deploy binge production to Cloudflare Pages
+        id: deploy_binge
+        uses: ./.github/actions/cloudflare-pages-deploy
+        with:
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          project-name: binge-institute
+          dist-dir: apps/binge/dist
           branch: main
 
       - name: Publish summary
@@ -53,6 +65,6 @@ jobs:
             echo
             echo "- Ref: \`${{ inputs.ref }}\`"
             echo "- Environment: \`production\`"
-            echo "- Project: \`web\`"
-            echo "- URL: [https://chill.institute](https://chill.institute)"
+            echo "- Chill: [https://chill.institute](https://chill.institute)"
+            echo "- Binge: [https://binge.institute](https://binge.institute)"
           } >> "${GITHUB_STEP_SUMMARY}"

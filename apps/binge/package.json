@@ -1,0 +1,48 @@
+{
+  "name": "binge",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vp dev --host 0.0.0.0 --port 3101",
+    "build": "vp build",
+    "preview": "vp preview --host 0.0.0.0 --port 3101",
+    "test": "vp test src --run",
+    "check": "vp check",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@base-ui/react": "catalog:",
+    "@bufbuild/protobuf": "catalog:",
+    "@chill-institute/contracts": "catalog:",
+    "@connectrpc/connect": "catalog:",
+    "@connectrpc/connect-web": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@tanstack/react-query-devtools": "catalog:",
+    "@tanstack/react-router": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "sonner": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwindcss": "catalog:",
+    "ts-pattern": "catalog:",
+    "vaul": "catalog:"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@tanstack/router-plugin": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

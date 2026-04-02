@@ -1,4 +1,4 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["e2e/**/*.ts", "src/**/*.test.ts", "src/**/*.test.tsx"]
+  "entry": ["apps/*/e2e/**/*.ts", "apps/*/src/**/*.test.ts", "apps/*/src/**/*.test.tsx"]
 }
