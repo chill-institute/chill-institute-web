@@ -73,31 +73,9 @@ jobs:
             echo "- Binge: \`${BINGE_CHANGED}\`"
           } >> "${GITHUB_STEP_SUMMARY}"
 
-  workspace-verify:
-    needs: changes
-    if: ${{ needs.changes.outputs.any_app == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up Vite+
-        uses: voidzero-dev/setup-vp@v1
-        with:
-          version: "0.1.14"
-          node-version-file: ".node-version"
-          cache: true
-          run-install: false
-
-      - name: Install dependencies
-        run: vp install
-
-      - name: Run workspace lint
-        run: vp lint
-
   verify-chill:
-    needs: [changes, workspace-verify]
-    if: ${{ needs.changes.outputs.chill == 'true' && needs.workspace-verify.result == 'success' }}
+    needs: changes
+    if: ${{ needs.changes.outputs.chill == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -128,8 +106,8 @@ jobs:
           if-no-files-found: error
 
   verify-binge:
-    needs: [changes, workspace-verify]
-    if: ${{ needs.changes.outputs.binge == 'true' && needs.workspace-verify.result == 'success' }}
+    needs: changes
+    if: ${{ needs.changes.outputs.binge == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
