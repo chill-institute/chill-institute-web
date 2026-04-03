@@ -13,7 +13,7 @@ export default defineConfig({
     ? [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]]
     : "list",
   use: {
-    baseURL: "http://localhost:3101",
+    baseURL: "http://localhost:4000",
     browserName: "chromium",
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
@@ -21,9 +21,9 @@ export default defineConfig({
   },
   webServer: {
     command: process.env.CI
-      ? "vp preview --host 0.0.0.0 --port 3101"
-      : "vp build && vp preview --host 0.0.0.0 --port 3101",
-    url: "http://localhost:3101",
+      ? "vp preview --host 0.0.0.0 --port 4000"
+      : "vp build && vp preview --host 0.0.0.0 --port 4000",
+    url: "http://localhost:4000",
     reuseExistingServer: process.env.PW_REUSE_SERVER === "1",
   },
 });

@@ -57,6 +57,14 @@ export type {
   UserIndexer,
 };
 
+export function normalizeBingeUserSettings(settings: UserSettings): UserSettings {
+  return {
+    ...settings,
+    showMovies: true,
+    showTvShows: true,
+  };
+}
+
 type UserSettingsDefaults = Omit<UserSettings, "$typeName">;
 
 export const moviesSources = [
@@ -204,7 +212,7 @@ export const defaultUserSettings: UserSettingsDefaults = {
   showTvShows: true,
   sortBy: SortBy.SEEDERS,
   sortDirection: SortDirection.DESC,
-  cardDisplayType: CardDisplayType.COMPACT,
+  cardDisplayType: CardDisplayType.EXPANDED,
   moviesSource: MoviesSource.IMDB_MOVIEMETER,
   tvShowsSource: TVShowsSource.TV_SHOWS_SOURCE_NETFLIX,
 };

@@ -6,6 +6,7 @@ import { ShellSettingsMenu } from "@/components/shell-settings-menu";
 export function AppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isHome = pathname === "/";
+  const isSettingsRoute = pathname === "/settings";
   const showAuthShell =
     pathname.startsWith("/auth/") || pathname === "/sign-in" || pathname === "/sign-out";
 
@@ -30,25 +31,9 @@ export function AppShell() {
       ) : (
         <>
           {isHome ? (
-            <>
-              <header className="flex flex-col items-center py-4 md:py-8 space-y-4">
-                <Link to="/">
-                  <h3 className="text-center text-4xl tracking-tight">
-                    Welcome to binge.institute
-                  </h3>
-                </Link>
-              </header>
-              <div className="relative overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 py-6 border-x-0 rounded-none">
-                <ResponsiveBox>
-                  <div className="flex justify-end">
-                    <ShellSettingsMenu />
-                  </div>
-                </ResponsiveBox>
-              </div>
-              <main>
-                <Outlet />
-              </main>
-            </>
+            <main>
+              <Outlet />
+            </main>
           ) : (
             <>
               <div className="w-full top-0 left-0">
@@ -60,9 +45,11 @@ export function AppShell() {
                           binge.institute
                         </h3>
                       </Link>
-                      <div className="flex shrink-0 justify-end">
-                        <ShellSettingsMenu />
-                      </div>
+                      {!isSettingsRoute ? (
+                        <div className="flex shrink-0 justify-end">
+                          <ShellSettingsMenu />
+                        </div>
+                      ) : null}
                     </div>
                   </ResponsiveBox>
                 </div>

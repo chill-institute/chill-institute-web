@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { createApi } from "@/lib/api";
-import type { UserSettings, UserIndexer } from "@/lib/types";
+import { normalizeBingeUserSettings, type UserSettings, type UserIndexer } from "@/lib/types";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -77,7 +77,7 @@ export function readCachedSettings(): UserSettings | undefined {
       console.warn("[chill] Ignoring cached settings with an unexpected shape");
       return undefined;
     }
-    return parsed;
+    return normalizeBingeUserSettings(parsed);
   } catch (error) {
     warnCacheFailure("Failed to read cached settings", error);
     return undefined;
@@ -86,9 +86,10 @@ export function readCachedSettings(): UserSettings | undefined {
 
 export function writeCachedSettings(settings: UserSettings) {
   try {
+    const normalizedSettings = normalizeBingeUserSettings(settings);
     localStorage.setItem(
       SETTINGS_STORAGE_KEY,
-      JSON.stringify(settings, (_, v) => (typeof v === "bigint" ? `${v}n` : v)),
+      JSON.stringify(normalizedSettings, (_, v) => (typeof v === "bigint" ? `${v}n` : v)),
     );
   } catch (error) {
     warnCacheFailure("Failed to write cached settings", error);

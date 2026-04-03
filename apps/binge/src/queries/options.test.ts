@@ -60,7 +60,13 @@ describe("cached settings", () => {
 
     writeCachedSettings(settings);
 
-    expect(readCachedSettings()).toEqual(settings);
+    expect(readCachedSettings()).toEqual(
+      create(UserSettingsSchema, {
+        ...settings,
+        showMovies: true,
+        showTvShows: true,
+      }),
+    );
   });
 
   it("ignores cached settings with an unexpected shape", () => {

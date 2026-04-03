@@ -1,20 +1,18 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Navigate, createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Film, Rss, Star, Tv } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Film, Star, Tv } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { TvShowDetailModal } from "@/components/tv-show-detail-modal";
 import { AddTransferButton } from "@/components/add-transfer-button";
-import { CardDisplayTypeToggle } from "@/components/card-display-type-toggle";
-import { MoviesRSSPopover, rssTriggerClassName } from "@/components/movies-rss-popover";
+import { ShellSettingsMenu } from "@/components/shell-settings-menu";
 import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
 import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { readCurrentCallbackPath, useAuth, readStoredToken } from "@/lib/auth";
-import { CardDisplayType, type Movie, type TVShow, type UserSettings } from "@/lib/types";
+import { type Movie, type TVShow, type UserSettings } from "@/lib/types";
 import { moviesQueryOptions, settingsQueryOptions, tvShowsQueryOptions } from "@/queries/options";
 import { useMoviesQuery } from "@/queries/movies";
 import {
@@ -33,13 +31,9 @@ export const Route = createFileRoute("/")({
     if (!token) return;
 
     const settingsPromise = queryClient.ensureQueryData(settingsQueryOptions(token));
-    void settingsPromise.then((settings) => {
-      if (settings.showMovies) {
-        void queryClient.ensureQueryData(moviesQueryOptions(token));
-      }
-      if (settings.showTvShows) {
-        void queryClient.ensureQueryData(tvShowsQueryOptions(token));
-      }
+    void settingsPromise.then(() => {
+      void queryClient.ensureQueryData(moviesQueryOptions(token));
+      void queryClient.ensureQueryData(tvShowsQueryOptions(token));
     });
   },
   component: HomePage,
@@ -54,47 +48,15 @@ function HomePage() {
   const pendingMoviesRefresh = usePendingMoviesRefresh();
   const pendingTVShowsRefresh = usePendingTVShowsRefresh();
 
-  const shouldFetchMovies =
-    configQuery.status === "success" &&
-    !configQuery.isFetching &&
-    configQuery.data.showMovies === true;
-  const shouldFetchTVShows =
-    configQuery.status === "success" &&
-    !configQuery.isFetching &&
-    configQuery.data.showTvShows === true;
+  const shouldFetchMovies = configQuery.status === "success" && !configQuery.isFetching;
+  const shouldFetchTVShows = configQuery.status === "success" && !configQuery.isFetching;
 
   const moviesQuery = useMoviesQuery(shouldFetchMovies);
   const tvShowsQuery = useTVShowsQuery(shouldFetchTVShows);
 
-  const config = configQuery.status === "success" ? configQuery.data : undefined;
-  const hasMovies = config?.showMovies === true;
-  const hasTVShows = config?.showTvShows === true;
   const [activeTab, setActiveTab] = useState<HomeTab>("movies");
   const [selectedShowId, setSelectedShowId] = useState<string>();
   const [selectedSeason, setSelectedSeason] = useState<number>();
-
-  useEffect(() => {
-    if (!config) {
-      return;
-    }
-
-    if (activeTab === "movies" && !config.showMovies && config.showTvShows) {
-      setActiveTab("tv");
-      return;
-    }
-
-    if (activeTab === "tv" && !config.showTvShows && config.showMovies) {
-      setActiveTab("movies");
-      setSelectedShowId(undefined);
-      setSelectedSeason(undefined);
-      return;
-    }
-
-    if (!config.showTvShows) {
-      setSelectedShowId(undefined);
-      setSelectedSeason(undefined);
-    }
-  }, [activeTab, config]);
 
   function patchConfig(patch: Partial<UserSettings>) {
     if (!configQuery.data) {
@@ -130,7 +92,7 @@ function HomePage() {
         <div className="mt-4">
           <Skeleton className="h-10 w-56 rounded-md" />
         </div>
-        <MediaCardsSkeleton displayType={CardDisplayType.COMPACT} />
+        <MediaCardsSkeleton />
       </div>
     ))
     .with({ status: "error" }, (query) => (
@@ -140,19 +102,9 @@ function HomePage() {
     ))
     .with({ status: "success" }, (query) => {
       const config = query.data;
+      const showTabs = true;
+      const currentTab: HomeTab = activeTab;
 
-      if (!hasMovies && !hasTVShows) {
-        return null;
-      }
-
-      const showTabs = hasMovies && hasTVShows;
-      const currentTab: HomeTab =
-        hasMovies && !hasTVShows ? "movies" : !hasMovies && hasTVShows ? "tv" : activeTab;
-
-      const currentMoviesResponse =
-        moviesQuery.status === "success" && moviesQuery.data.source === config.moviesSource
-          ? moviesQuery.data
-          : undefined;
       const currentTVShowsResponse =
         tvShowsQuery.status === "success" && tvShowsQuery.data.source === config.tvShowsSource
           ? tvShowsQuery.data
@@ -172,47 +124,27 @@ function HomePage() {
             onChange={(tvShowsSource) => patchConfig({ tvShowsSource })}
           />
         );
-      const headerControls = (
-        <div className="inline-flex items-center">
-          <CardDisplayTypeToggle
-            className="gap-0.5"
-            value={config.cardDisplayType}
-            onChange={(cardDisplayType) => patchConfig({ cardDisplayType })}
-          />
-          <div className="mx-1 h-6 w-px bg-stone-950/12 dark:bg-stone-100/10" />
-          {currentTab === "movies" ? (
-            <MoviesRSSPopover
-              source={config.moviesSource}
-              feedUrl={currentMoviesResponse?.rssFeedUrl}
-            />
-          ) : (
-            <DisabledTVRssButton />
-          )}
-        </div>
-      );
 
       const moviesContent = pendingMoviesRefresh ? (
-        <MediaCardsSkeleton displayType={config.cardDisplayType} />
+        <MediaCardsSkeleton />
       ) : (
         match(moviesQuery)
-          .with({ status: "pending" }, () => (
-            <MediaCardsSkeleton displayType={config.cardDisplayType} />
-          ))
+          .with({ status: "pending" }, () => <MediaCardsSkeleton />)
           .with({ status: "error" }, (movies) =>
             movies.isFetching ? (
-              <MediaCardsSkeleton displayType={config.cardDisplayType} />
+              <MediaCardsSkeleton />
             ) : (
               <UserErrorAlert className="mt-2" error={movies.error} />
             ),
           )
           .with({ status: "success" }, (movies) => {
             if (movies.data.source !== config.moviesSource) {
-              return <MediaCardsSkeleton displayType={config.cardDisplayType} />;
+              return <MediaCardsSkeleton />;
             }
 
             if (movies.data.movies.length === 0) {
               if (movies.isFetching) {
-                return <MediaCardsSkeleton displayType={config.cardDisplayType} />;
+                return <MediaCardsSkeleton />;
               }
 
               return (
@@ -222,48 +154,37 @@ function HomePage() {
               );
             }
 
-            return match(config.cardDisplayType)
-              .with(CardDisplayType.COMPACT, () => (
-                <div className="mt-2 grid gap-4 animate-reveal sm:grid-cols-2 md:grid-cols-3">
-                  {movies.data.movies.map((movie) => (
-                    <MovieCompactRow key={movie.id} movie={movie} />
-                  ))}
-                </div>
-              ))
-              .with(CardDisplayType.EXPANDED, () => (
-                <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
-                  {movies.data.movies.map((movie) => (
-                    <MovieExpandedCard key={movie.id} movie={movie} />
-                  ))}
-                </div>
-              ))
-              .otherwise(() => null);
+            return (
+              <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
+                {movies.data.movies.map((movie) => (
+                  <MovieExpandedCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            );
           })
           .exhaustive()
       );
 
       const tvShowsContent = pendingTVShowsRefresh ? (
-        <MediaCardsSkeleton displayType={config.cardDisplayType} />
+        <MediaCardsSkeleton />
       ) : (
         match(tvShowsQuery)
-          .with({ status: "pending" }, () => (
-            <MediaCardsSkeleton displayType={config.cardDisplayType} />
-          ))
+          .with({ status: "pending" }, () => <MediaCardsSkeleton />)
           .with({ status: "error" }, (shows) =>
             shows.isFetching ? (
-              <MediaCardsSkeleton displayType={config.cardDisplayType} />
+              <MediaCardsSkeleton />
             ) : (
               <UserErrorAlert className="mt-2" error={shows.error} />
             ),
           )
           .with({ status: "success" }, (shows) => {
             if (shows.data.source !== config.tvShowsSource) {
-              return <MediaCardsSkeleton displayType={config.cardDisplayType} />;
+              return <MediaCardsSkeleton />;
             }
 
             if (shows.data.shows.length === 0) {
               if (shows.isFetching) {
-                return <MediaCardsSkeleton displayType={config.cardDisplayType} />;
+                return <MediaCardsSkeleton />;
               }
 
               return (
@@ -273,36 +194,20 @@ function HomePage() {
               );
             }
 
-            return match(config.cardDisplayType)
-              .with(CardDisplayType.COMPACT, () => (
-                <div className="mt-2 grid gap-4 animate-reveal sm:grid-cols-2 md:grid-cols-3">
-                  {shows.data.shows.map((show) => (
-                    <TVShowCompactCard
-                      key={show.imdbId}
-                      show={show}
-                      onOpen={(nextShow) => {
-                        setSelectedShowId(nextShow.imdbId);
-                        setSelectedSeason(1);
-                      }}
-                    />
-                  ))}
-                </div>
-              ))
-              .with(CardDisplayType.EXPANDED, () => (
-                <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
-                  {shows.data.shows.map((show) => (
-                    <TVShowExpandedCard
-                      key={show.imdbId}
-                      show={show}
-                      onOpen={(nextShow) => {
-                        setSelectedShowId(nextShow.imdbId);
-                        setSelectedSeason(1);
-                      }}
-                    />
-                  ))}
-                </div>
-              ))
-              .otherwise(() => null);
+            return (
+              <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
+                {shows.data.shows.map((show) => (
+                  <TVShowExpandedCard
+                    key={show.imdbId}
+                    show={show}
+                    onOpen={(nextShow) => {
+                      setSelectedShowId(nextShow.imdbId);
+                      setSelectedSeason(1);
+                    }}
+                  />
+                ))}
+              </div>
+            );
           })
           .exhaustive()
       );
@@ -333,14 +238,18 @@ function HomePage() {
                       }}
                     />
                   </div>
-                  {headerControls}
+                  <div className="flex justify-end">
+                    <ShellSettingsMenu />
+                  </div>
                 </div>
                 <div className="flex justify-start">{sourceSelector}</div>
               </>
             ) : (
               <div className="flex flex-col gap-2 xs:flex-row xs:items-center xs:justify-between">
                 <div className="min-w-0 flex-1">{sourceSelector}</div>
-                <div className="self-end xs:self-auto">{headerControls}</div>
+                <div className="self-end xs:self-auto">
+                  <ShellSettingsMenu />
+                </div>
               </div>
             )}
           </div>
@@ -398,28 +307,6 @@ function HomeTabButton({
   );
 }
 
-function DisabledTVRssButton() {
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <button
-            type="button"
-            className={rssTriggerClassName}
-            disabled
-            aria-label="TV RSS disabled"
-          >
-            <Rss className="text-sm" />
-          </button>
-        }
-      />
-      <TooltipContent>
-        <p>{`TV show RSS feeds aren't available yet.`}</p>
-      </TooltipContent>
-    </Tooltip>
-  );
-}
-
 function LazyImage({ src, alt, className }: { src: string; alt: string; className: string }) {
   const [loaded, setLoaded] = useState(false);
 
@@ -436,61 +323,6 @@ function LazyImage({ src, alt, className }: { src: string; alt: string; classNam
       }`}
       onLoad={() => setLoaded(true)}
     />
-  );
-}
-
-function MovieCompactRow({ movie }: { movie: Movie }) {
-  return (
-    <article className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <div className="flex h-full flex-row items-center gap-3 p-3">
-        {movie.posterUrl ? (
-          <div className="overflow-hidden rounded">
-            <LazyImage
-              src={movie.posterUrl}
-              alt={movie.title}
-              className="h-[108px] w-[72px] object-cover"
-            />
-          </div>
-        ) : null}
-        <div className="flex h-full flex-1 flex-col justify-between">
-          <div className="mt-0.5 flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight" style={{ wordBreak: "break-word" }}>
-              {movie.title}
-            </h5>
-            <div className="flex flex-row items-center space-x-2">
-              <div className="flex flex-row items-center space-x-0.5">
-                <Star className="fill-amber-400 text-sm" strokeWidth={0} />
-                <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                <span className="text-sm">/</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">{movie.year}</div>
-              <div className="text-stone-600 dark:text-stone-400">
-                <span className="text-sm">/</span>
-              </div>
-              {movie.externalUrl ? (
-                <a
-                  href={movie.externalUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-                  title="Open IMDb page"
-                >
-                  <div className="flex flex-row items-center space-x-0.5">
-                    <span className="text-sm">IMDb</span>
-                    <ArrowUpRight className="text-xs" strokeWidth={1.25} />
-                  </div>
-                </a>
-              ) : null}
-            </div>
-          </div>
-          <div className="mb-0.5 flex flex-row gap-1">
-            <AddTransferButton url={movie.link}>send to put.io</AddTransferButton>
-          </div>
-        </div>
-      </div>
-    </article>
   );
 }
 
@@ -540,70 +372,6 @@ function MovieExpandedCard({ movie }: { movie: Movie }) {
             <AddTransferButton className="w-full" url={movie.link}>
               send to put.io
             </AddTransferButton>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function TVShowCompactCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVShow) => void }) {
-  return (
-    <article className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <div className="flex h-full flex-row items-center gap-3 p-3">
-        {show.posterUrl ? (
-          <div className="overflow-hidden rounded">
-            <LazyImage
-              src={show.posterUrl}
-              alt={show.title}
-              className="h-[108px] w-[72px] object-cover"
-            />
-          </div>
-        ) : null}
-        <div className="flex h-full flex-1 flex-col">
-          <div className="mt-0.5 flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight" style={{ wordBreak: "break-word" }}>
-              {show.title}
-            </h5>
-            <div className="flex flex-row items-center space-x-2">
-              <div className="flex flex-row items-center space-x-0.5">
-                <Star className="fill-amber-400 text-sm" strokeWidth={0} />
-                <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                <span className="text-sm">/</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">{show.year}</div>
-              {show.externalUrl ? (
-                <>
-                  <div className="text-stone-600 dark:text-stone-400">
-                    <span className="text-sm">/</span>
-                  </div>
-                  <a
-                    href={show.externalUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-0.5 text-stone-600 transition-colors hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100"
-                  >
-                    <span className="text-sm">IMDb</span>
-                    <ArrowUpRight className="text-xs" strokeWidth={1.25} />
-                  </a>
-                </>
-              ) : null}
-            </div>
-          </div>
-          <div className="mt-1.5">
-            <TVShowStatusBadge status={show.status} className="w-fit" />
-          </div>
-          <div className="mt-2">
-            <button
-              type="button"
-              onClick={() => onOpen(show)}
-              className="btn btn-secondary text-sm"
-            >
-              <span>details</span>
-              <ArrowRight className="text-xs" strokeWidth={1.5} />
-            </button>
           </div>
         </div>
       </div>
@@ -663,41 +431,19 @@ function TVShowExpandedCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVS
   );
 }
 
-function MediaCardsSkeleton({ displayType }: { displayType: CardDisplayType }) {
-  if (displayType === CardDisplayType.EXPANDED) {
-    return (
-      <div className="mt-2 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {Array.from({ length: 24 }, (_, index) => (
-          <div
-            key={`expanded-${index}`}
-            className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
-          >
-            <Skeleton className="aspect-2/3 w-full rounded-none" />
-            <div className="mx-4 my-3 flex flex-col space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="mt-2 h-7 w-full" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
+function MediaCardsSkeleton() {
   return (
-    <div className="mt-2 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+    <div className="mt-2 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
       {Array.from({ length: 24 }, (_, index) => (
         <div
-          key={`compact-${index}`}
-          className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
+          key={`expanded-${index}`}
+          className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
         >
-          <div className="flex flex-row items-center gap-3 p-3">
-            <Skeleton className="h-27 w-18 shrink-0" />
-            <div className="flex-1 flex-col space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="h-3 w-1/3" />
-            </div>
+          <Skeleton className="aspect-2/3 w-full rounded-none" />
+          <div className="mx-4 my-3 flex flex-col space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+            <Skeleton className="mt-2 h-7 w-full" />
           </div>
         </div>
       ))}

@@ -6,15 +6,13 @@ import { match } from "ts-pattern";
 import { useAuth } from "@/lib/auth";
 import { DownloadFolderPicker } from "@/components/download-folder-picker";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { useSettingsQuery, useSaveSettings } from "@/queries/settings";
 import { useDownloadFolderQuery } from "@/queries/download-folder";
 import { useProfileQuery } from "@/queries/profile";
 import { useTheme } from "@/hooks/use-theme";
 import { publicLinks } from "@/lib/public-links";
-import { defaultUserSettings, type UserSettings } from "@/lib/types";
+import { type UserSettings } from "@/lib/types";
 
 const LINKS = [
   { title: "About the Institute", url: publicLinks.about },
@@ -75,7 +73,7 @@ function SettingsSkeleton() {
       </div>
 
       <div>
-        <SectionTitle>Movies</SectionTitle>
+        <SectionTitle>Links</SectionTitle>
         <SectionBody>
           <Skeleton className="h-5 w-full" />
         </SectionBody>
@@ -105,14 +103,6 @@ export function SettingsPanel() {
     const base = draft ?? configQuery.data;
     if (!base) return;
     const next = { ...base, ...patch };
-    setDraft(next);
-    saveMutation.mutate(next);
-  };
-
-  const resetSettings = () => {
-    const base = draft ?? configQuery.data;
-    if (!base) return;
-    const next = { ...base, ...defaultUserSettings } as UserSettings;
     setDraft(next);
     saveMutation.mutate(next);
   };
@@ -178,13 +168,6 @@ export function SettingsPanel() {
                   <span>{profileQuery.data?.username ?? "put.io user"}</span>
                 </div>
                 <div className="flex flex-row space-x-2 items-center">
-                  <button
-                    type="button"
-                    className="ml-auto cursor-pointer text-sm dark:text-stone-400 dark:hover:text-stone-100 text-stone-600 hover:text-stone-950 hover:underline"
-                    onClick={resetSettings}
-                  >
-                    reset settings
-                  </button>
                   <Link
                     to="/sign-out"
                     search={{ error: undefined }}
@@ -216,33 +199,6 @@ export function SettingsPanel() {
           <div>
             <SectionTitle>Download folder</SectionTitle>
             <SectionBody>{downloadFolderContent}</SectionBody>
-          </div>
-
-          <div>
-            <SectionTitle>Home page</SectionTitle>
-            <SectionBody>
-              <div className="flex items-center justify-between space-x-1">
-                <Label htmlFor="show-movies">Show movies in the home page</Label>
-                <Switch
-                  id="show-movies"
-                  aria-label="Show movies in the home page"
-                  checked={effective.showMovies}
-                  onCheckedChange={(checked) => persistPatch({ showMovies: checked === true })}
-                />
-              </div>
-            </SectionBody>
-            <SectionBody>
-              <div className="flex items-center justify-between space-x-1">
-                <Label htmlFor="show-tv-shows">Show TV shows in the home page</Label>
-                <Switch
-                  id="show-tv-shows"
-                  aria-label="Show TV shows in the home page"
-                  checked={effective.showTvShows}
-                  onCheckedChange={(checked) => persistPatch({ showTvShows: checked === true })}
-                />
-              </div>
-            </SectionBody>
-            <div className="h-0.5" />
           </div>
 
           <div>

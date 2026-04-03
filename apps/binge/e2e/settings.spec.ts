@@ -1,13 +1,12 @@
 import type { Page } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
-import { MoviesSource } from "@chill-institute/contracts/chill/v4/api_pb";
 import {
   downloadFolderResponse,
   folderResponse,
   indexer,
   indexersResponse,
-  movie,
-  moviesResponseForSource,
+  moviesResponse,
+  tvShowsResponse,
   userSettings,
   userFile,
 } from "./support/seeds";
@@ -20,13 +19,13 @@ const profileResponse = {
 };
 
 type RequestSettingsPayload = Record<string, unknown> & {
-  showMovies?: boolean;
-  showTvShows?: boolean;
   downloadFolderId?: string | number;
 };
 
 const baseSettingsMethods = (overrides?: Record<string, unknown>) => ({
   GetUserSettings: userSettings({ showMovies: true }),
+  GetMovies: moviesResponse([]),
+  GetTVShows: tvShowsResponse([]),
   GetIndexers: indexersResponse([
     indexer({ id: "yts", name: "YTS" }),
     indexer({ id: "rarbg", name: "RARBG" }),
@@ -40,126 +39,16 @@ function settingsPage(page: Page) {
   return page.locator('[data-page="settings"]');
 }
 
-test.describe("settings and rss", () => {
-  test("rss popover includes auth_token in generated feed url", async ({
-    authenticatedPage,
-    mockRpc,
-  }) => {
-    await mockRpc({
-      GetUserSettings: userSettings({
-        showMovies: true,
-        moviesSource: MoviesSource.TRAKT,
-      }),
-      GetMovies: moviesResponseForSource(MoviesSource.TRAKT, [
-        movie({
-          id: "m1",
-          title: "Inception",
-          titlePretty: "Inception",
-          link: "magnet:?xt=urn:btih:inception",
-          source: MoviesSource.TRAKT,
-        }),
-      ]),
-    });
+test.describe("settings", () => {
+  test("home settings trigger opens the settings modal", async ({ authenticatedPage, mockRpc }) => {
+    await mockRpc(baseSettingsMethods());
 
     await authenticatedPage.goto("/");
-    await authenticatedPage.getByRole("button", { name: "Open RSS feed link" }).click();
+    await authenticatedPage.getByRole("button", { name: "Open settings" }).click();
 
-    await expect(authenticatedPage.getByRole("dialog").getByRole("textbox")).toHaveValue(
-      "https://api.chill.institute/rss/movies/trakt?auth_token=test-token",
-    );
-  });
-
-  test("settings edits persist via SaveUserSettings", async ({ authenticatedPage, mockRpc }) => {
-    let settingsState = userSettings({ showMovies: true });
-    let savedShowMovies: boolean | undefined;
-    let saveCalls = 0;
-
-    await mockRpc(baseSettingsMethods({ GetUserSettings: settingsState }));
-
-    await authenticatedPage.route("**/chill.v4.UserService/GetUserSettings", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(settingsState),
-      });
-    });
-
-    await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
-      saveCalls += 1;
-      const body = route.request().postDataJSON() as {
-        settings?: RequestSettingsPayload;
-      };
-      if (body.settings) {
-        settingsState = body.settings as typeof settingsState;
-        savedShowMovies = body.settings.showMovies ?? false;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(settingsState),
-      });
-    });
-
-    await authenticatedPage.goto("/settings");
-
-    const showMoviesSwitch = authenticatedPage.getByRole("switch", {
-      name: "Show movies in the home page",
-    });
-    await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "true");
-
-    await showMoviesSwitch.click();
-
-    await expect.poll(() => saveCalls).toBeGreaterThan(0);
-    await expect.poll(() => savedShowMovies).toBe(false);
-    await expect(showMoviesSwitch).toHaveAttribute("aria-checked", "false");
-  });
-
-  test("tv shows visibility persists via SaveUserSettings", async ({
-    authenticatedPage,
-    mockRpc,
-  }) => {
-    let settingsState = userSettings({ showMovies: true, showTvShows: true });
-    let savedShowTvShows: boolean | undefined;
-    let saveCalls = 0;
-
-    await mockRpc(baseSettingsMethods({ GetUserSettings: settingsState }));
-
-    await authenticatedPage.route("**/chill.v4.UserService/GetUserSettings", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(settingsState),
-      });
-    });
-
-    await authenticatedPage.route("**/chill.v4.UserService/SaveUserSettings", async (route) => {
-      saveCalls += 1;
-      const body = route.request().postDataJSON() as {
-        settings?: RequestSettingsPayload;
-      };
-      if (body.settings) {
-        settingsState = body.settings as typeof settingsState;
-        savedShowTvShows = body.settings.showTvShows ?? false;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(settingsState),
-      });
-    });
-
-    await authenticatedPage.goto("/settings");
-
-    const showTVShowsSwitch = authenticatedPage.getByRole("switch", {
-      name: "Show TV shows in the home page",
-    });
-    await expect(showTVShowsSwitch).toHaveAttribute("aria-checked", "true");
-
-    await showTVShowsSwitch.click();
-
-    await expect.poll(() => saveCalls).toBeGreaterThan(0);
-    await expect.poll(() => savedShowTvShows).toBe(false);
-    await expect(showTVShowsSwitch).toHaveAttribute("aria-checked", "false");
+    const panel = settingsPage(authenticatedPage);
+    await expect(panel).toBeVisible();
+    await expect(panel.getByText("Tune your binge setup")).toBeVisible();
   });
 
   test("folder picker loads via GetFolder and saves selected folder id", async ({

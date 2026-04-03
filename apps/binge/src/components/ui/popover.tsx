@@ -26,7 +26,7 @@ function PopoverContent({
       <PopoverPrimitive.Positioner side="bottom" align={align} sideOffset={sideOffset}>
         <PopoverPrimitive.Popup
           className={cn(
-            "ui-popup z-50 w-72 rounded-md border border-stone-950 bg-stone-100 p-4 text-stone-950 shadow-md outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50",
+            "ui-popup z-60 w-72 rounded-md border border-stone-950 bg-stone-100 p-4 text-stone-950 shadow-md outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50",
             className,
           )}
           {...props}

@@ -1,4 +1,4 @@
-import { CardDisplayType, TVShowsSource } from "@chill-institute/contracts/chill/v4/api_pb";
+import { TVShowsSource } from "@chill-institute/contracts/chill/v4/api_pb";
 
 import { expect, test } from "./support/fixtures";
 import {
@@ -62,7 +62,6 @@ const homeMethods = (overrides?: Record<string, unknown>) => ({
   GetUserSettings: userSettings({
     showMovies: true,
     showTvShows: true,
-    cardDisplayType: CardDisplayType.COMPACT,
     tvShowsSource: TVShowsSource.TV_SHOWS_SOURCE_NETFLIX,
   }),
   GetMovies: moviesResponse(movies),
@@ -71,7 +70,7 @@ const homeMethods = (overrides?: Record<string, unknown>) => ({
 });
 
 test.describe("tv shows home", () => {
-  test("does not show home tabs when only tv shows are enabled", async ({
+  test("always shows home tabs even for legacy tv-only settings", async ({
     authenticatedPage,
     mockRpc,
   }) => {
@@ -80,7 +79,6 @@ test.describe("tv shows home", () => {
         GetUserSettings: userSettings({
           showMovies: false,
           showTvShows: true,
-          cardDisplayType: CardDisplayType.COMPACT,
           tvShowsSource: TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX,
         }),
         GetTVShows: tvShowsResponseForSource(TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX, hboShows),
@@ -89,9 +87,9 @@ test.describe("tv shows home", () => {
 
     await authenticatedPage.goto("/");
 
-    await expect(authenticatedPage.getByRole("button", { name: "movies" })).toHaveCount(0);
-    await expect(authenticatedPage.getByRole("button", { name: "tv shows" })).toHaveCount(0);
-    await expect(authenticatedPage.getByText("The Pitt")).toBeVisible();
+    await expect(authenticatedPage.getByRole("button", { name: "movies" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("button", { name: "tv shows" })).toBeVisible();
+    await expect(authenticatedPage.getByText("Inception")).toBeVisible();
   });
 
   test("switching tabs swaps content", async ({ authenticatedPage, mockRpc }) => {

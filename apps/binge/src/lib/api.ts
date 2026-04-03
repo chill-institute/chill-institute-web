@@ -18,6 +18,7 @@ import {
   SortDirection,
   CardDisplayType,
   defaultUserSettings,
+  normalizeBingeUserSettings,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
@@ -124,7 +125,7 @@ async function runAPIRequest<T>(request: () => Promise<T>): Promise<T> {
 }
 
 function withSettingsDefaults(settings: UserSettings): UserSettings {
-  return {
+  return normalizeBingeUserSettings({
     ...settings,
     searchResultDisplayBehavior:
       settings.searchResultDisplayBehavior === SearchResultDisplayBehavior.UNSPECIFIED
@@ -147,7 +148,7 @@ function withSettingsDefaults(settings: UserSettings): UserSettings {
       settings.moviesSource === 0 ? defaultUserSettings.moviesSource : settings.moviesSource,
     tvShowsSource:
       settings.tvShowsSource === 0 ? defaultUserSettings.tvShowsSource : settings.tvShowsSource,
-  };
+  });
 }
 
 export function getPutioStartURL(successURL?: string) {
@@ -315,8 +316,12 @@ async function getUserSettings(authToken: string, signal?: AbortSignal): Promise
 
 async function saveUserSettings(authToken: string, settings: UserSettings): Promise<UserSettings> {
   try {
+    const normalizedSettings = withSettingsDefaults(settings);
     const response = await runAPIRequest(() =>
-      userClient.saveUserSettings({ settings }, { headers: authHeader(authToken) }),
+      userClient.saveUserSettings(
+        { settings: normalizedSettings },
+        { headers: authHeader(authToken) },
+      ),
     );
     return withSettingsDefaults(response);
   } catch (error) {

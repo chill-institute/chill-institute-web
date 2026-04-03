@@ -4,7 +4,7 @@ const AUTH_STORAGE_STATE = {
   cookies: [],
   origins: [
     {
-      origin: "http://localhost:3101",
+      origin: "http://localhost:4000",
       localStorage: [{ name: "chill.auth_token", value: "test-token" }],
     },
   ],

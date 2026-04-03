@@ -78,7 +78,7 @@ export function userSettings(init?: ConfigInit) {
       searchResultTitleBehavior: SearchResultTitleBehavior.TEXT,
       sortBy: SortBy.SEEDERS,
       sortDirection: SortDirection.DESC,
-      cardDisplayType: CardDisplayType.COMPACT,
+      cardDisplayType: CardDisplayType.EXPANDED,
       moviesSource: MoviesSource.IMDB_MOVIEMETER,
       filterNastyResults: true,
       ...init,

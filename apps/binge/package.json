@@ -6,9 +6,9 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vp dev --host 0.0.0.0 --port 3101",
+    "dev": "vp dev --host 0.0.0.0 --port 4000",
     "build": "vp build",
-    "preview": "vp preview --host 0.0.0.0 --port 3101",
+    "preview": "vp preview --host 0.0.0.0 --port 4000",
     "test": "vp test src --run",
     "check": "vp check",
     "e2e": "playwright test"

@@ -1,6 +1,6 @@
-import { Navigate, createFileRoute, useRouterState } from "@tanstack/react-router";
+import { Navigate, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 
-import { SettingsPanel } from "@/components/settings-panel";
+import { SettingsModal } from "@/components/settings-modal";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/settings")({
@@ -9,6 +9,7 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const callbackURL = useRouterState({ select: (state) => state.location.href });
 
   if (!auth.isAuthenticated) {
@@ -18,8 +19,13 @@ function SettingsPage() {
   }
 
   return (
-    <section data-page="settings">
-      <SettingsPanel />
-    </section>
+    <SettingsModal
+      open
+      onOpenChange={(open) => {
+        if (!open) {
+          void navigate({ to: "/" });
+        }
+      }}
+    />
   );
 }

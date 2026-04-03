@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useApi } from "@/lib/api";
-import type { UserSettings } from "@/lib/types";
+import { normalizeBingeUserSettings, type UserSettings } from "@/lib/types";
 import { readCachedSettings, writeCachedSettings } from "@/queries/options";
 
 const SAVE_DEBOUNCE_MS = 500;
@@ -60,17 +60,10 @@ export function useSaveSettings() {
     mutationFn: (next: UserSettings) => api.saveUserSettings(next),
     onSuccess: (_data, variables) => {
       const prev = previousRef.current;
-      if (
-        prev &&
-        (prev.moviesSource !== variables.moviesSource || prev.showMovies !== variables.showMovies)
-      ) {
+      if (prev && prev.moviesSource !== variables.moviesSource) {
         void queryClient.resetQueries({ queryKey: ["movies"] });
       }
-      if (
-        prev &&
-        (prev.tvShowsSource !== variables.tvShowsSource ||
-          prev.showTvShows !== variables.showTvShows)
-      ) {
+      if (prev && prev.tvShowsSource !== variables.tvShowsSource) {
         void queryClient.resetQueries({ queryKey: ["tv-shows"] });
       }
       if (prev && prev.downloadFolderId !== variables.downloadFolderId) {
@@ -102,25 +95,22 @@ export function useSaveSettings() {
   return {
     ...mutation,
     mutate: (next: UserSettings) => {
+      const normalizedNext = normalizeBingeUserSettings(next);
       const current = queryClient.getQueryData<UserSettings>(["user-settings"]);
       if (current) {
         previousRef.current = current;
-        const moviesChanged =
-          current.moviesSource !== next.moviesSource || current.showMovies !== next.showMovies;
-        if (moviesChanged) {
+        if (current.moviesSource !== normalizedNext.moviesSource) {
           queryClient.setQueryData(MOVIES_REFRESH_PENDING_QUERY_KEY, true);
         }
-        const tvShowsChanged =
-          current.tvShowsSource !== next.tvShowsSource || current.showTvShows !== next.showTvShows;
-        if (tvShowsChanged) {
+        if (current.tvShowsSource !== normalizedNext.tvShowsSource) {
           queryClient.setQueryData(TV_SHOWS_REFRESH_PENDING_QUERY_KEY, true);
         }
       }
-      queryClient.setQueryData(["user-settings"], next);
-      writeCachedSettings(next);
-      pendingRef.current = next;
+      queryClient.setQueryData(["user-settings"], normalizedNext);
+      writeCachedSettings(normalizedNext);
+      pendingRef.current = normalizedNext;
       clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => mutation.mutate(next), SAVE_DEBOUNCE_MS);
+      debounceRef.current = setTimeout(() => mutation.mutate(normalizedNext), SAVE_DEBOUNCE_MS);
     },
   };
 }
