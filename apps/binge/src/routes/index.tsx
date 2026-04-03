@@ -5,9 +5,7 @@ import { match } from "ts-pattern";
 
 import { TvShowDetailModal } from "@/components/tv-show-detail-modal";
 import { AddTransferButton } from "@/components/add-transfer-button";
-import { ShellSettingsMenu } from "@/components/shell-settings-menu";
 import { MoviesSourceSelect } from "@/components/movies-source-select";
-import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
 import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -213,7 +211,10 @@ function HomePage() {
       );
 
       return (
-        <div data-page="home" className="mx-auto my-6 w-full max-w-5xl px-4 md:my-12 xl:px-0">
+        <div
+          data-page="home"
+          className="mx-auto mb-6 w-full max-w-5xl px-4 pt-4 md:mb-12 md:pt-6 xl:px-0"
+        >
           <div className="flex flex-col gap-2.5">
             {showTabs ? (
               <>
@@ -238,19 +239,11 @@ function HomePage() {
                       }}
                     />
                   </div>
-                  <div className="flex justify-end">
-                    <ShellSettingsMenu />
-                  </div>
                 </div>
                 <div className="flex justify-start">{sourceSelector}</div>
               </>
             ) : (
-              <div className="flex flex-col gap-2 xs:flex-row xs:items-center xs:justify-between">
-                <div className="min-w-0 flex-1">{sourceSelector}</div>
-                <div className="self-end xs:self-auto">
-                  <ShellSettingsMenu />
-                </div>
-              </div>
+              <div className="flex justify-start">{sourceSelector}</div>
             )}
           </div>
 
@@ -295,7 +288,7 @@ function HomeTabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-9 items-center gap-1.5 rounded-md border px-2.5 text-sm leading-none transition-colors ${
+      className={`inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-2.5 text-sm leading-none transition-colors ${
         active
           ? "border-stone-950 bg-stone-100 text-stone-950 shadow-[1px_1px_rgba(12,10,9,1)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:shadow-[1px_1px_rgba(68,64,60,1)]"
           : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
@@ -418,10 +411,13 @@ function TVShowExpandedCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVS
               </>
             ) : null}
           </div>
-          <TVShowStatusBadge status={show.status} className="w-fit" />
         </div>
         <div className="mt-auto pt-3">
-          <button type="button" onClick={() => onOpen(show)} className="btn btn-secondary text-sm">
+          <button
+            type="button"
+            onClick={() => onOpen(show)}
+            className="btn btn-secondary w-full text-sm"
+          >
             <span>details</span>
             <ArrowRight className="text-xs" strokeWidth={1.5} />
           </button>

@@ -9,7 +9,6 @@ import { CardDisplayTypeToggle } from "@/components/card-display-type-toggle";
 import { MoviesRSSPopover, rssTriggerClassName } from "@/components/movies-rss-popover";
 import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { SearchInTheInstituteButton } from "@/components/search-in-the-institute-button";
-import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
 import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -387,7 +386,7 @@ function HomeTabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-9 items-center gap-1.5 rounded-md border px-2.5 text-sm leading-none transition-colors ${
+      className={`inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-2.5 text-sm leading-none transition-colors ${
         active
           ? "border-stone-950 bg-stone-100 text-stone-950 shadow-[1px_1px_rgba(12,10,9,1)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:shadow-[1px_1px_rgba(68,64,60,1)]"
           : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
@@ -443,21 +442,15 @@ function LazyImage({ src, alt, className }: { src: string; alt: string; classNam
 function MovieCompactRow({ movie }: { movie: Movie }) {
   return (
     <article className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <div className="flex h-full flex-row items-center gap-3 p-3">
+      <div className="flex h-full flex-row items-start gap-3 p-3">
         {movie.posterUrl ? (
           <div className="overflow-hidden rounded">
-            <LazyImage
-              src={movie.posterUrl}
-              alt={movie.title}
-              className="h-[108px] w-[72px] object-cover"
-            />
+            <LazyImage src={movie.posterUrl} alt={movie.title} className="h-27 w-18 object-cover" />
           </div>
         ) : null}
         <div className="flex h-full flex-1 flex-col justify-between">
-          <div className="mt-0.5 flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight" style={{ wordBreak: "break-word" }}>
-              {movie.title}
-            </h5>
+          <div className="flex flex-col space-y-1">
+            <h5 className="font-serif leading-tight break-words">{movie.title}</h5>
             <div className="flex flex-row items-center space-x-2">
               <div className="flex flex-row items-center space-x-0.5">
                 <Star className="fill-amber-400 text-sm" strokeWidth={0} />
@@ -556,21 +549,15 @@ function MovieExpandedCard({ movie }: { movie: Movie }) {
 function TVShowCompactCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVShow) => void }) {
   return (
     <article className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <div className="flex h-full flex-row items-center gap-3 p-3">
+      <div className="flex h-full flex-row items-start gap-3 p-3">
         {show.posterUrl ? (
           <div className="overflow-hidden rounded">
-            <LazyImage
-              src={show.posterUrl}
-              alt={show.title}
-              className="h-[108px] w-[72px] object-cover"
-            />
+            <LazyImage src={show.posterUrl} alt={show.title} className="h-27 w-18 object-cover" />
           </div>
         ) : null}
-        <div className="flex h-full flex-1 flex-col">
-          <div className="mt-0.5 flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight" style={{ wordBreak: "break-word" }}>
-              {show.title}
-            </h5>
+        <div className="flex h-full flex-1 flex-col justify-between">
+          <div className="flex flex-col space-y-1">
+            <h5 className="font-serif leading-tight break-words">{show.title}</h5>
             <div className="flex flex-row items-center space-x-2">
               <div className="flex flex-row items-center space-x-0.5">
                 <Star className="fill-amber-400 text-sm" strokeWidth={0} />
@@ -598,10 +585,7 @@ function TVShowCompactCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVSh
               ) : null}
             </div>
           </div>
-          <div className="mt-1.5">
-            <TVShowStatusBadge status={show.status} className="w-fit" />
-          </div>
-          <div className="mt-2">
+          <div className="mb-0.5 mt-2">
             <button
               type="button"
               onClick={() => onOpen(show)}
@@ -656,10 +640,13 @@ function TVShowExpandedCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVS
               </>
             ) : null}
           </div>
-          <TVShowStatusBadge status={show.status} className="w-fit" />
         </div>
         <div className="mt-auto pt-3">
-          <button type="button" onClick={() => onOpen(show)} className="btn btn-secondary text-sm">
+          <button
+            type="button"
+            onClick={() => onOpen(show)}
+            className="btn btn-secondary w-full text-sm"
+          >
             <span>details</span>
             <ArrowRight className="text-xs" strokeWidth={1.5} />
           </button>
@@ -697,7 +684,7 @@ function MediaCardsSkeleton({ displayType }: { displayType: CardDisplayType }) {
           key={`compact-${index}`}
           className="relative overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
         >
-          <div className="flex flex-row items-center gap-3 p-3">
+          <div className="flex flex-row items-start gap-3 p-3">
             <Skeleton className="h-27 w-18 shrink-0" />
             <div className="flex-1 flex-col space-y-2">
               <Skeleton className="h-4 w-3/4" />

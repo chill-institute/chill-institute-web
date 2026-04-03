@@ -45,4 +45,31 @@ test.describe("smoke", () => {
     await expect(settingsPage).toBeVisible();
     await expect(settingsPage.getByText("putio-user")).toBeVisible();
   });
+
+  test("authenticated home shell shows the sticky alpha header", async ({
+    authenticatedPage,
+    mockRpc,
+  }) => {
+    await mockRpc({
+      GetUserSettings: {
+        showMovies: true,
+        showTvShows: true,
+      },
+      GetMovies: {
+        movies: [],
+        source: 1,
+      },
+      GetTVShows: {
+        shows: [],
+        source: 1,
+      },
+    });
+
+    await authenticatedPage.goto("/");
+
+    await expect(
+      authenticatedPage.getByText("binge.institute is currently on alpha"),
+    ).toBeVisible();
+    await expect(authenticatedPage.getByRole("button", { name: "Open settings" })).toBeVisible();
+  });
 });

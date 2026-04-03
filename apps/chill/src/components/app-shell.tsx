@@ -63,7 +63,7 @@ export function AppShell() {
                   <ResponsiveBox>
                     <div className="flex flex-row justify-center items-start lg:space-x-4">
                       <Link className="hidden lg:block" to="/">
-                        <h3 style={{ fontSize: "2rem", letterSpacing: 0, lineHeight: "1.8rem" }}>
+                        <h3 className="font-serif text-3xl leading-8 tracking-tight">
                           chill.institute
                         </h3>
                       </Link>

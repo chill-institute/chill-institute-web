@@ -29,11 +29,15 @@ function useIsDesktop() {
   return isDesktop;
 }
 
-function SettingsModalBody({ onClose }: { onClose: () => void }) {
+function SettingsModalBody({ isDesktop, onClose }: { isDesktop: boolean; onClose: () => void }) {
   return (
     <section
       data-page="settings"
-      className="relative overflow-hidden rounded-[28px] border border-stone-950/90 bg-stone-100 text-stone-950 shadow-[0_28px_80px_rgba(0,0,0,0.28)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+      className={
+        isDesktop
+          ? "relative overflow-hidden rounded-xl border border-solid border-stone-950 bg-stone-100 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+          : "relative overflow-hidden bg-stone-100 text-stone-950 dark:bg-stone-900 dark:text-stone-100"
+      }
     >
       <div className="border-b border-stone-950/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),rgba(255,255,255,0))] px-5 py-4 dark:border-stone-100/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0))] sm:px-6">
         <div className="flex items-start justify-between gap-4">
@@ -48,7 +52,7 @@ function SettingsModalBody({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-stone-950/10 bg-stone-950/5 text-stone-700 transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/10 active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/5 dark:text-stone-200 dark:hover:bg-stone-100/10"
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-stone-950/10 bg-stone-950/5 text-stone-700 transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/10 active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/5 dark:text-stone-200 dark:hover:bg-stone-100/10"
             aria-label="Close settings"
           >
             <X className="h-4 w-4" />
@@ -82,7 +86,7 @@ export function SettingsModal({
           showCloseButton={false}
           className="top-1/2 left-1/2 w-[min(92vw,720px)] -translate-x-1/2 -translate-y-1/2 p-0"
         >
-          <SettingsModalBody onClose={() => onOpenChange(false)} />
+          <SettingsModalBody isDesktop onClose={() => onOpenChange(false)} />
         </DialogContent>
       </Dialog>
     );
@@ -100,9 +104,9 @@ export function SettingsModal({
       <DrawerDescription className="sr-only">
         Adjust your binge preferences, download folder, and home page visibility.
       </DrawerDescription>
-      <DrawerContent className="border-x-0 border-b-0 border-t-0 bg-transparent p-0 shadow-none">
+      <DrawerContent className="overflow-hidden rounded-t-3xl border-x-0 border-b-0 border-t-0 bg-stone-100 p-0 shadow-[0_-24px_48px_rgba(0,0,0,0.24)] dark:bg-stone-900">
         <div className="px-0 pb-0">
-          <SettingsModalBody onClose={() => onOpenChange(false)} />
+          <SettingsModalBody isDesktop={false} onClose={() => onOpenChange(false)} />
         </div>
       </DrawerContent>
     </Drawer>
@@ -123,7 +127,7 @@ export function SettingsModalTrigger({
       size={compact ? "icon-sm" : "sm"}
       className={
         compact
-          ? "rounded-full border border-stone-950/10 bg-stone-950/[0.04] text-stone-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/[0.08] active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/[0.04] dark:text-stone-200 dark:hover:bg-stone-100/[0.09]"
+          ? "rounded-full text-stone-500 transition-[color,transform] duration-150 ease-out hover:bg-transparent hover:text-stone-900 active:scale-[0.97] dark:text-stone-400 dark:hover:bg-transparent dark:hover:text-stone-100"
           : "rounded-full border border-stone-950/10 bg-stone-950/[0.04] px-3 text-stone-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/[0.08] active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/[0.04] dark:text-stone-200 dark:hover:bg-stone-100/[0.09]"
       }
       onClick={onClick}

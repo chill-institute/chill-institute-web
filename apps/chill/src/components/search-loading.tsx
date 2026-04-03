@@ -53,28 +53,26 @@ function SearchResultTableRowLoading() {
 export function FilterBarLoading() {
   return (
     <div className="flex flex-col space-y-6 mt-6 mb-2 lg:items-center">
-      <div className="flex flex-col space-y-1 lg:flex-row lg:space-x-2 lg:space-y-0 items-start lg:items-center">
-        <Skeleton className="h-4 w-20" />
+      <div className="flex flex-col items-start lg:items-center">
         <div className="flex flex-row items-center space-x-3">
           <div className="flex flex-row space-x-2">
             <Skeleton className="h-5 w-10" />
             <Skeleton className="h-5 w-12" />
             <Skeleton className="h-5 w-10" />
           </div>
-          <div className="w-[1px] h-4 bg-stone-400 dark:bg-stone-700" />
+          <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
           <div className="flex flex-row space-x-2">
             <Skeleton className="h-5 w-10" />
             <Skeleton className="h-5 w-10" />
           </div>
-          <div className="w-[1px] h-4 bg-stone-400 dark:bg-stone-700" />
+          <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
           <div className="flex flex-row space-x-2">
             <Skeleton className="h-5 w-10" />
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col space-y-1 lg:hidden lg:space-x-2 lg:space-y-0 items-start lg:items-center">
-        <Skeleton className="h-4 w-14" />
+      <div className="flex flex-col items-start lg:hidden lg:items-center">
         <div className="flex flex-row space-x-2">
           <Skeleton className="h-8 w-16" />
           <Skeleton className="h-8 w-16" />

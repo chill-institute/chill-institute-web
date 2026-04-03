@@ -98,7 +98,7 @@ export function SearchResults({ results, sortBy, sortDirection, titleBehavior, o
                 <td className="px-2 pt-3 text-center whitespace-nowrap">
                   <CopyButton value={result.link} />
                 </td>
-                <td className="pl-1 pt-3 whitespace-nowrap w-[100px]">
+                <td className="w-25 pl-1 pt-3 whitespace-nowrap">
                   <AddTransferButton className="w-full" url={result.link}>
                     send to put.io
                   </AddTransferButton>

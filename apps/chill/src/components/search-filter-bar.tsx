@@ -32,10 +32,8 @@ export function SearchFilterBar({
 }: Props) {
   return (
     <div className="flex flex-col space-y-6 mt-6 mb-2 lg:items-center">
-      <fieldset className="flex flex-col space-y-1 lg:flex-row lg:space-x-2 lg:space-y-0 items-start lg:items-center">
-        <legend className="text-sm font-medium leading-none">
-          Quick filters<span className="lg:visible invisible">:</span>
-        </legend>
+      <fieldset className="flex flex-col items-start lg:items-center">
+        <legend className="sr-only">Quick filters</legend>
 
         <div className="flex flex-row items-center space-x-3" id="quick-filters">
           <div className="flex flex-row space-x-2">
@@ -60,7 +58,7 @@ export function SearchFilterBar({
           </div>
 
           <div>
-            <div className="w-[1px] h-4 bg-stone-400 dark:bg-stone-700" />
+            <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
           </div>
 
           <div className="flex flex-row space-x-2">
@@ -85,7 +83,7 @@ export function SearchFilterBar({
           </div>
 
           <div>
-            <div className="w-[1px] h-4 bg-stone-400 dark:bg-stone-700" />
+            <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
           </div>
 
           <div className="flex flex-row space-x-2">
@@ -109,10 +107,8 @@ export function SearchFilterBar({
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col space-y-1 lg:hidden lg:space-x-2 lg:space-y-0 items-start lg:items-center">
-        <legend className="text-sm font-medium leading-none">
-          Sort by<span className="lg:visible invisible">:</span>
-        </legend>
+      <fieldset className="flex flex-col items-start lg:hidden lg:items-center">
+        <legend className="sr-only">Sort by</legend>
 
         <div className="flex flex-row space-x-2 flex-wrap" id="sort-options">
           {sortByValues.map((option) => {

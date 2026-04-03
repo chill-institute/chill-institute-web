@@ -124,7 +124,7 @@ function TvShowDetailContent({
     <button
       type="button"
       onClick={onClose}
-      className="absolute right-3 top-3 z-20 flex size-8 items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
+      className="absolute right-3 top-3 z-20 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
       aria-label="Close TV show details"
     >
       <X className="h-4 w-4" />
@@ -133,11 +133,11 @@ function TvShowDetailContent({
 
   const shellClassName = isDesktop
     ? "max-h-[90vh] w-full max-w-[940px] overflow-y-auto rounded-xl border border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-    : "max-h-[92vh] w-full overflow-y-auto rounded-t-2xl border-x-0 border-b-0 border-t border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_-24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100";
+    : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
 
   return (
     <div className={shellClassName}>
-      <div className="relative flex min-h-[240px] items-end overflow-hidden rounded-t-xl sm:min-h-[360px]">
+      <div className="relative flex min-h-60 items-end overflow-hidden sm:min-h-90">
         {backdropUrl ? (
           <>
             <Skeleton
@@ -165,7 +165,7 @@ function TvShowDetailContent({
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {posterUrl ? (
-            <div className="relative h-[180px] w-[120px] shrink-0">
+            <div className="relative h-45 w-30 shrink-0">
               <Skeleton
                 className={cn(
                   "absolute inset-0 h-full w-full rounded-md transition-opacity duration-200 ease-out",
@@ -183,7 +183,7 @@ function TvShowDetailContent({
               />
             </div>
           ) : (
-            <Skeleton className="h-[180px] w-[120px] shrink-0 rounded-md" />
+            <Skeleton className="h-45 w-30 shrink-0 rounded-md" />
           )}
 
           <div className="min-w-0 flex-1">
@@ -277,7 +277,7 @@ function TvShowDetailContent({
                   key={season.seasonNumber}
                   type="button"
                   onClick={() => onSeasonChange(season.seasonNumber)}
-                  className={`rounded border px-3 py-1.5 text-xs transition-colors ${
+                  className={`cursor-pointer rounded border px-3 py-1.5 text-xs transition-colors ${
                     season.seasonNumber === resolvedSeasonNumber
                       ? "border-stone-950 bg-stone-950 text-stone-100 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950"
                       : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
@@ -495,7 +495,7 @@ export function TvShowDetailModal({
       <DrawerDescription className="sr-only">
         Browse TV show metadata, seasons, and episode download actions.
       </DrawerDescription>
-      <DrawerContent className="border-x-0 border-b-0 border-t-0 bg-transparent p-0 shadow-none">
+      <DrawerContent className="overflow-hidden rounded-t-3xl border-x-0 border-b-0 border-t-0 bg-stone-100 p-0 shadow-[0_-24px_48px_rgba(0,0,0,0.24)] dark:bg-stone-900">
         {content}
       </DrawerContent>
     </Drawer>

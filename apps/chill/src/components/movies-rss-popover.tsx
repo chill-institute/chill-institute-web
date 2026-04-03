@@ -12,7 +12,7 @@ import { publicLinks } from "@/lib/public-links";
 import { getMoviesSourceLabel, type MoviesSource } from "@/lib/types";
 
 const rssTriggerClassName =
-  "inline-flex items-center justify-center rounded-sm p-1 text-stone-950 transition-[transform,color,opacity,background-color] duration-[140ms] ease-[var(--ease-out)] hover:bg-stone-200/70 hover:text-stone-700 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-40 dark:text-stone-100 dark:hover:bg-stone-800/80 dark:hover:text-stone-300";
+  "inline-flex cursor-pointer items-center justify-center rounded-sm p-1 text-stone-950 transition-[transform,color,opacity,background-color] duration-[140ms] ease-[var(--ease-out)] hover:bg-stone-200/70 hover:text-stone-700 active:scale-[0.95] disabled:cursor-not-allowed disabled:opacity-40 dark:text-stone-100 dark:hover:bg-stone-800/80 dark:hover:text-stone-300";
 
 export function MoviesRSSPopover({ source, feedUrl }: { source: MoviesSource; feedUrl?: string }) {
   const sourceName = getMoviesSourceLabel(source);
