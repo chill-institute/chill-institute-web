@@ -322,7 +322,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
               aria-hidden="true"
               onLoad={() => setBackdropLoaded(true)}
               className={cn(
-                "absolute inset-0 h-full w-full scale-110 object-cover object-center blur-2xl saturate-[0.78] transition-opacity duration-300 ease-out",
+                "absolute inset-0 h-full w-full scale-105 object-cover object-center blur-sm saturate-[0.85] transition-opacity duration-300 ease-out",
                 backdropLoaded ? "opacity-100" : "opacity-0",
               )}
             />
@@ -383,12 +383,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                 <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-white/84">
                   {synopsis}
                 </p>
-              ) : (
-                <p className="mt-4 text-sm leading-relaxed text-white/84">
-                  Search results for <span className="font-medium">{movie.title}</span> (
-                  {movie.year})
-                </p>
-              )}
+              ) : null}
               {metadataTags.length > 0 ? (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {metadataTags.map((tag) => (
@@ -417,23 +412,12 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
 
       <div className="px-6 pb-6">
         <div className="mt-5 border-t border-stone-950 pt-5 dark:border-stone-700">
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <h4 className="text-sm font-medium text-stone-900 dark:text-stone-100">
-                Torrent results
-              </h4>
-              <p className="mt-1 text-xs text-stone-600 dark:text-stone-400">
-                Search: {movie.title} {movie.year}
-              </p>
-            </div>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
             {searchQuery.status === "success" ? (
               <p className="text-xs text-stone-600 dark:text-stone-400">
                 {visibleResults.length}
                 {visibleResults.length !== results.length ? ` of ${results.length}` : ""} result
                 {visibleResults.length === 1 ? "" : "s"}
-                {sendableResultsCount !== visibleResults.length
-                  ? ` · ${sendableResultsCount} sendable`
-                  : ""}
               </p>
             ) : null}
           </div>
