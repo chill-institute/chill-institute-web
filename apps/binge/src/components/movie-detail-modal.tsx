@@ -7,8 +7,8 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/compone
 import { UserErrorAlert } from "@/components/user-error-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/cn";
-import { formatBytes } from "@/lib/format";
-import { type Movie } from "@/lib/types";
+import { formatAge, formatBytes } from "@/lib/format";
+import { type Movie, type SearchResult } from "@/lib/types";
 import { useMovieSearchQuery } from "@/queries/movies";
 
 type Props = {
@@ -56,6 +56,33 @@ function formatUploadedAt(value: string) {
   }).format(date);
 }
 
+function formatResultAge(value: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const age = formatAge(value);
+  if (age === "unknown") {
+    return undefined;
+  }
+
+  return age === "Today" ? age : `${age} ago`;
+}
+
+function formatSeederCount(seeders: bigint) {
+  if (seeders <= 0n) {
+    return undefined;
+  }
+
+  const count = Number(seeders);
+  const formattedCount = new Intl.NumberFormat().format(count);
+  return `${formattedCount} seeder${count === 1 ? "" : "s"}`;
+}
+
+function canSendResult(result: SearchResult) {
+  return result.link.trim().length > 0;
+}
+
 function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) {
   const [posterLoaded, setPosterLoaded] = useState(!movie.posterUrl);
   const searchQuery = useMovieSearchQuery(movie, true);
@@ -65,6 +92,15 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
   }, [movie.posterUrl]);
 
   const results = useMemo(() => searchQuery.data?.results ?? [], [searchQuery.data]);
+  const synopsis = useMemo(() => {
+    const movieWithOptionalSynopsis = movie as Movie & { overview?: string; synopsis?: string };
+    return movieWithOptionalSynopsis.overview?.trim() || movieWithOptionalSynopsis.synopsis?.trim();
+  }, [movie]);
+  const sendableResultsCount = useMemo(
+    () => results.filter((result) => canSendResult(result)).length,
+    [results],
+  );
+  const hasOnlyUnavailableResults = results.length > 0 && sendableResultsCount === 0;
 
   const shellClassName =
     "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100 sm:max-h-[90vh] sm:max-w-[940px] sm:rounded-xl sm:border sm:border-stone-950 sm:shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:sm:border-stone-700";
@@ -104,7 +140,7 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/88">
                 <span>{movie.year || "Unknown year"}</span>
                 <span className="text-white/45">&middot;</span>
-                <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
+                <span>{movie.rating ? `IMDb ${movie.rating.toFixed(1)}` : "IMDb N/A"}</span>
                 {movie.externalUrl ? (
                   <>
                     <span className="text-white/45">&middot;</span>
@@ -120,9 +156,16 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
                   </>
                 ) : null}
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-white/84">
-                Search results for <span className="font-medium">{movie.title}</span> ({movie.year})
-              </p>
+              {synopsis ? (
+                <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-white/84">
+                  {synopsis}
+                </p>
+              ) : (
+                <p className="mt-4 text-sm leading-relaxed text-white/84">
+                  Search results for <span className="font-medium">{movie.title}</span> (
+                  {movie.year})
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -139,6 +182,25 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
 
       <div className="px-6 pb-6">
         <div className="mt-5 border-t border-stone-950 pt-5 dark:border-stone-700">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h4 className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                Torrent results
+              </h4>
+              <p className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+                Search: {movie.title} {movie.year}
+              </p>
+            </div>
+            {searchQuery.status === "success" ? (
+              <p className="text-xs text-stone-600 dark:text-stone-400">
+                {results.length} result{results.length === 1 ? "" : "s"}
+                {sendableResultsCount !== results.length
+                  ? ` · ${sendableResultsCount} sendable`
+                  : ""}
+              </p>
+            ) : null}
+          </div>
+
           {searchQuery.status === "pending" ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 6 }, (_, index) => (
@@ -156,7 +218,12 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
               ))}
             </div>
           ) : searchQuery.status === "error" ? (
-            <UserErrorAlert error={searchQuery.error} />
+            <div className="space-y-2">
+              <p className="text-sm text-stone-600 dark:text-stone-400">
+                We couldn&apos;t load torrent matches for this movie yet.
+              </p>
+              <UserErrorAlert error={searchQuery.error} />
+            </div>
           ) : results.length === 0 ? (
             <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
               <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
@@ -169,49 +236,88 @@ function MovieDetailContent({ movie, onClose }: Props & { isDesktop: boolean }) 
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {results.map((result) => (
-                <div
-                  key={result.id || `${result.title}-${result.link}`}
-                  className="flex flex-col gap-3 rounded-lg border border-stone-950 bg-stone-50 px-3 py-3 dark:border-stone-700 dark:bg-stone-950/40 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">{result.title}</div>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-600 dark:text-stone-400">
-                      <span>{result.indexer || result.source || "Unknown source"}</span>
-                      {result.size > 0 ? (
-                        <>
-                          <span>&middot;</span>
-                          <span>{formatBytes(result.size)}</span>
-                        </>
-                      ) : null}
-                      {result.seeders > 0 ? (
-                        <>
-                          <span>&middot;</span>
-                          <span className="inline-flex items-center gap-1">
-                            <Users className="size-3" />
-                            {result.seeders}
-                          </span>
-                        </>
-                      ) : null}
-                      {result.uploadedAt ? (
-                        <>
-                          <span>&middot;</span>
-                          <span>{formatUploadedAt(result.uploadedAt)}</span>
-                        </>
-                      ) : null}
+              {hasOnlyUnavailableResults ? (
+                <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-3 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
+                  Results came back, but none include a usable transfer link yet.
+                </div>
+              ) : null}
+
+              {results.map((result) => {
+                const isSendable = canSendResult(result);
+                const ageLabel = formatResultAge(result.uploadedAt);
+                const uploadedAtLabel = result.uploadedAt
+                  ? formatUploadedAt(result.uploadedAt)
+                  : undefined;
+                const sizeLabel = result.size > 0n ? formatBytes(result.size) : undefined;
+                const seederLabel = formatSeederCount(result.seeders);
+
+                return (
+                  <div
+                    key={result.id || `${result.title}-${result.link}`}
+                    className={cn(
+                      "flex flex-col gap-3 rounded-lg border border-stone-950 bg-stone-50 px-3 py-3 dark:border-stone-700 dark:bg-stone-950/40 sm:flex-row sm:items-center sm:justify-between",
+                      !isSendable && "border-dashed border-stone-950/40 dark:border-stone-700/80",
+                    )}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="break-words text-sm font-medium">{result.title}</div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-600 dark:text-stone-400">
+                        <span className="font-medium text-stone-700 dark:text-stone-300">
+                          {result.indexer || result.source || "Unknown source"}
+                        </span>
+                        {sizeLabel ? (
+                          <>
+                            <span>&middot;</span>
+                            <span>{sizeLabel}</span>
+                          </>
+                        ) : null}
+                        {seederLabel ? (
+                          <>
+                            <span>&middot;</span>
+                            <span className="inline-flex items-center gap-1">
+                              <Users className="size-3" />
+                              {seederLabel}
+                            </span>
+                          </>
+                        ) : null}
+                        {ageLabel ? (
+                          <>
+                            <span>&middot;</span>
+                            <span title={uploadedAtLabel}>{ageLabel}</span>
+                          </>
+                        ) : null}
+                        {!isSendable ? (
+                          <>
+                            <span>&middot;</span>
+                            <span>Unavailable</span>
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      {isSendable ? (
+                        <AddTransferButton
+                          className="w-full sm:w-auto"
+                          url={result.link}
+                          ariaLabel={`Send ${result.title} to put.io`}
+                        >
+                          send to put.io
+                        </AddTransferButton>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="btn btn-secondary w-full cursor-not-allowed opacity-60 sm:w-auto"
+                          aria-label={`Cannot send ${result.title} to put.io`}
+                          title="This result is missing a usable transfer link"
+                        >
+                          unavailable
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <AddTransferButton
-                      className="w-full sm:w-auto"
-                      url={result.link}
-                      ariaLabel={`Send ${result.title} to put.io`}
-                    >
-                      send to put.io
-                    </AddTransferButton>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
