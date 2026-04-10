@@ -322,7 +322,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
               aria-hidden="true"
               onLoad={() => setBackdropLoaded(true)}
               className={cn(
-                "absolute inset-0 h-full w-full scale-105 object-cover object-center blur-sm saturate-[0.85] transition-opacity duration-300 ease-out",
+                "absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-300 ease-out",
                 backdropLoaded ? "opacity-100" : "opacity-0",
               )}
             />
