@@ -3,8 +3,8 @@ import { Navigate, createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight, Film, Star, Tv } from "lucide-react";
 import { match } from "ts-pattern";
 
+import { MovieDetailModal } from "@/components/movie-detail-modal";
 import { TvShowDetailModal } from "@/components/tv-show-detail-modal";
-import { AddTransferButton } from "@/components/add-transfer-button";
 import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
 import { UserErrorAlert } from "@/components/user-error-alert";
@@ -53,6 +53,7 @@ function HomePage() {
   const tvShowsQuery = useTVShowsQuery(shouldFetchTVShows);
 
   const [activeTab, setActiveTab] = useState<HomeTab>("movies");
+  const [selectedMovieId, setSelectedMovieId] = useState<string>();
   const [selectedShowId, setSelectedShowId] = useState<string>();
   const [selectedSeason, setSelectedSeason] = useState<number>();
 
@@ -103,6 +104,13 @@ function HomePage() {
       const showTabs = true;
       const currentTab: HomeTab = activeTab;
 
+      const currentMoviesResponse =
+        moviesQuery.status === "success" && moviesQuery.data.source === config.moviesSource
+          ? moviesQuery.data
+          : undefined;
+      const selectedMovie = currentMoviesResponse?.movies.find(
+        (movie) => movie.id === selectedMovieId,
+      );
       const currentTVShowsResponse =
         tvShowsQuery.status === "success" && tvShowsQuery.data.source === config.tvShowsSource
           ? tvShowsQuery.data
@@ -155,7 +163,13 @@ function HomePage() {
             return (
               <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
                 {movies.data.movies.map((movie) => (
-                  <MovieExpandedCard key={movie.id} movie={movie} />
+                  <MovieExpandedCard
+                    key={movie.id}
+                    movie={movie}
+                    onOpen={(nextMovie) => {
+                      setSelectedMovieId(nextMovie.id);
+                    }}
+                  />
                 ))}
               </div>
             );
@@ -226,6 +240,7 @@ function HomePage() {
                       label="movies"
                       onClick={() => {
                         setActiveTab("movies");
+                        setSelectedMovieId(undefined);
                         setSelectedShowId(undefined);
                         setSelectedSeason(undefined);
                       }}
@@ -251,6 +266,15 @@ function HomePage() {
 
           {saveConfigMutation.error ? (
             <UserErrorAlert className="mt-4" error={saveConfigMutation.error} />
+          ) : null}
+
+          {currentTab === "movies" && selectedMovie ? (
+            <MovieDetailModal
+              movie={selectedMovie}
+              onClose={() => {
+                setSelectedMovieId(undefined);
+              }}
+            />
           ) : null}
 
           {currentTab === "tv" && selectedShowId ? (
@@ -319,55 +343,55 @@ function LazyImage({ src, alt, className }: { src: string; alt: string; classNam
   );
 }
 
-function MovieExpandedCard({ movie }: { movie: Movie }) {
+function MovieExpandedCard({ movie, onOpen }: { movie: Movie; onOpen: (movie: Movie) => void }) {
   return (
     <article className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      {movie.posterUrl ? (
-        <LazyImage
-          src={movie.posterUrl}
-          alt={movie.title}
-          className="aspect-2/3 w-full border-b border-stone-950 object-cover dark:border-stone-700"
-        />
-      ) : null}
-      <div className="mx-4 my-3 flex h-full flex-col">
-        <div className="flex flex-col space-y-1">
-          <h5 className="font-serif leading-tight">{movie.title}</h5>
-          <div className="flex flex-row items-center space-x-2">
-            <div className="flex flex-row items-center space-x-0.5">
-              <Star className="fill-amber-400 text-sm" strokeWidth={0} />
-              <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
-            </div>
-            <div className="text-stone-600 dark:text-stone-400">
-              <span className="text-sm">/</span>
-            </div>
-            <div className="text-stone-600 dark:text-stone-400">{movie.year}</div>
-            <div className="text-stone-600 dark:text-stone-400">
-              <span className="text-sm">/</span>
-            </div>
-            {movie.externalUrl ? (
-              <a
-                href={movie.externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-                title="Open IMDb page"
-              >
-                <div className="flex flex-row items-center space-x-0.5">
+      <button
+        type="button"
+        onClick={() => onOpen(movie)}
+        className="flex cursor-pointer flex-col text-left"
+      >
+        {movie.posterUrl ? (
+          <LazyImage
+            src={movie.posterUrl}
+            alt={movie.title}
+            className="aspect-2/3 w-full border-b border-stone-950 object-cover dark:border-stone-700"
+          />
+        ) : null}
+        <div className="mx-4 my-3 flex h-full flex-col">
+          <div className="flex flex-col space-y-1">
+            <h5 className="font-serif leading-tight">{movie.title}</h5>
+            <div className="flex flex-row items-center space-x-2">
+              <div className="flex flex-row items-center space-x-0.5">
+                <Star className="fill-amber-400 text-sm" strokeWidth={0} />
+                <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
+              </div>
+              <div className="text-stone-600 dark:text-stone-400">
+                <span className="text-sm">/</span>
+              </div>
+              <div className="text-stone-600 dark:text-stone-400">{movie.year}</div>
+              <div className="text-stone-600 dark:text-stone-400">
+                <span className="text-sm">/</span>
+              </div>
+              {movie.externalUrl ? (
+                <span
+                  className="inline-flex items-center gap-0.5 text-stone-600 dark:text-stone-400"
+                  title="Open IMDb page in modal"
+                >
                   <span className="text-sm">IMDb</span>
                   <ArrowUpRight className="text-xs" strokeWidth={1.25} />
-                </div>
-              </a>
-            ) : null}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <div className="mt-auto pt-3">
+            <span className="btn btn-secondary w-full text-sm">
+              <span>details</span>
+              <ArrowRight className="text-xs" strokeWidth={1.5} />
+            </span>
           </div>
         </div>
-        <div className="mt-auto flex w-full flex-row gap-1 pt-3">
-          <div className="flex flex-1 flex-col">
-            <AddTransferButton className="w-full" url={movie.link}>
-              send to put.io
-            </AddTransferButton>
-          </div>
-        </div>
-      </div>
+      </button>
     </article>
   );
 }
