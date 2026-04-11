@@ -29,6 +29,7 @@ Run the full repo checks before opening or updating a pull request:
 
 ```bash
 vp run verify
+vp run smoke
 vp run e2e
 ```
 
@@ -37,6 +38,8 @@ If you only changed one app, use the targeted root commands:
 ```bash
 vp run verify:chill
 vp run verify:binge
+vp run smoke:chill
+vp run smoke:binge
 vp run e2e:chill
 vp run e2e:binge
 ```
