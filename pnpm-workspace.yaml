@@ -6,7 +6,7 @@ packages:
 catalog:
   "@base-ui/react": ^1.2.0
   "@bufbuild/protobuf": ^2.11.0
-  "@chill-institute/contracts": ^1.0.9
+  "@chill-institute/contracts": ^1.1.0
   "@connectrpc/connect": ^2.1.1
   "@connectrpc/connect-web": ^2.1.1
   "@playwright/test": ^1.59.1
@@ -37,6 +37,8 @@ catalog:
 catalogMode: prefer
 
 minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  - "@chill-institute/contracts"
 
 overrides:
   vite: "catalog:"

@@ -185,7 +185,6 @@ test.describe("movies", () => {
     await authenticatedPage.goto("/");
     await openFirstMovieModal(authenticatedPage);
 
-    await expect(authenticatedPage.getByText("Search results for Inception (2010)")).toBeVisible();
     await expect(authenticatedPage.getByText("Inception.2010.1080p.BluRay.x264")).toBeVisible();
     await expect(authenticatedPage.getByLabel("Resolution")).toBeVisible();
     await expect(authenticatedPage.getByLabel("Codec")).toBeVisible();

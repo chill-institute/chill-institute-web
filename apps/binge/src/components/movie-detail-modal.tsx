@@ -25,8 +25,6 @@ type CodecFilterValue = (typeof CODEC_FILTER_OPTIONS)[number];
 type SortValue = (typeof SORT_OPTIONS)[number];
 
 type MovieWithOptionalMetadata = Movie & {
-  overview?: string;
-  synopsis?: string;
   genres?: string[];
   keywords?: string[];
 };
@@ -209,7 +207,7 @@ function FilterSelect({
 }
 
 function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: boolean }) {
-  const [backdropLoaded, setBackdropLoaded] = useState(!movie.posterUrl);
+  const [backdropLoaded, setBackdropLoaded] = useState(!movie.backdropUrl);
   const [posterLoaded, setPosterLoaded] = useState(!movie.posterUrl);
   const [resolutionFilter, setResolutionFilter] = useState<ResolutionFilterValue>("all");
   const [codecFilter, setCodecFilter] = useState<CodecFilterValue>("all");
@@ -217,9 +215,9 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   const searchQuery = useMovieSearchQuery(movie, true);
 
   useEffect(() => {
-    setBackdropLoaded(!movie.posterUrl);
+    setBackdropLoaded(!movie.backdropUrl);
     setPosterLoaded(!movie.posterUrl);
-  }, [movie.posterUrl]);
+  }, [movie.backdropUrl, movie.posterUrl]);
 
   useEffect(() => {
     setResolutionFilter("all");
@@ -228,10 +226,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   }, [movie.id]);
 
   const results = useMemo(() => searchQuery.data?.results ?? [], [searchQuery.data]);
-  const synopsis = useMemo(() => {
-    const movieWithOptionalSynopsis = movie as MovieWithOptionalMetadata;
-    return movieWithOptionalSynopsis.overview?.trim() || movieWithOptionalSynopsis.synopsis?.trim();
-  }, [movie]);
+  const synopsis = movie.overview?.trim() || undefined;
   const metadataTags = useMemo(
     () => buildMetadataTags(movie as MovieWithOptionalMetadata),
     [movie],
@@ -308,7 +303,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   return (
     <div className={shellClassName}>
       <div className="relative flex min-h-60 items-end overflow-hidden sm:min-h-90">
-        {movie.posterUrl ? (
+        {movie.backdropUrl ? (
           <>
             <Skeleton
               className={cn(
@@ -317,7 +312,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
               )}
             />
             <img
-              src={movie.posterUrl}
+              src={movie.backdropUrl}
               alt=""
               aria-hidden="true"
               onLoad={() => setBackdropLoaded(true)}
@@ -328,11 +323,10 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             />
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-stone-300 via-stone-200 to-stone-100 dark:from-stone-800 dark:via-stone-900 dark:to-stone-950" />
+          <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/58 via-black/36 to-black/54" />
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-100 via-stone-100/8 via-35% to-black/35 dark:from-stone-900 dark:via-stone-900/12 dark:to-black/48" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_38%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-100 via-stone-100/10 via-35% to-black/45 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {movie.posterUrl ? (
