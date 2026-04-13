@@ -236,7 +236,7 @@ test.describe("tv shows home", () => {
       .locator("article")
       .filter({ hasText: "The Pitt" })
       .first()
-      .getByRole("button", { name: /details/i })
+      .getByRole("button")
       .click();
 
     const modal = authenticatedPage.getByRole("dialog", { name: "The Pitt" });

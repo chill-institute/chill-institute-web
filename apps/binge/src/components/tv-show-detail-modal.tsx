@@ -195,8 +195,12 @@ function TvShowDetailContent({
                     <Star className="fill-amber-400 text-xs" strokeWidth={0} />
                     <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
                   </span>
-                  <span className="text-white/45">&middot;</span>
-                  <span className="text-white/72">{show.year || "Unknown year"}</span>
+                  {show.year ? (
+                    <>
+                      <span className="text-white/45">&middot;</span>
+                      <span className="text-white/72">{show.year}</span>
+                    </>
+                  ) : null}
                   <span className="text-white/45">&middot;</span>
                   <span className="text-white/72">
                     {detailQuery.data?.show?.seasonCount ?? show.seasonCount} seasons
@@ -277,11 +281,11 @@ function TvShowDetailContent({
                   key={season.seasonNumber}
                   type="button"
                   onClick={() => onSeasonChange(season.seasonNumber)}
-                  className={`cursor-pointer rounded border px-3 py-1.5 text-xs transition-colors ${
+                  className={
                     season.seasonNumber === resolvedSeasonNumber
-                      ? "border-stone-950 bg-stone-950 text-stone-100 dark:border-stone-100 dark:bg-stone-100 dark:text-stone-950"
-                      : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-                  }`}
+                      ? "btn text-xs bg-stone-950 text-stone-100 dark:bg-stone-100 dark:text-stone-950 dark:border-stone-100"
+                      : "btn btn-secondary text-xs"
+                  }
                 >
                   {season.name || `Season ${season.seasonNumber}`}
                 </button>

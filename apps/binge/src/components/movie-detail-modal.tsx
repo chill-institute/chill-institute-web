@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, Search, Users, X } from "lucide-react";
+import { ArrowUpRight, Search, Star, Users, X } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -350,9 +350,16 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             <div className="max-w-[560px] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
               <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{movie.title}</h3>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/88">
-                <span>{movie.year || "Unknown year"}</span>
-                <span className="text-white/45">&middot;</span>
-                <span>{movie.rating ? `IMDb ${movie.rating.toFixed(1)}` : "IMDb N/A"}</span>
+                <span className="flex items-center gap-1">
+                  <Star className="fill-amber-400 text-xs" strokeWidth={0} />
+                  <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
+                </span>
+                {movie.year ? (
+                  <>
+                    <span className="text-white/45">&middot;</span>
+                    <span className="text-white/72">{movie.year}</span>
+                  </>
+                ) : null}
                 {movie.externalUrl ? (
                   <>
                     <span className="text-white/45">&middot;</span>
@@ -396,19 +403,9 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
 
       <div className="px-6 pb-6">
         {synopsis ? (
-          <p className="mt-5 max-w-[60ch] text-sm text-stone-600 dark:text-stone-400">{synopsis}</p>
+          <p className="mt-5 text-sm text-stone-600 dark:text-stone-400">{synopsis}</p>
         ) : null}
         <div className="mt-5 border-t border-stone-950 pt-5 dark:border-stone-700">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-            {searchQuery.status === "success" ? (
-              <p className="text-xs text-stone-600 dark:text-stone-400">
-                {visibleResults.length}
-                {visibleResults.length !== results.length ? ` of ${results.length}` : ""} result
-                {visibleResults.length === 1 ? "" : "s"}
-              </p>
-            ) : null}
-          </div>
-
           {searchQuery.status === "pending" ? (
             <div className="flex flex-col gap-2">
               {Array.from({ length: 6 }, (_, index) => (
@@ -444,47 +441,54 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <FilterSelect
-                  label="Resolution"
-                  value={resolutionFilter}
-                  onChange={(value) => setResolutionFilter(value as ResolutionFilterValue)}
-                  options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
-                    value,
-                    label: value === "all" ? "All resolutions" : value,
-                  }))}
-                />
-                <FilterSelect
-                  label="Codec"
-                  value={codecFilter}
-                  onChange={(value) => setCodecFilter(value as CodecFilterValue)}
-                  options={CODEC_FILTER_OPTIONS.map((value) => ({
-                    value,
-                    label: value === "all" ? "All codecs" : value,
-                  }))}
-                />
-                <FilterSelect
-                  label="Sort"
-                  value={sortBy}
-                  onChange={(value) => setSortBy(value as SortValue)}
-                  options={[
-                    { value: "seeders", label: "Most seeders" },
-                    { value: "size", label: "Largest size" },
-                    { value: "age", label: "Newest first" },
-                  ]}
-                />
-                {hasActiveFilters ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setResolutionFilter("all");
-                      setCodecFilter("all");
-                    }}
-                    className="btn btn-secondary text-xs"
-                  >
-                    Clear filters
-                  </button>
-                ) : null}
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <FilterSelect
+                    label="Resolution"
+                    value={resolutionFilter}
+                    onChange={(value) => setResolutionFilter(value as ResolutionFilterValue)}
+                    options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
+                      value,
+                      label: value === "all" ? "All resolutions" : value,
+                    }))}
+                  />
+                  <FilterSelect
+                    label="Codec"
+                    value={codecFilter}
+                    onChange={(value) => setCodecFilter(value as CodecFilterValue)}
+                    options={CODEC_FILTER_OPTIONS.map((value) => ({
+                      value,
+                      label: value === "all" ? "All codecs" : value,
+                    }))}
+                  />
+                  <FilterSelect
+                    label="Sort"
+                    value={sortBy}
+                    onChange={(value) => setSortBy(value as SortValue)}
+                    options={[
+                      { value: "seeders", label: "Most seeders" },
+                      { value: "size", label: "Largest size" },
+                      { value: "age", label: "Newest first" },
+                    ]}
+                  />
+                  {hasActiveFilters ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setResolutionFilter("all");
+                        setCodecFilter("all");
+                      }}
+                      className="btn btn-secondary text-xs"
+                    >
+                      Clear filters
+                    </button>
+                  ) : null}
+                </div>
+                <p className="text-xs tabular-nums text-stone-500 dark:text-stone-400">
+                  {visibleResults.length}
+                  {visibleResults.length !== results.length ? ` of ${results.length}` : ""} result
+                  {visibleResults.length === 1 ? "" : "s"}
+                </p>
               </div>
 
               {visibleResults.length === 0 ? (
