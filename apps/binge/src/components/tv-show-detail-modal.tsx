@@ -160,8 +160,8 @@ function TvShowDetailContent({
         ) : (
           <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-100 via-stone-100/10 via-35% to-black/45 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
+        <div className="absolute inset-0 bg-linear-to-r from-white/78 via-white/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {posterUrl ? (
@@ -188,31 +188,31 @@ function TvShowDetailContent({
 
           <div className="min-w-0 flex-1">
             {show ? (
-              <div className="max-w-[520px] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
+              <div className="max-w-[520px] text-stone-950 dark:text-white dark:drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
                 <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{show.title}</h3>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/88">
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-stone-700 dark:text-white/88">
                   <span className="flex items-center gap-1">
                     <Star className="fill-amber-400 text-xs" strokeWidth={0} />
                     <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
                   </span>
                   {show.year ? (
                     <>
-                      <span className="text-white/45">&middot;</span>
-                      <span className="text-white/72">{show.year}</span>
+                      <span className="text-stone-400 dark:text-white/45">&middot;</span>
+                      <span className="text-stone-600 dark:text-white/72">{show.year}</span>
                     </>
                   ) : null}
-                  <span className="text-white/45">&middot;</span>
-                  <span className="text-white/72">
+                  <span className="text-stone-400 dark:text-white/45">&middot;</span>
+                  <span className="text-stone-600 dark:text-white/72">
                     {detailQuery.data?.show?.seasonCount ?? show.seasonCount} seasons
                   </span>
                   {show.externalUrl ? (
                     <>
-                      <span className="text-white/45">&middot;</span>
+                      <span className="text-stone-400 dark:text-white/45">&middot;</span>
                       <a
                         href={show.externalUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-0.5 text-white/88 transition-colors hover:text-white"
+                        className="inline-flex items-center gap-0.5 text-stone-700 transition-colors hover:text-stone-950 dark:text-white/88 dark:hover:text-white"
                       >
                         <span>IMDb</span>
                         <ArrowUpRight className="text-xs" strokeWidth={1.25} />
@@ -224,12 +224,12 @@ function TvShowDetailContent({
                   <TVShowStatusBadge status={detailQuery.data?.show?.status ?? show.status} />
                   {genres.length > 0 ? (
                     <>
-                      <span className="text-white/45">&middot;</span>
+                      <span className="text-stone-400 dark:text-white/45">&middot;</span>
                       <div className="flex flex-wrap items-center gap-2">
                         {genres.map((genre) => (
                           <span
                             key={genre}
-                            className="rounded-md border border-white/16 bg-black/14 px-2 py-1 text-[11px] leading-none text-white/76"
+                            className="rounded-md border border-stone-950/10 bg-white/42 px-2 py-1 text-[11px] leading-none text-stone-700 backdrop-blur-sm dark:border-white/16 dark:bg-black/14 dark:text-white/76 dark:backdrop-blur-none"
                           >
                             {genre}
                           </span>

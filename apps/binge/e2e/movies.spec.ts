@@ -18,6 +18,7 @@ const movies = [
     titlePretty: "Inception",
     year: 2010,
     rating: 8.8,
+    genres: ["Science Fiction", "Action"],
     link: "magnet:?xt=urn:btih:inception",
     posterUrl: "/test/baggio.jpg",
   }),
@@ -186,6 +187,8 @@ test.describe("movies", () => {
     await openFirstMovieModal(authenticatedPage);
 
     await expect(authenticatedPage.getByText("Inception.2010.1080p.BluRay.x264")).toBeVisible();
+    await expect(authenticatedPage.getByText("Science Fiction")).toBeVisible();
+    await expect(authenticatedPage.getByText("Action")).toBeVisible();
     await expect(authenticatedPage.getByLabel("Resolution")).toBeVisible();
     await expect(authenticatedPage.getByLabel("Codec")).toBeVisible();
     await expect(authenticatedPage.getByLabel("Sort")).toBeVisible();

@@ -13,11 +13,24 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const originalEnv = import.meta.env.VITE_PUBLIC_API_BASE_URL;
+
 describe("getPublicAPIBaseURL", () => {
+  afterEach(() => {
+    vi.stubEnv("VITE_PUBLIC_API_BASE_URL", originalEnv);
+  });
+
   it("uses production api for localhost", () => {
     withWindowLocation("http://localhost:3000/auth/success");
 
     expect(getPublicAPIBaseURL()).toBe("https://api.chill.institute");
+  });
+
+  it("prefers an explicit api override on localhost", () => {
+    vi.stubEnv("VITE_PUBLIC_API_BASE_URL", "http://localhost:8080");
+    withWindowLocation("http://localhost:3000/auth/success");
+
+    expect(getPublicAPIBaseURL()).toBe("http://localhost:8080");
   });
 
   it("uses production api for pages preview deployments", () => {
