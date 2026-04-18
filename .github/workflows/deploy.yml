@@ -18,6 +18,9 @@ on:
           - chill
           - binge
 
+env:
+  VITE_PLUS_VERSION: "0.1.16"
+
 jobs:
   deploy-chill:
     if: ${{ inputs.app == 'all' || inputs.app == 'chill' }}
@@ -36,10 +39,13 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          version: "0.1.14"
+          version: ${{ env.VITE_PLUS_VERSION }}
           node-version-file: ".node-version"
           cache: true
           run-install: false
+
+      - name: Load Vite+ environment
+        run: vp env
 
       - name: Install dependencies
         run: vp install
@@ -73,10 +79,13 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          version: "0.1.14"
+          version: ${{ env.VITE_PLUS_VERSION }}
           node-version-file: ".node-version"
           cache: true
           run-install: false
+
+      - name: Load Vite+ environment
+        run: vp env
 
       - name: Install dependencies
         run: vp install
