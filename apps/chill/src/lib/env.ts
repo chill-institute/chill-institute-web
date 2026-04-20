@@ -17,5 +17,5 @@ export function getPublicAPIBaseURL() {
     return window.location.origin;
   }
 
-  return "http://localhost:8080";
+  return "http://localhost:58780";
 }

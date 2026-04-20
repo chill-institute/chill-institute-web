@@ -21,16 +21,16 @@ describe("getPublicAPIBaseURL", () => {
   });
 
   it("uses production api for localhost", () => {
-    withWindowLocation("http://localhost:3000/auth/success");
+    withWindowLocation("http://localhost:58300/auth/success");
 
     expect(getPublicAPIBaseURL()).toBe("https://api.chill.institute");
   });
 
   it("prefers an explicit api override on localhost", () => {
-    vi.stubEnv("VITE_PUBLIC_API_BASE_URL", "http://localhost:8080");
-    withWindowLocation("http://localhost:3000/auth/success");
+    vi.stubEnv("VITE_PUBLIC_API_BASE_URL", "http://localhost:58780");
+    withWindowLocation("http://localhost:58300/auth/success");
 
-    expect(getPublicAPIBaseURL()).toBe("http://localhost:8080");
+    expect(getPublicAPIBaseURL()).toBe("http://localhost:58780");
   });
 
   it("uses production api for pages preview deployments", () => {
