@@ -21,8 +21,8 @@ export default defineConfig({
   },
   webServer: {
     command: process.env.CI
-      ? "vp preview --host 0.0.0.0 --port 3000"
-      : "vp build && vp preview --host 0.0.0.0 --port 3000",
+      ? "vp preview --host 0.0.0.0 --port 58300"
+      : "vp build && vp preview --host 0.0.0.0 --port 58300",
     url: "http://localhost:58300",
     reuseExistingServer: process.env.PW_REUSE_SERVER === "1",
   },
