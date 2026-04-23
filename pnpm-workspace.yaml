@@ -13,8 +13,8 @@ catalog:
   "@tailwindcss/vite": ^4.2.2
   "@tanstack/react-query": ^5.99.0
   "@tanstack/react-query-devtools": ^5.99.0
-  "@tanstack/react-router": ^1.168.10
-  "@tanstack/router-plugin": ^1.167.12
+  "@tanstack/react-router": ^1.168.23
+  "@tanstack/router-plugin": ^1.167.22
   "@types/node": ^25.6.0
   "@types/react": ^19.2.14
   "@types/react-dom": ^19.2.3
@@ -29,7 +29,7 @@ catalog:
   tailwind-merge: ^3.5.0
   tailwindcss: ^4.2.2
   ts-pattern: ^5.9.0
-  typescript: ^6.0.2
+  typescript: ^6.0.3
   vaul: ^1.1.2
   vite: npm:@voidzero-dev/vite-plus-core@0.1.14
   vite-plus: 0.1.16
