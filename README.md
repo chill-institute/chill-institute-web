@@ -1,4 +1,4 @@
-# chill-institute-web
+# chill-web
 
 ![chill.institute web](https://chill.institute/banner.png)
 

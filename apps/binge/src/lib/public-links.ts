@@ -1,4 +1,4 @@
-const WEB_REPOSITORY_URL = "https://github.com/chill-institute/chill-institute-web";
+const WEB_REPOSITORY_URL = "https://github.com/chill-institute/chill-web";
 const GITHUB_ORG_URL = "https://github.com/chill-institute";
 
 export const publicLinks = {

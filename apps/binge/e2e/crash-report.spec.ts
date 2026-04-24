@@ -62,7 +62,7 @@ test.describe("crash report fallback", () => {
 
     const url = new URL(href!);
     expect(url.origin + url.pathname).toBe(
-      "https://github.com/chill-institute/chill-institute-web/issues/new",
+      "https://github.com/chill-institute/chill-web/issues/new",
     );
     expect(url.searchParams.get("template")).toBe("bug_report.md");
     expect(url.searchParams.get("title")).toContain("[bug] Crash on /debug/crash");

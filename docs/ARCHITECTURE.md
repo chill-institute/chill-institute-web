@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes how `chill-institute-web` is structured as a Vite+ workspace hosting both web apps.
+This document describes how `chill-web` is structured as a Vite+ workspace hosting both web apps.
 
 ## System Context
 

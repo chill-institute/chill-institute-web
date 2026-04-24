@@ -121,7 +121,7 @@ export function buildGitHubIssueURL(report: ErrorReport) {
     "```",
   ].join("\n");
 
-  const url = new URL("https://github.com/chill-institute/chill-institute-web/issues/new");
+  const url = new URL("https://github.com/chill-institute/chill-web/issues/new");
   url.searchParams.set("template", "bug_report.md");
   url.searchParams.set("title", title);
   url.searchParams.set("body", body);
