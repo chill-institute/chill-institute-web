@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VITE_PLUS_VERSION: "0.1.16"
+  VITE_PLUS_VERSION: "0.1.20"
 
 jobs:
   changes:

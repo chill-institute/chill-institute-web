@@ -3,6 +3,9 @@ packages:
   - packages/*
   - tools/*
 
+allowBuilds:
+  esbuild: true
+
 catalog:
   "@base-ui/react": ^1.2.0
   "@bufbuild/protobuf": ^2.11.0
@@ -31,14 +34,10 @@ catalog:
   ts-pattern: ^5.9.0
   typescript: ^6.0.3
   vaul: ^1.1.2
-  vite: npm:@voidzero-dev/vite-plus-core@0.1.14
-  vite-plus: 0.1.16
-  vitest: npm:@voidzero-dev/vite-plus-test@0.1.14
+  vite: npm:@voidzero-dev/vite-plus-core@0.1.20
+  vite-plus: 0.1.20
+  vitest: npm:@voidzero-dev/vite-plus-test@0.1.20
 catalogMode: prefer
-
-minimumReleaseAge: 4320
-minimumReleaseAgeExclude:
-  - "@chill-institute/contracts"
 
 overrides:
   vite: "catalog:"
