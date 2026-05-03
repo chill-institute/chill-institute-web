@@ -11,7 +11,7 @@
   },
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/cn",
-    "ui": "@/components/ui"
+    "utils": "@chill-institute/ui/cn",
+    "ui": "@chill-institute/ui/components/ui"
   }
 }

@@ -7,7 +7,7 @@ import {
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@chill-institute/ui/components/ui/popover";
 import { publicLinks } from "@/lib/public-links";
 import { getMoviesSourceLabel, type MoviesSource } from "@/lib/types";
 

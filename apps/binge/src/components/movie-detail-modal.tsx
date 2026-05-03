@@ -2,11 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Search, Star, Users, X } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { Button } from "@chill-institute/ui/components/ui/button";
+import { IconButton } from "@chill-institute/ui/components/icon-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@chill-institute/ui/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@chill-institute/ui/components/ui/drawer";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/cn";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
+import { cn } from "@chill-institute/ui/cn";
 import { formatAge, formatBytes } from "@/lib/format";
 import { type Movie, type SearchResult } from "@/lib/types";
 import { useMovieSearchQuery } from "@/queries/movies";
@@ -110,8 +122,14 @@ function compareBigintsDescending(left: bigint, right: bigint) {
   return left > right ? -1 : 1;
 }
 
+// Hoisted to module scope so the literals don't get re-evaluated on every
+// call — useMemo maps over every result and runs the parsers per row.
+const RESOLUTION_RE = /\b(2160p|1080p|720p)\b/i;
+const X265_RE = /\b(x265|h\.?265|hevc)\b/i;
+const X264_RE = /\b(x264|h\.?264|avc)\b/i;
+
 function parseResolution(title: string): ParsedResult["resolution"] {
-  const match = title.match(/\b(2160p|1080p|720p)\b/i);
+  const match = title.match(RESOLUTION_RE);
   if (!match) {
     return undefined;
   }
@@ -125,13 +143,11 @@ function parseResolution(title: string): ParsedResult["resolution"] {
 }
 
 function parseCodec(title: string): ParsedResult["codec"] {
-  const normalizedTitle = title.toLowerCase();
-
-  if (/\b(x265|h\.?265|hevc)\b/i.test(normalizedTitle)) {
+  if (X265_RE.test(title)) {
     return "x265";
   }
 
-  if (/\b(x264|h\.?264|avc)\b/i.test(normalizedTitle)) {
+  if (X264_RE.test(title)) {
     return "x264";
   }
 
@@ -319,7 +335,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
           <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-linear-to-r from-white/78 via-white/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-stone-100/78 via-stone-100/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {movie.posterUrl ? (
@@ -373,239 +389,271 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                   </>
                 ) : null}
               </div>
-              {metadataTags.length > 0 ? (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {metadataTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md border border-stone-950/10 bg-white/42 px-2 py-1 text-[11px] leading-none text-stone-700 backdrop-blur-sm dark:border-white/16 dark:bg-black/14 dark:text-white/76 dark:backdrop-blur-none"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
 
-        <button
-          type="button"
+        <IconButton
           onClick={onClose}
-          className="absolute right-3 top-3 z-20 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
           aria-label="Close movie details"
+          className="absolute right-3 top-3 z-20 rounded-full border-stone-950 bg-stone-100 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:bg-stone-900 dark:shadow-[1px_1px_0_var(--color-stone-700)]"
         >
-          <X className="h-4 w-4" />
-        </button>
+          <X />
+        </IconButton>
       </div>
 
-      <div className="px-6 pb-6">
+      <div className="flex flex-col gap-4 px-6 pt-5 pb-6">
         {synopsis ? (
-          <p className="mt-5 text-sm text-stone-600 dark:text-stone-400">{synopsis}</p>
+          <p className="m-0 max-w-[64ch] text-sm leading-relaxed text-pretty text-stone-700 dark:text-stone-300">
+            {synopsis}
+          </p>
         ) : null}
-        <div className="mt-5 border-t border-stone-950 pt-5 dark:border-stone-700">
-          {searchQuery.status === "pending" ? (
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 6 }, (_, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-3 dark:border-stone-700/30"
-                >
-                  <Skeleton className="h-5 w-5 rounded" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-3 w-1/3" />
-                  </div>
-                  <Skeleton className="h-8 w-28 rounded-md" />
-                </div>
-              ))}
-            </div>
-          ) : searchQuery.status === "error" ? (
-            <div className="space-y-2">
-              <p className="text-sm text-stone-600 dark:text-stone-400">
-                We couldn&apos;t load torrent matches for this movie yet.
-              </p>
-              <UserErrorAlert error={searchQuery.error} />
-            </div>
-          ) : results.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-              <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
-                <Search className="size-4" />
-                <span>No torrent results found</span>
-              </div>
-              <p className="mt-2">
-                We searched by movie title and year, but nothing usable came back yet.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-end justify-between gap-2">
-                <div className="flex flex-wrap items-end gap-2">
-                  <FilterSelect
-                    label="Resolution"
-                    value={resolutionFilter}
-                    onChange={(value) => setResolutionFilter(value as ResolutionFilterValue)}
-                    options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
-                      value,
-                      label: value === "all" ? "All resolutions" : value,
-                    }))}
-                  />
-                  <FilterSelect
-                    label="Codec"
-                    value={codecFilter}
-                    onChange={(value) => setCodecFilter(value as CodecFilterValue)}
-                    options={CODEC_FILTER_OPTIONS.map((value) => ({
-                      value,
-                      label: value === "all" ? "All codecs" : value,
-                    }))}
-                  />
-                  <FilterSelect
-                    label="Sort"
-                    value={sortBy}
-                    onChange={(value) => setSortBy(value as SortValue)}
-                    options={[
-                      { value: "seeders", label: "Most seeders" },
-                      { value: "size", label: "Largest size" },
-                      { value: "age", label: "Newest first" },
-                    ]}
-                  />
-                  {hasActiveFilters ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setResolutionFilter("all");
-                        setCodecFilter("all");
-                      }}
-                      className="btn btn-secondary text-xs"
-                    >
-                      Clear filters
-                    </button>
-                  ) : null}
-                </div>
-                <p className="self-end pb-0.5 text-xs leading-none tabular-nums text-stone-500 dark:text-stone-400">
-                  {visibleResults.length}
-                  {visibleResults.length !== results.length ? ` of ${results.length}` : ""} result
-                  {visibleResults.length === 1 ? "" : "s"}
-                </p>
-              </div>
+        {metadataTags.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {metadataTags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center rounded-full border border-stone-950 bg-stone-100 px-2 py-0.5 font-mono text-[0.6875rem] lowercase text-stone-700 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
-              {visibleResults.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-                  <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
-                    <Search className="size-4" />
-                    <span>No results match these filters</span>
-                  </div>
-                  <p className="mt-2">
-                    Try a different resolution or codec to widen the result set.
+        <h4 className="m-0 font-mono text-[0.6875rem] font-medium tracking-[0.04em] lowercase text-stone-600 dark:text-stone-300">
+          send to put.io
+        </h4>
+
+        {searchQuery.status === "pending" ? (
+          <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 border-t border-stone-950/10 px-3 py-3 first:border-t-0 dark:border-stone-700/30"
+              >
+                <Skeleton className="h-3 w-14 rounded" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-7 w-28 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : searchQuery.status === "error" ? (
+          <div className="space-y-2">
+            <p className="text-sm text-stone-700 dark:text-stone-300">
+              couldn&apos;t load torrent matches for this movie yet.
+            </p>
+            <UserErrorAlert error={searchQuery.error} />
+          </div>
+        ) : results.length === 0 ? (
+          <EmptyResults
+            title="no torrent results found"
+            body="searched by movie title and year, but nothing usable came back yet."
+          />
+        ) : (
+          <>
+            <ResultsToolbar
+              resolutionFilter={resolutionFilter}
+              codecFilter={codecFilter}
+              sortBy={sortBy}
+              hasActiveFilters={hasActiveFilters}
+              visibleCount={visibleResults.length}
+              totalCount={results.length}
+              onResolutionChange={setResolutionFilter}
+              onCodecChange={setCodecFilter}
+              onSortChange={setSortBy}
+              onClearFilters={() => {
+                setResolutionFilter("all");
+                setCodecFilter("all");
+              }}
+            />
+
+            {visibleResults.length === 0 ? (
+              <EmptyResults
+                title="no results match these filters"
+                body="try a different resolution or codec to widen the result set."
+              />
+            ) : (
+              <>
+                {hasOnlyUnavailableResults ? (
+                  <p className="m-0 text-[0.8125rem] text-stone-600 dark:text-stone-300">
+                    results came back, but none include a usable transfer link yet.
                   </p>
-                </div>
-              ) : null}
+                ) : null}
 
-              {hasOnlyUnavailableResults ? (
-                <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-3 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-                  Results came back, but none include a usable transfer link yet.
-                </div>
-              ) : null}
+                <div
+                  role="list"
+                  aria-label="Torrent results list"
+                  className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40"
+                >
+                  {visibleResults.map(({ result, resolution, codec }) => {
+                    const isSendable = canSendResult(result);
+                    const ageLabel = formatResultAge(result.uploadedAt);
+                    const uploadedAtLabel = result.uploadedAt
+                      ? formatUploadedAt(result.uploadedAt)
+                      : undefined;
+                    const sizeLabel = result.size > 0n ? formatBytes(result.size) : undefined;
+                    const seederLabel = formatSeederCount(result.seeders);
 
-              <div role="list" aria-label="Torrent results list" className="flex flex-col gap-2">
-                {visibleResults.map(({ result, resolution, codec }) => {
-                  const isSendable = canSendResult(result);
-                  const ageLabel = formatResultAge(result.uploadedAt);
-                  const uploadedAtLabel = result.uploadedAt
-                    ? formatUploadedAt(result.uploadedAt)
-                    : undefined;
-                  const sizeLabel = result.size > 0n ? formatBytes(result.size) : undefined;
-                  const seederLabel = formatSeederCount(result.seeders);
-
-                  return (
-                    <div
-                      key={result.id || `${result.title}-${result.link}`}
-                      role="listitem"
-                      className={cn(
-                        "flex flex-col gap-3 rounded-lg border border-stone-950 bg-stone-50 px-3 py-3 dark:border-stone-700 dark:bg-stone-950/40 sm:flex-row sm:items-center sm:justify-between",
-                        !isSendable && "border-dashed border-stone-950/40 dark:border-stone-700/80",
-                      )}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="break-words text-sm font-medium">{result.title}</div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-600 dark:text-stone-400">
-                          <span className="font-medium text-stone-700 dark:text-stone-300">
-                            {result.indexer || result.source || "Unknown source"}
-                          </span>
-                          {resolution ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="rounded-full border border-stone-950/12 bg-stone-200/80 px-2 py-0.5 text-[11px] leading-none text-stone-700 dark:border-stone-700/70 dark:bg-stone-800/90 dark:text-stone-300">
-                                {resolution}
-                              </span>
-                            </>
-                          ) : null}
-                          {codec ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="rounded-full border border-stone-950/12 bg-stone-200/80 px-2 py-0.5 text-[11px] leading-none text-stone-700 dark:border-stone-700/70 dark:bg-stone-800/90 dark:text-stone-300">
-                                {codec}
-                              </span>
-                            </>
-                          ) : null}
-                          {sizeLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span>{sizeLabel}</span>
-                            </>
-                          ) : null}
-                          {seederLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="inline-flex items-center gap-1">
-                                <Users className="size-3" />
-                                {seederLabel}
-                              </span>
-                            </>
-                          ) : null}
-                          {ageLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span title={uploadedAtLabel}>{ageLabel}</span>
-                            </>
-                          ) : null}
-                          {!isSendable ? (
-                            <>
-                              <span>&middot;</span>
-                              <span>Unavailable</span>
-                            </>
-                          ) : null}
+                    return (
+                      <div
+                        key={result.id || `${result.title}-${result.link}`}
+                        role="listitem"
+                        className={cn(
+                          "flex flex-col gap-3 border-t border-stone-950/10 px-3 py-3 first:border-t-0 sm:flex-row sm:items-center sm:justify-between dark:border-stone-700/30",
+                          !isSendable && "opacity-70",
+                        )}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="break-words text-[0.8125rem] font-medium text-stone-950 dark:text-stone-100">
+                            {result.title}
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
+                            <span className="text-stone-700 dark:text-stone-200">
+                              {result.indexer || result.source || "unknown"}
+                            </span>
+                            {resolution ? (
+                              <>
+                                <span>·</span>
+                                <span>{resolution}</span>
+                              </>
+                            ) : null}
+                            {codec ? (
+                              <>
+                                <span>·</span>
+                                <span>{codec}</span>
+                              </>
+                            ) : null}
+                            {sizeLabel ? (
+                              <>
+                                <span>·</span>
+                                <span className="tabular-nums">{sizeLabel}</span>
+                              </>
+                            ) : null}
+                            {seederLabel ? (
+                              <>
+                                <span>·</span>
+                                <span className="inline-flex items-center gap-1 tabular-nums">
+                                  <Users className="size-3" />
+                                  {seederLabel}
+                                </span>
+                              </>
+                            ) : null}
+                            {ageLabel ? (
+                              <>
+                                <span>·</span>
+                                <span title={uploadedAtLabel}>{ageLabel}</span>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {isSendable ? (
+                            <AddTransferButton className="w-full sm:w-auto" url={result.link}>
+                              send to put.io
+                            </AddTransferButton>
+                          ) : (
+                            <Button
+                              variant="off"
+                              disabled
+                              className="w-full sm:w-auto"
+                              aria-label={`Cannot send ${result.title} to put.io`}
+                              title="This result is missing a usable transfer link"
+                            >
+                              unavailable
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {isSendable ? (
-                          <AddTransferButton
-                            className="w-full sm:w-auto"
-                            url={result.link}
-                            ariaLabel={`Send ${result.title} to put.io`}
-                          >
-                            send to put.io
-                          </AddTransferButton>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled
-                            className="btn btn-secondary w-full cursor-not-allowed opacity-60 sm:w-auto"
-                            aria-label={`Cannot send ${result.title} to put.io`}
-                            title="This result is missing a usable transfer link"
-                          >
-                            unavailable
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
+    </div>
+  );
+}
+
+function ResultsToolbar({
+  resolutionFilter,
+  codecFilter,
+  sortBy,
+  hasActiveFilters,
+  visibleCount,
+  totalCount,
+  onResolutionChange,
+  onCodecChange,
+  onSortChange,
+  onClearFilters,
+}: {
+  resolutionFilter: ResolutionFilterValue;
+  codecFilter: CodecFilterValue;
+  sortBy: SortValue;
+  hasActiveFilters: boolean;
+  visibleCount: number;
+  totalCount: number;
+  onResolutionChange: (value: ResolutionFilterValue) => void;
+  onCodecChange: (value: CodecFilterValue) => void;
+  onSortChange: (value: SortValue) => void;
+  onClearFilters: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-2">
+      <div className="flex flex-wrap items-end gap-2">
+        <FilterSelect
+          label="Resolution"
+          value={resolutionFilter}
+          onChange={(value) => onResolutionChange(value as ResolutionFilterValue)}
+          options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
+            value,
+            label: value === "all" ? "all resolutions" : value,
+          }))}
+        />
+        <FilterSelect
+          label="Codec"
+          value={codecFilter}
+          onChange={(value) => onCodecChange(value as CodecFilterValue)}
+          options={CODEC_FILTER_OPTIONS.map((value) => ({
+            value,
+            label: value === "all" ? "all codecs" : value,
+          }))}
+        />
+        <FilterSelect
+          label="Sort"
+          value={sortBy}
+          onChange={(value) => onSortChange(value as SortValue)}
+          options={[
+            { value: "seeders", label: "most seeders" },
+            { value: "size", label: "largest size" },
+            { value: "age", label: "newest first" },
+          ]}
+        />
+        {hasActiveFilters ? (
+          <Button variant="ghost" size="sm" onClick={onClearFilters}>
+            clear filters
+          </Button>
+        ) : null}
+      </div>
+      <p className="m-0 self-end pb-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-stone-600 dark:text-stone-300">
+        {visibleCount}
+        {visibleCount !== totalCount ? ` of ${totalCount}` : ""} result
+        {visibleCount === 1 ? "" : "s"}
+      </p>
+    </div>
+  );
+}
+
+function EmptyResults({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-700 dark:border-stone-700 dark:text-stone-300">
+      <div className="flex items-center gap-2 font-medium text-stone-950 dark:text-stone-100">
+        <Search className="size-4" />
+        <span>{title}</span>
+      </div>
+      <p className="m-0 mt-2">{body}</p>
     </div>
   );
 }

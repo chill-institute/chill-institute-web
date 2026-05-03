@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
 
 function SearchResultCardLoading() {
   return (

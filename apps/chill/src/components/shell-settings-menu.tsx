@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Minus, Settings } from "lucide-react";
 
 import { SettingsPanel } from "@/components/settings-panel";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@chill-institute/ui/components/ui/collapsible";
 
 export function ShellSettingsMenu() {
   const [open, setOpen] = useState(false);
@@ -17,7 +21,7 @@ export function ShellSettingsMenu() {
           >
             <div className="flex flex-row items-center space-x-1">
               {open ? <Minus className="text-xs" /> : <Settings className="text-xs" />}
-              <span className="text-sm">{open ? "Hide settings" : "Show settings"}</span>
+              <span className="text-sm">{open ? "hide settings" : "show settings"}</span>
             </div>
           </button>
         }

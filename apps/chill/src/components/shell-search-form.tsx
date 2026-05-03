@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@chill-institute/ui/components/ui/tooltip";
 import { normalizeQuery } from "@/lib/search";
 
 export function ShellSearchForm({
@@ -92,16 +92,16 @@ export function ShellSearchForm({
     >
       <fieldset>
         {label ? (
-          <label className="mb-1 block" htmlFor="search-global">
+          <label className="mb-1 block text-sm" htmlFor="search-global">
             {label}
           </label>
         ) : null}
-        <div className="flex flex-row space-x-2">
-          <div className="flex-1 relative">
+        <div className="flex flex-row gap-2">
+          <div className="relative flex-1">
             <input
               ref={inputRef}
               id="search-global"
-              className="input w-full pl-2 pr-7 py-0 text-lg"
+              className="input h-7.5 w-full pr-8 pl-2.5 text-base"
               required
               type="text"
               name="q"
@@ -110,7 +110,9 @@ export function ShellSearchForm({
               onBlur={() => setFocused(false)}
               onChange={(event) => setDraft({ base: initialQuery, value: event.target.value })}
             />
-            <div className="absolute right-0 top-0 h-full flex items-center px-1.5">{icon}</div>
+            <div className="absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center">
+              {icon}
+            </div>
           </div>
           <button type="submit" className="btn">
             and chill

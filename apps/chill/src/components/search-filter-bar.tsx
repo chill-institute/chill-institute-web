@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@chill-institute/ui/components/ui/checkbox";
 import type { FilterState } from "@/hooks/use-search-filters";
 import {
   SortDirection,
@@ -23,6 +23,11 @@ type Props = {
   onSort: (sortBy: UserSettings["sortBy"]) => void;
 };
 
+/*
+ * Quick filters (resolution / codec / other) sit on a single horizontal
+ * row at lg+, separated by 1px stone-950/12 hairlines. The sort row is
+ * mobile-only (lg:hidden) and uses .btn pills with an active stamp fill.
+ */
 export function SearchFilterBar({
   filters,
   onResolutionChange,
@@ -31,12 +36,11 @@ export function SearchFilterBar({
   onSort,
 }: Props) {
   return (
-    <div className="flex flex-col space-y-6 mt-6 mb-2 lg:items-center">
-      <fieldset className="flex flex-col items-start lg:items-center">
+    <div className="mt-6 mb-2 flex flex-col gap-4 lg:items-center">
+      <fieldset className="m-0 border-0 p-0">
         <legend className="sr-only">Quick filters</legend>
-
-        <div className="flex flex-row items-center space-x-3" id="quick-filters">
-          <div className="flex flex-row space-x-2">
+        <div id="quick-filters" className="flex flex-wrap items-center gap-x-3.5 gap-y-2">
+          <div className="flex items-center gap-2.5">
             {resolutionFilters.map((filter) => {
               const checked = filters.resolution.includes(filter);
               return (
@@ -57,11 +61,9 @@ export function SearchFilterBar({
             })}
           </div>
 
-          <div>
-            <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
-          </div>
+          <span aria-hidden="true" className="h-4 w-px bg-stone-950/12 dark:bg-stone-100/12" />
 
-          <div className="flex flex-row space-x-2">
+          <div className="flex items-center gap-2.5">
             {codecFilters.map((filter) => {
               const checked = filters.codec.includes(filter);
               return (
@@ -82,11 +84,9 @@ export function SearchFilterBar({
             })}
           </div>
 
-          <div>
-            <div className="h-4 w-px bg-stone-400 dark:bg-stone-700" />
-          </div>
+          <span aria-hidden="true" className="h-4 w-px bg-stone-950/12 dark:bg-stone-100/12" />
 
-          <div className="flex flex-row space-x-2">
+          <div className="flex items-center gap-2.5">
             {otherFilters.map((filter) => {
               const checked = filters.other.includes(filter);
               return (
@@ -107,10 +107,9 @@ export function SearchFilterBar({
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col items-start lg:hidden lg:items-center">
+      <fieldset className="m-0 border-0 p-0 lg:hidden">
         <legend className="sr-only">Sort by</legend>
-
-        <div className="flex flex-row space-x-2 flex-wrap" id="sort-options">
+        <div id="sort-options" className="flex flex-wrap gap-1.5">
           {sortByValues.map((option) => {
             const active = filters.sortBy === option;
             return (
@@ -120,14 +119,12 @@ export function SearchFilterBar({
                 className={`btn ${active ? "bg-stone-300 dark:bg-stone-700" : ""}`}
                 onClick={() => onSort(option)}
               >
-                <div className="flex flex-row items-center space-x-0.5">
-                  <span>{sortByLabels[option].toLowerCase()}</span>
-                  {active ? (
-                    <span className="text-xs -mb-0.5">
-                      {filters.sortDirection === SortDirection.ASC ? <ArrowUp /> : <ArrowDown />}
-                    </span>
-                  ) : null}
-                </div>
+                <span>{sortByLabels[option].toLowerCase()}</span>
+                {active ? (
+                  <span className="text-xs">
+                    {filters.sortDirection === SortDirection.ASC ? <ArrowUp /> : <ArrowDown />}
+                  </span>
+                ) : null}
               </button>
             );
           })}

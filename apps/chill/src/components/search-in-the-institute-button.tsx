@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@chill-institute/ui/components/ui/tooltip";
 
 export function SearchInTheInstituteButton({
   title,

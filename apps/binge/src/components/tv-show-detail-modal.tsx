@@ -3,11 +3,23 @@ import { ArrowUpRight, CloudUpload, Loader2, Star, X } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
 import { TVShowStatusBadge } from "@/components/tv-show-status-badge";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { Button } from "@chill-institute/ui/components/ui/button";
+import { IconButton } from "@chill-institute/ui/components/icon-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@chill-institute/ui/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@chill-institute/ui/components/ui/drawer";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/cn";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
+import { cn } from "@chill-institute/ui/cn";
 import { formatBytes } from "@/lib/format";
 import { type TVShow } from "@/lib/types";
 import {
@@ -121,14 +133,13 @@ function TvShowDetailContent({
     (downloadsQuery.isFetching && downloadsQuery.status === "success");
 
   const closeButton = (
-    <button
-      type="button"
+    <IconButton
       onClick={onClose}
-      className="absolute right-3 top-3 z-20 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
       aria-label="Close TV show details"
+      className="absolute right-3 top-3 z-20 rounded-full border-stone-950 bg-stone-100 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:bg-stone-900 dark:shadow-[1px_1px_0_var(--color-stone-700)]"
     >
-      <X className="h-4 w-4" />
-    </button>
+      <X />
+    </IconButton>
   );
 
   const shellClassName = isDesktop
@@ -161,7 +172,7 @@ function TvShowDetailContent({
           <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-linear-to-r from-white/78 via-white/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-stone-100/78 via-stone-100/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {posterUrl ? (
@@ -229,7 +240,7 @@ function TvShowDetailContent({
                         {genres.map((genre) => (
                           <span
                             key={genre}
-                            className="rounded-md border border-stone-950/10 bg-white/42 px-2 py-1 text-[11px] leading-none text-stone-700 backdrop-blur-sm dark:border-white/16 dark:bg-black/14 dark:text-white/76 dark:backdrop-blur-none"
+                            className="rounded-md border border-stone-950/10 bg-white/42 px-2 py-1 text-[0.6875rem] leading-none text-stone-700 backdrop-blur-sm dark:border-white/16 dark:bg-black/14 dark:text-white/76 dark:backdrop-blur-none"
                           >
                             {genre}
                           </span>
@@ -277,18 +288,14 @@ function TvShowDetailContent({
           {seasons.length > 1 ? (
             <div className="mb-4 flex flex-wrap gap-1">
               {seasons.map((season) => (
-                <button
+                <Button
                   key={season.seasonNumber}
-                  type="button"
+                  size="sm"
+                  variant={season.seasonNumber === resolvedSeasonNumber ? "primary" : "ghost"}
                   onClick={() => onSeasonChange(season.seasonNumber)}
-                  className={
-                    season.seasonNumber === resolvedSeasonNumber
-                      ? "btn text-xs bg-stone-950 text-stone-100 dark:bg-stone-100 dark:text-stone-950 dark:border-stone-100"
-                      : "btn btn-secondary text-xs"
-                  }
                 >
-                  {season.name || `Season ${season.seasonNumber}`}
-                </button>
+                  {season.name || `season ${season.seasonNumber}`}
+                </Button>
               ))}
             </div>
           ) : detailQuery.isPending ? (
@@ -320,10 +327,10 @@ function TvShowDetailContent({
 
               <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:flex-nowrap">
                 {downloadsQuery.isPending ? (
-                  <button type="button" className="btn btn-secondary text-sm" disabled>
-                    <Loader2 className="animate-spin text-xs" />
+                  <Button disabled>
+                    <Loader2 className="animate-spin" />
                     <span>loading downloads</span>
-                  </button>
+                  </Button>
                 ) : downloadsQuery.data?.seasonPack?.link ? (
                   <AddTransferButton
                     url={downloadsQuery.data.seasonPack.link}
@@ -332,10 +339,10 @@ function TvShowDetailContent({
                     send season to put.io
                   </AddTransferButton>
                 ) : (
-                  <button type="button" className="btn btn-secondary text-sm opacity-70" disabled>
-                    <CloudUpload className="text-xs" />
+                  <Button variant="off" disabled>
+                    <CloudUpload />
                     <span>season pack unavailable</span>
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -344,24 +351,23 @@ function TvShowDetailContent({
           {seasonQuery.status === "error" ? (
             <UserErrorAlert error={seasonQuery.error} />
           ) : seasonQuery.isPending ? (
-            <div className="flex flex-col gap-2">
+            <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
               {Array.from({ length: 6 }, (_, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-2 dark:border-stone-700/30"
+                  className="flex items-center gap-3 border-t border-stone-950/10 px-3 py-2.5 first:border-t-0 dark:border-stone-700/30"
                 >
-                  <Skeleton className="h-7 w-7 rounded-md" />
+                  <Skeleton className="h-3 w-6 rounded" />
                   <div className="flex-1 space-y-1">
                     <Skeleton className="h-4 w-44" />
                     <Skeleton className="h-3 w-28" />
                   </div>
                   <EpisodeActionSkeleton />
-                  <EpisodeActionSkeleton />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
               {(seasonQuery.data?.episodes ?? []).map((episode) => {
                 const episodeDownload = downloadsByEpisode.get(episode.episodeNumber);
                 const paddedEpisode = String(episode.episodeNumber).padStart(2, "0");
@@ -369,20 +375,20 @@ function TvShowDetailContent({
                 return (
                   <div
                     key={`${episode.seasonNumber}-${episode.episodeNumber}`}
-                    className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-2.5 dark:border-stone-700/30"
+                    className="flex items-center gap-3 border-t border-stone-950/10 px-3 py-2.5 first:border-t-0 dark:border-stone-700/30"
                   >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-stone-200 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-400">
-                      {paddedEpisode}
+                    <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-stone-600 dark:text-stone-300">
+                      e{paddedEpisode}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm">
-                        {episode.name || `Episode ${episode.episodeNumber}`}
+                      <div className="truncate text-[0.8125rem] text-stone-950 dark:text-stone-100">
+                        {episode.name || `episode ${episode.episodeNumber}`}
                       </div>
-                      <div className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-stone-500 dark:text-stone-400">
+                      <div className="mt-0.5 flex flex-wrap gap-x-2 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
                         <span>{formatAirDate(episode.airDate)}</span>
-                        {episode.runtime ? <span>{episode.runtime} min</span> : null}
-                        {episode.rating ? <span>{episode.rating.toFixed(1)} IMDb</span> : null}
+                        {episode.runtime ? <span>· {episode.runtime}m</span> : null}
+                        {episode.rating ? <span>· ★ {episode.rating.toFixed(1)}</span> : null}
                       </div>
                     </div>
 
@@ -397,9 +403,9 @@ function TvShowDetailContent({
                           <CloudUpload />
                         </AddTransferButton>
                       ) : (
-                        <button type="button" className="btn px-2 opacity-60" disabled>
+                        <Button variant="off" disabled>
                           <CloudUpload />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>

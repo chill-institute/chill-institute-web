@@ -4,7 +4,7 @@ test.describe("smoke", () => {
   test("public sign-in route renders", async ({ page }) => {
     await page.goto("/sign-in");
 
-    await expect(page.getByRole("button", { name: "authenticate at put.io" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "sign in with put.io" })).toBeVisible();
   });
 
   test("authenticated settings shell renders", async ({ authenticatedPage, mockRpc }) => {

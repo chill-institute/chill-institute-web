@@ -1,14 +1,25 @@
-import { type ReactNode, useState } from "react";
-import { Navigate, createFileRoute } from "@tanstack/react-router";
-import { Film, Star, Tv } from "lucide-react";
+import { useState } from "react";
+import { Link, Navigate, createFileRoute } from "@tanstack/react-router";
+import { Calendar, Film, Flame, Star, Tv } from "lucide-react";
 import { match } from "ts-pattern";
 
 import { MovieDetailModal } from "@/components/movie-detail-modal";
 import { TvShowDetailModal } from "@/components/tv-show-detail-modal";
 import { MoviesSourceSelect } from "@/components/movies-source-select";
 import { TVShowsSourceSelect } from "@/components/tv-shows-source-select";
+import { ShellSettingsMenu } from "@/components/shell-settings-menu";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
+import { StickyHeader } from "@chill-institute/ui/components/sticky-header";
+import { Tab, Tabs } from "@chill-institute/ui/components/tabs";
+import { PosterCard } from "@chill-institute/ui/components/poster-card";
+import { InstituteFooter } from "@chill-institute/ui/components/institute-footer";
+import {
+  SortPill,
+  SortRow,
+  SortRowDivider,
+  SortRowLabel,
+} from "@chill-institute/ui/components/sort-row";
 import { readCurrentCallbackPath, useAuth, readStoredToken } from "@/lib/auth";
 import { type Movie, type TVShow, type UserSettings } from "@/lib/types";
 import { moviesQueryOptions, settingsQueryOptions, tvShowsQueryOptions } from "@/queries/options";
@@ -22,6 +33,7 @@ import {
 import { useTVShowsQuery } from "@/queries/tv-shows";
 
 type HomeTab = "movies" | "tv";
+type SortKey = "popular" | "rating" | "recent";
 
 export const Route = createFileRoute("/")({
   loader: ({ context: { queryClient } }) => {
@@ -36,6 +48,68 @@ export const Route = createFileRoute("/")({
   },
   component: HomePage,
 });
+
+function BingeBrand() {
+  return (
+    <Link to="/" className="flex min-w-0 items-center gap-2">
+      <h3 className="truncate font-serif text-lg leading-none font-normal tracking-tight text-stone-950 dark:text-stone-100">
+        binge.institute
+      </h3>
+      <span className="rounded-full border border-stone-950/10 bg-stone-950/[0.05] px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.18em] text-stone-600 uppercase dark:border-stone-100/10 dark:bg-stone-100/[0.06] dark:text-stone-400">
+        alpha
+      </span>
+    </Link>
+  );
+}
+
+function HomeShell({
+  tab,
+  onTabChange,
+  children,
+}: {
+  tab: HomeTab;
+  onTabChange: (next: HomeTab) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <StickyHeader
+        brand={<BingeBrand />}
+        tabs={
+          <Tabs>
+            <Tab active={tab === "movies"} onClick={() => onTabChange("movies")}>
+              <Film aria-hidden="true" />
+              movies
+            </Tab>
+            <Tab active={tab === "tv"} onClick={() => onTabChange("tv")}>
+              <Tv aria-hidden="true" />
+              tv shows
+            </Tab>
+          </Tabs>
+        }
+        right={<ShellSettingsMenu />}
+      />
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 md:px-6">
+        {children}
+        <InstituteFooter
+          left={
+            <span>
+              <span>binge.institute</span>
+              <span className="ml-1 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
+                · alpha · made with espresso in milan
+              </span>
+            </span>
+          }
+          right={
+            <span className="font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
+              not affiliated with put.io
+            </span>
+          }
+        />
+      </main>
+    </div>
+  );
+}
 
 function HomePage() {
   const auth = useAuth();
@@ -53,16 +127,21 @@ function HomePage() {
   const tvShowsQuery = useTVShowsQuery(shouldFetchTVShows);
 
   const [activeTab, setActiveTab] = useState<HomeTab>("movies");
+  const [sort, setSort] = useState<SortKey>("popular");
   const [selectedMovie, setSelectedMovie] = useState<Movie>();
   const [selectedShowId, setSelectedShowId] = useState<string>();
   const [selectedSeason, setSelectedSeason] = useState<number>();
 
   function patchConfig(patch: Partial<UserSettings>) {
-    if (!configQuery.data) {
-      return;
-    }
-
+    if (!configQuery.data) return;
     saveConfigMutation.mutate({ ...configQuery.data, ...patch });
+  }
+
+  function handleTabChange(next: HomeTab) {
+    setActiveTab(next);
+    setSelectedMovie(undefined);
+    setSelectedShowId(undefined);
+    setSelectedSeason(undefined);
   }
 
   if (!auth.isAuthenticated) {
@@ -77,33 +156,21 @@ function HomePage() {
 
   return match(configQuery)
     .with({ status: "pending" }, () => (
-      <div className="mx-auto my-6 w-full max-w-5xl px-4 md:my-12 xl:px-0">
-        <div className="flex flex-col gap-3 xs:flex-row xs:items-end xs:justify-between">
-          <div className="flex gap-2">
-            <Skeleton className="h-10 w-28 rounded-md" />
-            <Skeleton className="h-10 w-32 rounded-md" />
-          </div>
-          <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-32 rounded-md" />
-            <Skeleton className="h-10 w-10 rounded-md" />
-          </div>
-        </div>
-        <div className="mt-4">
-          <Skeleton className="h-10 w-56 rounded-md" />
-        </div>
-        <MediaCardsSkeleton />
-      </div>
+      <HomeShell tab={activeTab} onTabChange={handleTabChange}>
+        <PageHeading tab={activeTab} />
+        <SortRowSkeleton />
+        <PosterGridSkeleton />
+      </HomeShell>
     ))
     .with({ status: "error" }, (query) => (
-      <div className="mx-auto my-6 w-full max-w-5xl px-4 xl:px-0">
-        <UserErrorAlert error={query.error} />
-      </div>
+      <HomeShell tab={activeTab} onTabChange={handleTabChange}>
+        <div className="my-6">
+          <UserErrorAlert error={query.error} />
+        </div>
+      </HomeShell>
     ))
     .with({ status: "success" }, (query) => {
       const config = query.data;
-      const showTabs = true;
-      const currentTab: HomeTab = activeTab;
-
       const currentTVShowsResponse =
         tvShowsQuery.status === "success" && tvShowsQuery.data.source === config.tvShowsSource
           ? tvShowsQuery.data
@@ -111,8 +178,9 @@ function HomePage() {
       const selectedShow = currentTVShowsResponse?.shows.find(
         (show) => show.imdbId === selectedShowId,
       );
+
       const sourceSelector =
-        currentTab === "movies" ? (
+        activeTab === "movies" ? (
           <MoviesSourceSelect
             value={config.moviesSource}
             onChange={(moviesSource) => patchConfig({ moviesSource })}
@@ -125,302 +193,231 @@ function HomePage() {
         );
 
       const moviesContent = pendingMoviesRefresh ? (
-        <MediaCardsSkeleton />
+        <PosterGridSkeleton />
       ) : (
         match(moviesQuery)
-          .with({ status: "pending" }, () => <MediaCardsSkeleton />)
+          .with({ status: "pending" }, () => <PosterGridSkeleton />)
           .with({ status: "error" }, (movies) =>
             movies.isFetching ? (
-              <MediaCardsSkeleton />
+              <PosterGridSkeleton />
             ) : (
               <UserErrorAlert className="mt-2" error={movies.error} />
             ),
           )
           .with({ status: "success" }, (movies) => {
             if (movies.data.source !== config.moviesSource) {
-              return <MediaCardsSkeleton />;
+              return <PosterGridSkeleton />;
             }
 
             if (movies.data.movies.length === 0) {
               if (movies.isFetching) {
-                return <MediaCardsSkeleton />;
+                return <PosterGridSkeleton />;
               }
-
               return (
-                <div className="mt-2">
-                  {`Couldn't fetch any movies from the selected source, please try another one.`}
-                </div>
+                <EmptyState message="couldn't fetch any movies from the selected source, please try another one." />
               );
             }
 
             return (
-              <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
-                {movies.data.movies.map((movie) => (
-                  <MovieExpandedCard
+              <PosterGrid>
+                {sortMovies(movies.data.movies, sort).map((movie, index) => (
+                  <PosterCard
                     key={movie.id}
-                    movie={movie}
-                    onOpen={(nextMovie) => {
-                      setSelectedMovie(nextMovie);
-                    }}
+                    className="animate-reveal"
+                    style={staggerDelay(index)}
+                    title={movie.title}
+                    image={movie.posterUrl ?? null}
+                    rating={movie.rating != null ? movie.rating.toFixed(1) : null}
+                    year={movie.year != null ? String(movie.year) : null}
+                    onClick={() => setSelectedMovie(movie)}
                   />
                 ))}
-              </div>
+              </PosterGrid>
             );
           })
           .exhaustive()
       );
 
       const tvShowsContent = pendingTVShowsRefresh ? (
-        <MediaCardsSkeleton />
+        <PosterGridSkeleton />
       ) : (
         match(tvShowsQuery)
-          .with({ status: "pending" }, () => <MediaCardsSkeleton />)
+          .with({ status: "pending" }, () => <PosterGridSkeleton />)
           .with({ status: "error" }, (shows) =>
             shows.isFetching ? (
-              <MediaCardsSkeleton />
+              <PosterGridSkeleton />
             ) : (
               <UserErrorAlert className="mt-2" error={shows.error} />
             ),
           )
           .with({ status: "success" }, (shows) => {
             if (shows.data.source !== config.tvShowsSource) {
-              return <MediaCardsSkeleton />;
+              return <PosterGridSkeleton />;
             }
 
             if (shows.data.shows.length === 0) {
               if (shows.isFetching) {
-                return <MediaCardsSkeleton />;
+                return <PosterGridSkeleton />;
               }
-
               return (
-                <div className="mt-2">
-                  {`Couldn't fetch any TV shows from the selected source, please try another one.`}
-                </div>
+                <EmptyState message="couldn't fetch any tv shows from the selected source, please try another one." />
               );
             }
 
             return (
-              <div className="mt-2 grid grid-cols-2 gap-4 animate-reveal sm:grid-cols-3 md:grid-cols-4">
-                {shows.data.shows.map((show) => (
-                  <TVShowExpandedCard
+              <PosterGrid>
+                {sortShows(shows.data.shows, sort).map((show, index) => (
+                  <PosterCard
                     key={show.imdbId}
-                    show={show}
-                    onOpen={(nextShow) => {
-                      setSelectedShowId(nextShow.imdbId);
+                    className="animate-reveal"
+                    style={staggerDelay(index)}
+                    title={show.title}
+                    image={show.posterUrl ?? null}
+                    rating={show.rating != null ? show.rating.toFixed(1) : null}
+                    year={show.year != null ? String(show.year) : null}
+                    onClick={() => {
+                      setSelectedShowId(show.imdbId);
                       setSelectedSeason(1);
                     }}
                   />
                 ))}
-              </div>
+              </PosterGrid>
             );
           })
           .exhaustive()
       );
 
       return (
-        <div
-          data-page="home"
-          className="mx-auto mb-6 w-full max-w-5xl px-4 pt-4 md:mb-12 md:pt-6 xl:px-0"
-        >
-          <div className="flex flex-col gap-2.5">
-            {showTabs ? (
-              <>
-                <div className="flex flex-col gap-2.5 xs:flex-row xs:items-center xs:justify-between">
-                  <div className="flex flex-wrap gap-2">
-                    <HomeTabButton
-                      active={currentTab === "movies"}
-                      icon={<Film className="text-sm" />}
-                      label="movies"
-                      onClick={() => {
-                        setActiveTab("movies");
-                        setSelectedMovie(undefined);
-                        setSelectedShowId(undefined);
-                        setSelectedSeason(undefined);
-                      }}
-                    />
-                    <HomeTabButton
-                      active={currentTab === "tv"}
-                      icon={<Tv className="text-sm" />}
-                      label="tv shows"
-                      onClick={() => {
-                        setActiveTab("tv");
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-start">{sourceSelector}</div>
-              </>
-            ) : (
-              <div className="flex justify-start">{sourceSelector}</div>
-            )}
-          </div>
+        <HomeShell tab={activeTab} onTabChange={handleTabChange}>
+          <PageHeading tab={activeTab} />
+          <SortRow>
+            <SortRowLabel>sort</SortRowLabel>
+            <SortPill active={sort === "popular"} onClick={() => setSort("popular")}>
+              <Flame aria-hidden="true" />
+              popular
+            </SortPill>
+            <SortPill active={sort === "rating"} onClick={() => setSort("rating")}>
+              <Star aria-hidden="true" />
+              rating
+            </SortPill>
+            <SortPill active={sort === "recent"} onClick={() => setSort("recent")}>
+              <Calendar aria-hidden="true" />
+              recent
+            </SortPill>
+            <SortRowDivider />
+            <SortRowLabel>source</SortRowLabel>
+            <div className="contents">{sourceSelector}</div>
+          </SortRow>
 
-          {currentTab === "movies" ? moviesContent : tvShowsContent}
+          {activeTab === "movies" ? moviesContent : tvShowsContent}
 
           {saveConfigMutation.error ? (
             <UserErrorAlert className="mt-4" error={saveConfigMutation.error} />
           ) : null}
 
-          {currentTab === "movies" && selectedMovie ? (
-            <MovieDetailModal
-              movie={selectedMovie}
-              onClose={() => {
-                setSelectedMovie(undefined);
-              }}
-            />
+          {activeTab === "movies" && selectedMovie ? (
+            <MovieDetailModal movie={selectedMovie} onClose={() => setSelectedMovie(undefined)} />
           ) : null}
 
-          {currentTab === "tv" && selectedShowId ? (
+          {activeTab === "tv" && selectedShowId ? (
             <TvShowDetailModal
               imdbId={selectedShowId}
               fallbackShow={selectedShow}
               activeSeason={selectedSeason}
-              onSeasonChange={(season) => {
-                setSelectedSeason(season);
-              }}
+              onSeasonChange={(season) => setSelectedSeason(season)}
               onClose={() => {
                 setSelectedShowId(undefined);
                 setSelectedSeason(undefined);
               }}
             />
           ) : null}
-        </div>
+        </HomeShell>
       );
     })
     .exhaustive();
 }
 
-function HomeTabButton({
-  active,
-  icon,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  icon: ReactNode;
-  label: string;
-  onClick: () => void;
-}) {
+function PageHeading({ tab }: { tab: HomeTab }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-2.5 text-sm leading-none transition-colors ${
-        active
-          ? "border-stone-950 bg-stone-100 text-stone-950 shadow-[1px_1px_rgba(12,10,9,1)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:shadow-[1px_1px_rgba(68,64,60,1)]"
-          : "border-transparent text-stone-600 hover:bg-stone-200 hover:text-stone-950 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-      }`}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
+    <div className="flex items-end justify-between gap-4 pt-7 pb-3.5">
+      <h2 className="m-0 font-serif text-3xl leading-none font-normal tracking-tight">
+        {tab === "movies" ? "movies" : "tv shows"}
+      </h2>
+    </div>
   );
 }
 
-function LazyImage({ src, alt, className }: { src: string; alt: string; className: string }) {
-  const [loaded, setLoaded] = useState(false);
-
+function PosterGrid({ children }: { children: React.ReactNode }) {
   return (
-    <img
-      src={src}
-      alt={alt}
-      loading="lazy"
-      decoding="async"
-      className={`${className} transition-[opacity,transform,filter] duration-200 ease-[var(--ease-out)] motion-reduce:transition-none ${
-        loaded
-          ? "translate-y-0 scale-100 opacity-100 blur-0"
-          : "translate-y-1 scale-[0.985] opacity-0 blur-[6px] motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:opacity-100 motion-reduce:blur-0"
-      }`}
-      onLoad={() => setLoaded(true)}
-    />
+    <div className="grid grid-cols-2 gap-4 pb-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {children}
+    </div>
   );
 }
 
-function MovieExpandedCard({ movie, onOpen }: { movie: Movie; onOpen: (movie: Movie) => void }) {
-  return (
-    <article className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <button
-        type="button"
-        onClick={() => onOpen(movie)}
-        className="flex cursor-pointer flex-col text-left"
-      >
-        {movie.posterUrl ? (
-          <LazyImage
-            src={movie.posterUrl}
-            alt={movie.title}
-            className="aspect-2/3 w-full border-b border-stone-950 object-cover dark:border-stone-700"
-          />
-        ) : null}
-        <div className="mx-4 my-3 flex h-full flex-col">
-          <div className="flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight">{movie.title}</h5>
-            <div className="flex flex-row items-center space-x-2">
-              <div className="flex flex-row items-center space-x-0.5">
-                <Star className="fill-amber-400 text-sm" strokeWidth={0} />
-                <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                <span className="text-sm">/</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">{movie.year}</div>
-            </div>
-          </div>
-        </div>
-      </button>
-    </article>
-  );
+// Cap stagger so a 200-item grid doesn't feel like loading a movie reel.
+function staggerDelay(index: number): React.CSSProperties {
+  const ms = Math.min(index * 25, 350);
+  return { animationDelay: `${ms}ms` };
 }
 
-function TVShowExpandedCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVShow) => void }) {
+function PosterGridSkeleton() {
   return (
-    <article className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900">
-      <button
-        type="button"
-        onClick={() => onOpen(show)}
-        className="flex cursor-pointer flex-col text-left"
-      >
-        {show.posterUrl ? (
-          <LazyImage
-            src={show.posterUrl}
-            alt={show.title}
-            className="aspect-2/3 w-full border-b border-stone-950 object-cover dark:border-stone-700"
-          />
-        ) : null}
-        <div className="mx-4 my-3 flex h-full flex-col">
-          <div className="flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight">{show.title}</h5>
-            <div className="flex flex-row items-center space-x-2">
-              <div className="flex flex-row items-center space-x-0.5">
-                <Star className="fill-amber-400 text-sm" strokeWidth={0} />
-                <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">
-                <span className="text-sm">/</span>
-              </div>
-              <div className="text-stone-600 dark:text-stone-400">{show.year}</div>
-            </div>
-          </div>
-        </div>
-      </button>
-    </article>
-  );
-}
-
-function MediaCardsSkeleton() {
-  return (
-    <div className="mt-2 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-      {Array.from({ length: 24 }, (_, index) => (
-        <div
-          key={`expanded-${index}`}
-          className="relative flex flex-col overflow-hidden rounded border border-solid border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
+    <div className="grid grid-cols-2 gap-4 pb-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {Array.from({ length: 18 }, (_, index) => (
+        <article
+          key={`poster-skel-${index}`}
+          className="flex flex-col overflow-hidden rounded border border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
         >
-          <Skeleton className="aspect-2/3 w-full rounded-none" />
-          <div className="mx-4 my-3 flex flex-col space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="aspect-[2/3] w-full rounded-none border-b border-stone-950 dark:border-stone-700" />
+          <div className="flex flex-col gap-2 px-3 py-2.5">
+            <Skeleton className="h-3.5 w-3/4" />
+            <Skeleton className="h-3 w-1/3" />
           </div>
-        </div>
+        </article>
       ))}
     </div>
   );
+}
+
+function SortRowSkeleton() {
+  return (
+    <div className="mb-4.5 flex items-center gap-2 border-y border-stone-950 py-2 dark:border-stone-700">
+      <Skeleton className="h-5 w-12" />
+      <Skeleton className="h-6 w-16 rounded-md" />
+      <Skeleton className="h-6 w-16 rounded-md" />
+      <Skeleton className="h-6 w-16 rounded-md" />
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-16 text-center animate-reveal">
+      <p className="m-0 font-serif text-xl text-stone-700 italic dark:text-stone-300">{message}</p>
+      <p className="m-0 text-[0.8125rem] text-stone-600 dark:text-stone-300">
+        i probably broke something — try a different source?
+      </p>
+    </div>
+  );
+}
+
+function sortMovies(movies: ReadonlyArray<Movie>, sort: SortKey): Movie[] {
+  const next = [...movies];
+  if (sort === "rating") {
+    next.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  } else if (sort === "recent") {
+    next.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+  }
+  return next;
+}
+
+function sortShows(shows: ReadonlyArray<TVShow>, sort: SortKey): TVShow[] {
+  const next = [...shows];
+  if (sort === "rating") {
+    next.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  } else if (sort === "recent") {
+    next.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+  }
+  return next;
 }

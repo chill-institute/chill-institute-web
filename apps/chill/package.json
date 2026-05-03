@@ -18,6 +18,7 @@
     "@base-ui/react": "catalog:",
     "@bufbuild/protobuf": "catalog:",
     "@chill-institute/contracts": "catalog:",
+    "@chill-institute/ui": "workspace:*",
     "@connectrpc/connect": "catalog:",
     "@connectrpc/connect-web": "catalog:",
     "@tailwindcss/vite": "catalog:",

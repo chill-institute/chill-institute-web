@@ -6,7 +6,7 @@ import { match } from "ts-pattern";
 import { useAuth } from "@/lib/auth";
 import { DownloadFolderPicker } from "@/components/download-folder-picker";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
 import { useSettingsQuery, useSaveSettings } from "@/queries/settings";
 import { useDownloadFolderQuery } from "@/queries/download-folder";
 import { useProfileQuery } from "@/queries/profile";

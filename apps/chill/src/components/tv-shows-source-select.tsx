@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@chill-institute/ui/components/ui/toggle-group";
 import {
   getTVShowsSourceLabel,
   TVShowsSource,

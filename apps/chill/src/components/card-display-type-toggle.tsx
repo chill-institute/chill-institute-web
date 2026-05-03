@@ -1,7 +1,7 @@
 import { LayoutGrid, LayoutList } from "lucide-react";
 
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "@chill-institute/ui/components/ui/toggle-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@chill-institute/ui/components/ui/tooltip";
 import { CardDisplayType, type UserSettings } from "@/lib/types";
 
 const displayTypeOptions = [

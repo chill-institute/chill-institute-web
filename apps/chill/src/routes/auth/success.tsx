@@ -21,10 +21,10 @@ export const Route = createFileRoute("/auth/success")({
 
 function AuthSuccessFallback() {
   return (
-    <AuthPage centered title="Signing you in">
-      <div className="flex flex-row items-center justify-center space-x-1.5 text-sm text-stone-700 dark:text-stone-300">
+    <AuthPage title="signing you in">
+      <div className="flex items-center gap-2 text-sm text-stone-700 dark:text-stone-300">
         <Loader className="animate-spin" />
-        <span className="leading-none">Finalizing your session...</span>
+        <span>finalizing your session…</span>
       </div>
     </AuthPage>
   );

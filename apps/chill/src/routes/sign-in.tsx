@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
+import { ExternalLink, Loader } from "lucide-react";
 
 import { AuthPage } from "@/components/auth-page";
+import { Button } from "@chill-institute/ui/components/ui/button";
 import { getPutioStartURL } from "@/lib/api";
 import { ACCESS_DENIED_ERROR, SESSION_EXPIRED_ERROR, UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
 import { normalizeCallbackPath, useAuth } from "@/lib/auth";
@@ -34,30 +35,20 @@ function SignInPage() {
       return {
         actionLabel: "learn more",
         actionURL: publicLinks.about,
-        message: (
-          <p>
-            The Institute is an exclusive extension for put.io users and it requires an active
-            put.io membership in to work.
-            <br />
-          </p>
-        ),
+        message:
+          "the institute is an exclusive extension for put.io users — it needs an active put.io membership to work.",
         type: ACCESS_DENIED_ERROR,
       };
     }
     if (search.error === SESSION_EXPIRED_ERROR) {
       return {
-        message: "Your session has expired, please sign in again.",
+        message: "your session expired. sign in again to keep going.",
         type: SESSION_EXPIRED_ERROR,
       };
     }
     return {
-      message: (
-        <p>
-          An error occurred while signing you in.
-          <br />
-          Please try clearing your cookies or signing in with a different browser.
-        </p>
-      ),
+      message:
+        "something went sideways while signing you in. try clearing cookies, or pop a different browser open.",
       type: UNKNOWN_AUTH_ERROR,
     };
   }, [search.error]);
@@ -83,76 +74,82 @@ function SignInPage() {
     return <p>Redirecting...</p>;
   }
 
-  return (
-    <AuthPage centered>
-      {visibleError ? (
-        <div className="flex flex-col items-center space-y-4">
-          <div className="flex flex-col items-center text-center">{visibleError?.message}</div>
-          <div className="flex flex-row space-x-4">
-            <AuthButton
-              busy={loading === "help"}
-              onClick={() => {
-                setLoading("help");
-                window.location.href = visibleError?.actionURL ?? "/about";
-              }}
-            >
-              {visibleError?.actionLabel ?? "get help"}
-            </AuthButton>
-            <AuthButton
-              busy={loading === "sign-in"}
-              onClick={() => {
-                setLoading("sign-in");
-                const callback = search.callbackUrl?.trim();
-                if (callback) {
-                  const normalized = normalizeCallbackPath(callback);
-                  if (normalized) {
-                    auth.setPendingCallbackURL(normalized);
-                  }
-                }
-                window.location.href = getPutioStartURL(authSuccessURL);
-              }}
-            >
-              {visibleError?.type === SESSION_EXPIRED_ERROR ? "sign in again" : "try again"}
-            </AuthButton>
-          </div>
-        </div>
-      ) : (
-        <AuthButton
-          busy={loading === "sign-in"}
-          onClick={() => {
-            setLoading("sign-in");
-            const callback = search.callbackUrl?.trim();
-            if (callback) {
-              const normalized = normalizeCallbackPath(callback);
-              if (normalized) {
-                auth.setPendingCallbackURL(normalized);
-              }
-            }
-            window.location.href = getPutioStartURL(authSuccessURL);
-          }}
-        >
-          authenticate at put.io
-        </AuthButton>
-      )}
-    </AuthPage>
-  );
-}
+  function startSignIn() {
+    setLoading("sign-in");
+    const callback = search.callbackUrl?.trim();
+    if (callback) {
+      const normalized = normalizeCallbackPath(callback);
+      if (normalized) {
+        auth.setPendingCallbackURL(normalized);
+      }
+    }
+    window.location.href = getPutioStartURL(authSuccessURL);
+  }
 
-function AuthButton({
-  busy = false,
-  children,
-  onClick,
-}: {
-  busy?: boolean;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
   return (
-    <button type="button" className={`btn ${busy ? "cursor-wait" : ""}`} onClick={onClick}>
-      <span className="flex flex-row space-x-1 items-center justify-center text-sm">
-        {busy ? <Loader className="animate-spin text-xs" /> : null}
-        <span className="leading-none">{children}</span>
-      </span>
-    </button>
+    <AuthPage
+      title="welcome to the institute"
+      description="search smarter. send to put.io. and chill."
+    >
+      {visibleError ? (
+        <p className="m-0 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+          {visibleError.message}
+        </p>
+      ) : (
+        <p className="m-0 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+          chill is an independent companion app for put.io users. you bring the put.io account, i
+          bring the search and the send button. that&apos;s the whole deal.
+        </p>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        {visibleError?.actionURL ? (
+          <Button
+            disabled={loading === "help"}
+            onClick={() => {
+              setLoading("help");
+              window.location.href = visibleError.actionURL ?? publicLinks.about;
+            }}
+          >
+            {loading === "help" ? <Loader className="animate-spin" /> : null}
+            {visibleError.actionLabel ?? "learn more"}
+          </Button>
+        ) : null}
+        <Button variant="primary" size="lg" disabled={loading === "sign-in"} onClick={startSignIn}>
+          {loading === "sign-in" ? <Loader className="animate-spin" /> : <ExternalLink />}
+          <span>
+            {visibleError?.type === SESSION_EXPIRED_ERROR
+              ? "sign in again"
+              : visibleError
+                ? "try again"
+                : "sign in with put.io"}
+          </span>
+        </Button>
+      </div>
+
+      <p className="m-0 font-mono text-[0.6875rem] leading-relaxed text-stone-600 dark:text-stone-300">
+        not affiliated with put.io. by alberto chillardinho.{" "}
+        <a
+          href={publicLinks.about}
+          className="underline decoration-stone-700 underline-offset-2 dark:decoration-stone-300"
+        >
+          about
+        </a>{" "}
+        ·{" "}
+        <a
+          href={publicLinks.guides}
+          className="underline decoration-stone-700 underline-offset-2 dark:decoration-stone-300"
+        >
+          guides
+        </a>{" "}
+        ·{" "}
+        <a
+          href={publicLinks.github}
+          className="underline decoration-stone-700 underline-offset-2 dark:decoration-stone-300"
+        >
+          github
+        </a>
+      </p>
+    </AuthPage>
   );
 }

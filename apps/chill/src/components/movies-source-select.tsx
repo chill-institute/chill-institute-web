@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@chill-institute/ui/components/ui/toggle-group";
 import { moviesSourceLabels, moviesSources, MoviesSource, type UserSettings } from "@/lib/types";
 
 const moviesSourceTabLabels: Record<UserSettings["moviesSource"], string> = {

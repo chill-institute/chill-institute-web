@@ -11,8 +11,8 @@ import { AppShell } from "@/components/app-shell";
 import { BackendUnavailableScreen } from "@/components/backend-unavailable-screen";
 import { AuthProvider } from "@/lib/auth";
 import { BackendHealthProvider, useBackendUnavailable } from "@/hooks/use-backend-unavailable";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@chill-institute/ui/components/ui/toaster";
+import { TooltipProvider } from "@chill-institute/ui/components/ui/tooltip";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: Root,
