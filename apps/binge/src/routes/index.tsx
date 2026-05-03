@@ -208,10 +208,16 @@ function HomePage() {
             ? tvShowsQuery.data.shows.length
             : null;
       const sortLabel = sort === "popular" ? "popular" : sort === "rating" ? "rating" : "recent";
+      const noun =
+        activeTab === "movies"
+          ? visibleCount === 1
+            ? "title"
+            : "titles"
+          : visibleCount === 1
+            ? "show"
+            : "shows";
       const countLabel =
-        visibleCount != null
-          ? `${visibleCount} ${activeTab === "movies" ? "titles" : "shows"} · sorted by ${sortLabel}`
-          : null;
+        visibleCount != null ? `${visibleCount} ${noun} · sorted by ${sortLabel}` : null;
 
       const moviesContent = pendingMoviesRefresh ? (
         <PosterGridSkeleton />

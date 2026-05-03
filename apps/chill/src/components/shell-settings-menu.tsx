@@ -17,7 +17,7 @@ export function ShellSettingsMenu() {
         render={
           <button
             type="button"
-            className="inline-flex cursor-pointer items-center gap-1.5 px-0 py-[3px] text-xs whitespace-nowrap text-stone-600 hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100"
+            className="inline-flex cursor-pointer items-center gap-[5px] px-0 py-[3px] text-xs whitespace-nowrap text-stone-600 hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-100"
           >
             {open ? (
               <Minus className="size-3" aria-hidden="true" />
