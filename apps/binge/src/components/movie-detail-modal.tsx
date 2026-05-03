@@ -306,12 +306,12 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   const hasOnlyUnavailableResults = visibleResults.length > 0 && sendableResultsCount === 0;
   const hasActiveFilters = resolutionFilter !== "all" || codecFilter !== "all";
   const shellClassName = isDesktop
-    ? "max-h-[90vh] w-full max-w-[940px] overflow-y-auto rounded-xl border border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
     : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
 
   return (
     <div className={shellClassName}>
-      <div className="relative flex min-h-60 items-end overflow-hidden sm:min-h-90">
+      <div className="relative flex h-[280px] items-end overflow-hidden">
         {movie.backdropUrl ? (
           <>
             <Skeleton
@@ -402,7 +402,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
         </IconButton>
       </div>
 
-      <div className="flex flex-col gap-4 px-6 pt-5 pb-6">
+      <div className="flex flex-col gap-3.5 px-6 pt-[18px] pb-6">
         {synopsis ? (
           <p className="m-0 max-w-[64ch] text-sm leading-relaxed text-pretty text-stone-700 dark:text-stone-300">
             {synopsis}
@@ -666,7 +666,7 @@ export function MovieDetailModal({ movie, onClose }: Props) {
       <Dialog open onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           showCloseButton={false}
-          className="fixed left-1/2 top-1/2 z-50 w-[min(100vw-1rem,940px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
+          className="fixed top-1/2 left-1/2 z-50 w-[min(100vw-1rem,760px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
         >
           <DialogTitle className="sr-only">{movie.title} details</DialogTitle>
           <DialogDescription className="sr-only">

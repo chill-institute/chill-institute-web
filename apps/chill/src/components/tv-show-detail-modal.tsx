@@ -144,12 +144,12 @@ function TvShowDetailContent({
   );
 
   const shellClassName = isDesktop
-    ? "max-h-[90vh] w-full max-w-[940px] overflow-y-auto rounded-xl border border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
     : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
 
   return (
     <div className={shellClassName}>
-      <div className="relative flex min-h-60 items-end overflow-hidden sm:min-h-90">
+      <div className="relative flex h-[280px] items-end overflow-hidden">
         {backdropUrl ? (
           <>
             <Skeleton
@@ -490,7 +490,7 @@ export function TvShowDetailModal({
         <DialogTitle className="sr-only">{show?.title ?? "TV show details"}</DialogTitle>
         <DialogContent
           showCloseButton={false}
-          className="top-1/2 left-1/2 w-full max-w-[940px] -translate-x-1/2 -translate-y-1/2 gap-0 p-0"
+          className="top-1/2 left-1/2 w-full max-w-[760px] -translate-x-1/2 -translate-y-1/2 gap-0 p-0"
         >
           {content}
         </DialogContent>
