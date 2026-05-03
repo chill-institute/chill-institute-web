@@ -24,6 +24,12 @@
   --breakpoint-xs: 400px;
   --font-sans: "Metric", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Family", ui-serif, "Iowan Old Style", "Apple Garamond", Georgia, serif;
+
+  /* Tighter than Tailwind's default 1.25 / -0.025em — matches the printed-press feel.
+     `text-4xl leading-tight tracking-tight` should yield a 36px / 1.05 / -0.01em headline. */
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --tracking-tight: -0.01em;
 }
 
 /* ---------- Webfonts ---------- */

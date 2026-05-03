@@ -25,7 +25,7 @@ function StickyHeader({ brand, tabs, right, children, className }: StickyHeaderP
     <header
       data-slot="sticky-header"
       className={cn(
-        "sticky top-0 z-40 flex items-center gap-3 border-b border-stone-950 bg-stone-100/88 px-4 py-2.5 backdrop-blur-md backdrop-saturate-150 dark:border-stone-700 dark:bg-stone-900/88",
+        "sticky top-0 z-40 flex items-center gap-3 border-b border-stone-950 bg-stone-100/88 px-[18px] py-2.5 backdrop-blur-md backdrop-saturate-150 dark:border-stone-700 dark:bg-stone-900/88",
         className,
       )}
     >

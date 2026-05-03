@@ -52,6 +52,13 @@ export const Route = createFileRoute("/")({
 function BingeBrand() {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2">
+      <img
+        src="/logo.png"
+        width={22}
+        height={22}
+        alt=""
+        className="rounded-sm border border-stone-950 dark:border-stone-700"
+      />
       <h3 className="truncate font-serif text-lg leading-none font-normal tracking-tight text-stone-950 dark:text-stone-100">
         binge.institute
       </h3>
@@ -89,7 +96,7 @@ function HomeShell({
         }
         right={<ShellSettingsMenu />}
       />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 md:px-6">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-[18px]">
         {children}
         <InstituteFooter
           left={
@@ -192,6 +199,20 @@ function HomePage() {
           />
         );
 
+      const visibleCount =
+        activeTab === "movies"
+          ? moviesQuery.status === "success" && moviesQuery.data.source === config.moviesSource
+            ? moviesQuery.data.movies.length
+            : null
+          : tvShowsQuery.status === "success" && tvShowsQuery.data.source === config.tvShowsSource
+            ? tvShowsQuery.data.shows.length
+            : null;
+      const sortLabel = sort === "popular" ? "popular" : sort === "rating" ? "rating" : "recent";
+      const countLabel =
+        visibleCount != null
+          ? `${visibleCount} ${activeTab === "movies" ? "titles" : "shows"} · sorted by ${sortLabel}`
+          : null;
+
       const moviesContent = pendingMoviesRefresh ? (
         <PosterGridSkeleton />
       ) : (
@@ -290,7 +311,7 @@ function HomePage() {
       return (
         <HomeShell tab={activeTab} onTabChange={handleTabChange}>
           <PageHeading tab={activeTab} />
-          <SortRow>
+          <SortRow count={countLabel}>
             <SortRowLabel>sort</SortRowLabel>
             <SortPill active={sort === "popular"} onClick={() => setSort("popular")}>
               <Flame aria-hidden="true" />
@@ -393,7 +414,14 @@ function SortRowSkeleton() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center gap-2 py-16 text-center animate-reveal">
+    <div className="animate-reveal flex flex-col items-center gap-2 py-16 text-center">
+      <img
+        src="/logo.png"
+        width={48}
+        height={48}
+        alt=""
+        className="mb-1 rounded-md border border-stone-950 dark:border-stone-700"
+      />
       <p className="m-0 font-serif text-xl text-stone-700 italic dark:text-stone-300">{message}</p>
       <p className="m-0 text-[0.8125rem] text-stone-600 dark:text-stone-300">
         i probably broke something — try a different source?

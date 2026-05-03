@@ -58,7 +58,7 @@ function PosterCard({
           : undefined
       }
       className={cn(
-        "group flex flex-col overflow-hidden rounded border border-stone-950 bg-stone-100 motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 motion-safe:ease-[var(--ease-out)] dark:border-stone-700 dark:bg-stone-900",
+        "group flex flex-col overflow-hidden rounded border border-stone-950 bg-stone-100 motion-safe:transition-[transform,box-shadow] motion-safe:duration-[180ms] motion-safe:ease-[var(--ease-out)] dark:border-stone-700 dark:bg-stone-900",
         interactive &&
           "cursor-pointer motion-safe:hover-hover:hover:-translate-y-0.5 motion-safe:hover-hover:hover:shadow-[1px_1px_0_var(--color-stone-950)] active:translate-y-0 active:shadow-none active:duration-100 motion-safe:dark:hover-hover:hover:shadow-[1px_1px_0_var(--color-stone-700)]",
         className,
@@ -79,7 +79,7 @@ function PosterCard({
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-1 px-3 py-2.5 text-[0.8125rem] text-stone-600 dark:text-stone-300">
+      <div className="flex flex-col gap-1 px-3 pt-2.5 pb-3 text-[0.8125rem] text-stone-600 dark:text-stone-300">
         <h5 className="m-0 break-words font-serif text-base leading-tight tracking-tight text-stone-950 dark:text-stone-100">
           {title}
         </h5>
