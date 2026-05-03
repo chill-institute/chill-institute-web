@@ -25,11 +25,25 @@
   --font-sans: "Metric", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Family", ui-serif, "Iowan Old Style", "Apple Garamond", Georgia, serif;
 
-  /* Tighter than Tailwind's default 1.25 / -0.025em — matches the printed-press feel.
-     `text-4xl leading-tight tracking-tight` should yield a 36px / 1.05 / -0.01em headline. */
-  --leading-tight: 1.05;
-  --leading-snug: 1.2;
-  --tracking-tight: -0.01em;
+  /* Semantic surface + foreground tokens. Tailwind v4 exposes any --color-*
+     declared here as a real utility, so call sites can write `bg-surface
+     text-fg-2 border-border-strong` instead of stamping a stone-100 / dark:stone-900
+     pair on every component. The dark mode values are flipped in the `.dark`
+     selector below. */
+  --color-app: var(--color-stone-300);
+  --color-surface: var(--color-stone-100);
+  --color-surface-2: var(--color-stone-50);
+  --color-hover: var(--color-stone-200);
+  --color-active: var(--color-stone-300);
+  --color-skeleton: var(--color-stone-400);
+
+  --color-fg-1: var(--color-stone-950);
+  --color-fg-2: var(--color-stone-700);
+  --color-fg-3: var(--color-stone-600);
+  --color-fg-4: var(--color-stone-500);
+  --color-fg-inverse: var(--color-stone-100);
+
+  --color-border-strong: var(--color-stone-950);
 }
 
 /* ---------- Webfonts ---------- */
@@ -84,9 +98,9 @@
 }
 
 /* ---------- Design system tokens ----------
-   Semantic colours, motion, geometry. The Tailwind `stone-*` scale is
-   the source of truth — these tokens just give it surface/foreground
-   meaning so components can stay theme-agnostic. */
+   Motion, geometry, shadow. Surface + foreground colors live in the
+   @theme block above so Tailwind exposes them as `bg-surface`,
+   `text-fg-1`, etc. */
 @layer base {
   :root {
     @apply antialiased;
@@ -100,22 +114,6 @@
     --duration-base: 180ms;
     --duration-slow: 240ms;
 
-    /* surface tokens — light mode rests on stone-300 with stone-100 cards */
-    --bg-app: var(--color-stone-300);
-    --bg-surface: var(--color-stone-100);
-    --bg-surface-2: var(--color-stone-50);
-    --bg-hover: var(--color-stone-200);
-    --bg-active: var(--color-stone-300);
-    --bg-skeleton: var(--color-stone-400);
-
-    --fg-1: var(--color-stone-950);
-    --fg-2: var(--color-stone-700);
-    --fg-3: var(--color-stone-600);
-    --fg-4: var(--color-stone-500);
-    --fg-inverse: var(--color-stone-100);
-
-    --border-strong: var(--color-stone-950);
-
     --shadow-press: 1px 1px 0 var(--color-stone-950);
     --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.3);
     --shadow-poster: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -127,21 +125,23 @@
     --control-h-md: 2.25rem; /* 36px — hero / tab */
   }
 
+  /* Dark mode flips the @theme color tokens (surface/fg/border) and the
+     shadow stamp colours. Everything else stays the same. */
   .dark {
-    --bg-app: var(--color-stone-800);
-    --bg-surface: var(--color-stone-900);
-    --bg-surface-2: var(--color-stone-950);
-    --bg-hover: var(--color-stone-800);
-    --bg-active: var(--color-stone-700);
-    --bg-skeleton: var(--color-stone-700);
+    --color-app: var(--color-stone-800);
+    --color-surface: var(--color-stone-900);
+    --color-surface-2: var(--color-stone-950);
+    --color-hover: var(--color-stone-800);
+    --color-active: var(--color-stone-700);
+    --color-skeleton: var(--color-stone-700);
 
-    --fg-1: var(--color-stone-100);
-    --fg-2: var(--color-stone-200);
-    --fg-3: var(--color-stone-300);
-    --fg-4: var(--color-stone-400);
-    --fg-inverse: var(--color-stone-950);
+    --color-fg-1: var(--color-stone-100);
+    --color-fg-2: var(--color-stone-200);
+    --color-fg-3: var(--color-stone-300);
+    --color-fg-4: var(--color-stone-400);
+    --color-fg-inverse: var(--color-stone-950);
 
-    --border-strong: var(--color-stone-700);
+    --color-border-strong: var(--color-stone-700);
 
     --shadow-press: 1px 1px 0 var(--color-stone-700);
     --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.6);
@@ -150,7 +150,7 @@
   }
 
   body {
-    @apply bg-stone-300 text-stone-950;
+    @apply bg-app text-fg-1;
     font-family: var(--font-sans);
   }
 
@@ -160,31 +160,49 @@
     @apply ring-2 ring-stone-400 ring-offset-2 ring-offset-stone-300;
   }
 
-  .dark body {
-    @apply bg-stone-800 text-stone-100;
-  }
-
   .dark :focus-visible {
     @apply ring-stone-700 ring-offset-stone-800;
   }
 }
 
 @layer components {
+  /* Family-serif printed-press headlines — the design system specifies
+     line-height 1.05 / 1.2 and -0.01em letter-spacing across the heading
+     scale, so the element selectors carry it instead of every component
+     repeating `font-serif leading-tight tracking-tight font-normal`. */
   h1,
   h2,
   h3,
+  h5,
   .font-serif {
     font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+    font-weight: 400;
   }
 
   h1 {
     @apply text-4xl;
+    line-height: 1.05;
   }
 
   h2 {
     @apply text-3xl;
+    line-height: 1.2;
   }
 
+  h3 {
+    @apply text-2xl;
+    line-height: 1.2;
+  }
+
+  h5 {
+    font-size: 1.0625rem;
+    line-height: 1.05;
+  }
+
+  /* h4 stays size-only — it is a structural heading the design system
+     intentionally leaves un-styled (e.g. modal "send to put.io" labels
+     compose `<h4>` with their own font-mono / sizing). */
   h4 {
     @apply text-xl;
   }

@@ -7,10 +7,8 @@ import { StickyHeader } from "@chill-institute/ui/components/sticky-header";
 function BingeBrand() {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2">
-      <h3 className="truncate font-serif text-lg leading-none font-normal tracking-tight text-stone-950 dark:text-stone-100">
-        binge.institute
-      </h3>
-      <span className="rounded-full border border-stone-950/10 bg-stone-950/[0.05] px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.18em] text-stone-600 uppercase dark:border-stone-100/10 dark:bg-stone-100/[0.06] dark:text-stone-400">
+      <h3 className="text-fg-1 truncate text-lg leading-none">binge.institute</h3>
+      <span className="border-fg-1/10 bg-fg-1/[0.05] text-fg-3 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.18em] uppercase">
         alpha
       </span>
     </Link>

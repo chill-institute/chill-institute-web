@@ -19,35 +19,24 @@ function SortRow({ className, children, count }: SortRowProps) {
     <div
       data-slot="sort-row"
       className={cn(
-        "mb-4.5 flex flex-wrap items-center gap-1.5 border-y border-stone-950 py-2 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-300",
+        "border-border-strong text-fg-3 mb-4.5 flex flex-wrap items-center gap-1.5 border-y py-2 text-sm",
         className,
       )}
     >
       {children}
       {count != null ? (
-        <span className="ml-auto font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
-          {count}
-        </span>
+        <span className="text-fg-3 ml-auto font-mono text-[0.6875rem] tabular-nums">{count}</span>
       ) : null}
     </div>
   );
 }
 
 function SortRowLabel({ children }: { children: ReactNode }) {
-  return (
-    <span className="pl-0.5 font-mono text-[0.6875rem] lowercase text-stone-600 dark:text-stone-300">
-      {children}
-    </span>
-  );
+  return <span className="text-fg-3 pl-0.5 font-mono text-[0.6875rem] lowercase">{children}</span>;
 }
 
 function SortRowDivider() {
-  return (
-    <span
-      aria-hidden="true"
-      className="mx-1.5 h-5 w-px self-stretch bg-stone-950 dark:bg-stone-700"
-    />
-  );
+  return <span aria-hidden="true" className="bg-border-strong mx-1.5 h-5 w-px self-stretch" />;
 }
 
 type SortPillProps = ComponentPropsWithoutRef<typeof ButtonPrimitive> & {
@@ -63,9 +52,9 @@ function SortPill({ active, className, ...props }: SortPillProps) {
       className={cn(
         // Constant font-weight across states avoids the sub-pixel layout
         // shift a 400→500 swap causes when toggling active.
-        "inline-flex cursor-pointer items-center gap-1 rounded-md border border-transparent bg-transparent px-2.5 py-1 text-[0.8125rem] text-stone-700 motion-safe:transition-[color,background-color,box-shadow,transform] motion-safe:duration-150 motion-safe:ease-[var(--ease-out)] hover-hover:hover:bg-stone-200 hover-hover:hover:text-stone-950 dark:text-stone-200 dark:hover-hover:hover:bg-stone-800 dark:hover-hover:hover:text-stone-100 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
+        "text-fg-2 hover-hover:hover:bg-hover hover-hover:hover:text-fg-1 motion-safe:ease-[var(--ease-out)] inline-flex cursor-pointer items-center gap-1 rounded-md border border-transparent bg-transparent px-2.5 py-1 text-[0.8125rem] motion-safe:transition-[color,background-color,box-shadow,transform] motion-safe:duration-150 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3",
         active &&
-          "border-stone-950 bg-stone-100 text-stone-950 shadow-[1px_1px_0_var(--color-stone-950)] hover-hover:hover:bg-stone-100 active:translate-x-px active:translate-y-px active:shadow-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:shadow-[1px_1px_0_var(--color-stone-700)] dark:hover-hover:hover:bg-stone-900",
+          "border-border-strong bg-surface text-fg-1 shadow-[1px_1px_0_var(--color-border-strong)] hover-hover:hover:bg-surface active:translate-x-px active:translate-y-px active:shadow-none",
         className,
       )}
       {...props}

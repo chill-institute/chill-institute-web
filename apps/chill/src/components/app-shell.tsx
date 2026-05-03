@@ -28,12 +28,10 @@ export function AppShell() {
             <>
               <header className="px-4 pt-8 pb-6">
                 <Link to="/">
-                  <h1 className="m-0 text-center font-serif text-4xl leading-tight font-normal tracking-tight">
-                    Welcome to the Institute
-                  </h1>
+                  <h1 className="m-0 text-center">Welcome to the Institute</h1>
                 </Link>
               </header>
-              <div className="border-y border-stone-950 bg-stone-100 px-4 py-6 dark:border-stone-700 dark:bg-stone-900">
+              <div className="border-border-strong bg-surface border-y px-4 py-6">
                 <MobileBox>
                   <ShellSearchForm
                     initialQuery={searchParamQ}
@@ -48,11 +46,11 @@ export function AppShell() {
             </>
           ) : (
             <>
-              <div className="border-b border-stone-950 bg-stone-100 px-4 py-3 dark:border-stone-700 dark:bg-stone-900">
+              <div className="border-border-strong bg-surface border-b px-4 py-3">
                 <div className="mx-auto flex max-w-5xl flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-6">
                   <Link
                     to="/"
-                    className="hidden shrink-0 font-serif text-[1.375rem] leading-9 tracking-tight text-stone-950 sm:block dark:text-stone-100"
+                    className="text-fg-1 hidden shrink-0 font-serif text-[1.375rem] leading-9 tracking-[-0.01em] sm:block"
                   >
                     chill.institute
                   </Link>

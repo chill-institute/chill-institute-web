@@ -67,8 +67,8 @@ export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProp
           <TriangleAlert />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl leading-tight">Something went wrong.</h1>
-          <p className="text-sm text-stone-700 dark:text-stone-300">
+          <h1 className="text-2xl leading-7">Something went wrong.</h1>
+          <p className="text-fg-2 text-sm">
             The app hit a crash. Nothing is sent anywhere unless you choose to copy the report.
           </p>
         </div>

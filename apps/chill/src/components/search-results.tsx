@@ -123,7 +123,7 @@ export function SearchResults({ results, sortBy, sortDirection, titleBehavior, o
                     scope="col"
                     className={
                       isTitle
-                        ? "pr-2 pb-1.5 text-left font-serif text-base leading-tight font-normal tracking-tight whitespace-nowrap"
+                        ? "pr-2 pb-1.5 text-left font-serif text-base leading-5 font-normal tracking-[-0.01em] whitespace-nowrap"
                         : "px-2 pb-1 text-center text-sm font-normal whitespace-nowrap"
                     }
                   >

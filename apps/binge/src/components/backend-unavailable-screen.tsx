@@ -14,8 +14,8 @@ export function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenPr
           <ServerCrash />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl leading-tight">The Institute is having a moment...</h1>
-          <p className="text-sm text-stone-700 dark:text-stone-300">
+          <h1 className="text-2xl leading-7">The Institute is having a moment...</h1>
+          <p className="text-fg-2 text-sm">
             We could not reach the API cleanly. This is usually a brief deploy blip or a temporary
             outage, not a sign-out.
           </p>

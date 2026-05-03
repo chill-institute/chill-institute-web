@@ -57,12 +57,10 @@ function BingeBrand() {
         width={22}
         height={22}
         alt=""
-        className="rounded-sm border border-stone-950 dark:border-stone-700"
+        className="border-border-strong rounded-sm border"
       />
-      <h3 className="truncate font-serif text-lg leading-none font-normal tracking-tight text-stone-950 dark:text-stone-100">
-        binge.institute
-      </h3>
-      <span className="rounded-full border border-stone-950/10 bg-stone-950/[0.05] px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.18em] text-stone-600 uppercase dark:border-stone-100/10 dark:bg-stone-100/[0.06] dark:text-stone-400">
+      <h3 className="text-fg-1 truncate text-lg leading-none">binge.institute</h3>
+      <span className="border-fg-1/10 bg-fg-1/[0.05] text-fg-3 rounded-full border px-2 py-0.5 text-[0.625rem] font-medium tracking-[0.18em] uppercase">
         alpha
       </span>
     </Link>
@@ -100,17 +98,15 @@ function HomeShell({
         {children}
         <InstituteFooter
           left={
-            <span>
+            <p className="m-0 flex flex-wrap items-baseline gap-1">
               <span>binge.institute</span>
-              <span className="ml-1 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
+              <span className="text-fg-3 font-mono text-[0.6875rem]">
                 · alpha · made with espresso in milan
               </span>
-            </span>
+            </p>
           }
           right={
-            <span className="font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
-              not affiliated with put.io
-            </span>
+            <p className="text-fg-3 m-0 font-mono text-[0.6875rem]">not affiliated with put.io</p>
           }
         />
       </main>
@@ -367,9 +363,7 @@ function HomePage() {
 function PageHeading({ tab }: { tab: HomeTab }) {
   return (
     <div className="flex items-end justify-between gap-4 pt-7 pb-3.5">
-      <h2 className="m-0 font-serif text-3xl leading-none font-normal tracking-tight">
-        {tab === "movies" ? "movies" : "tv shows"}
-      </h2>
+      <h2 className="m-0 leading-none">{tab === "movies" ? "movies" : "tv shows"}</h2>
     </div>
   );
 }
@@ -394,9 +388,9 @@ function PosterGridSkeleton() {
       {Array.from({ length: 18 }, (_, index) => (
         <article
           key={`poster-skel-${index}`}
-          className="flex flex-col overflow-hidden rounded border border-stone-950 bg-stone-100 dark:border-stone-700 dark:bg-stone-900"
+          className="border-border-strong bg-surface flex flex-col overflow-hidden rounded border"
         >
-          <Skeleton className="aspect-[2/3] w-full rounded-none border-b border-stone-950 dark:border-stone-700" />
+          <Skeleton className="border-border-strong aspect-[2/3] w-full rounded-none border-b" />
           <div className="flex flex-col gap-2 px-3 py-2.5">
             <Skeleton className="h-3.5 w-3/4" />
             <Skeleton className="h-3 w-1/3" />
@@ -409,7 +403,7 @@ function PosterGridSkeleton() {
 
 function SortRowSkeleton() {
   return (
-    <div className="mb-4.5 flex items-center gap-2 border-y border-stone-950 py-2 dark:border-stone-700">
+    <div className="border-border-strong mb-4.5 flex items-center gap-2 border-y py-2">
       <Skeleton className="h-5 w-12" />
       <Skeleton className="h-6 w-16 rounded-md" />
       <Skeleton className="h-6 w-16 rounded-md" />
@@ -426,10 +420,10 @@ function EmptyState({ message }: { message: string }) {
         width={48}
         height={48}
         alt=""
-        className="mb-1 rounded-md border border-stone-950 dark:border-stone-700"
+        className="border-border-strong mb-1 rounded-md border"
       />
-      <p className="m-0 font-serif text-xl text-stone-700 italic dark:text-stone-300">{message}</p>
-      <p className="m-0 text-[0.8125rem] text-stone-600 dark:text-stone-300">
+      <p className="text-fg-2 m-0 font-serif text-xl italic">{message}</p>
+      <p className="text-fg-3 m-0 text-[0.8125rem]">
         i probably broke something — try a different source?
       </p>
     </div>

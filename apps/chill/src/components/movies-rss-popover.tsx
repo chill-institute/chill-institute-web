@@ -42,7 +42,7 @@ export function MoviesRSSPopover({ source, feedUrl }: { source: MoviesSource; fe
           <div className="space-y-2">
             <h4 className="font-medium leading-none text-base">RSS feed</h4>
 
-            <p className="leading-tight text-sm text-stone-600 dark:text-stone-400">
+            <p className="text-fg-3 text-sm leading-5">
               Here&apos;s a link for <b>{sourceName}</b>, generated for you. Please don&apos;t share
               it publicly.
             </p>

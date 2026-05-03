@@ -450,7 +450,7 @@ function MovieCompactRow({ movie }: { movie: Movie }) {
         ) : null}
         <div className="flex h-full flex-1 flex-col justify-between">
           <div className="flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight break-words">{movie.title}</h5>
+            <h5 className="break-words">{movie.title}</h5>
             <div className="flex flex-row items-center space-x-2">
               <div className="flex flex-row items-center space-x-0.5">
                 <Star className="fill-amber-400 text-sm" strokeWidth={0} />
@@ -504,7 +504,7 @@ function MovieExpandedCard({ movie }: { movie: Movie }) {
       ) : null}
       <div className="mx-4 my-3 flex h-full flex-col">
         <div className="flex flex-col space-y-1">
-          <h5 className="font-serif leading-tight">{movie.title}</h5>
+          <h5>{movie.title}</h5>
           <div className="flex flex-row items-center space-x-2">
             <div className="flex flex-row items-center space-x-0.5">
               <Star className="fill-amber-400 text-sm" strokeWidth={0} />
@@ -557,7 +557,7 @@ function TVShowCompactCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVSh
         ) : null}
         <div className="flex h-full flex-1 flex-col justify-between">
           <div className="flex flex-col space-y-1">
-            <h5 className="font-serif leading-tight break-words">{show.title}</h5>
+            <h5 className="break-words">{show.title}</h5>
             <div className="flex flex-row items-center space-x-2">
               <div className="flex flex-row items-center space-x-0.5">
                 <Star className="fill-amber-400 text-sm" strokeWidth={0} />
@@ -613,7 +613,7 @@ function TVShowExpandedCard({ show, onOpen }: { show: TVShow; onOpen: (show: TVS
       ) : null}
       <div className="mx-4 my-3 flex h-full flex-col">
         <div className="flex flex-col space-y-1">
-          <h5 className="font-serif leading-tight">{show.title}</h5>
+          <h5>{show.title}</h5>
           <div className="flex flex-row items-center space-x-2">
             <div className="flex flex-row items-center space-x-0.5">
               <Star className="fill-amber-400 text-sm" strokeWidth={0} />

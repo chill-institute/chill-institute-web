@@ -30,31 +30,25 @@ export function AuthPage({
     <div className="flex min-h-dvh items-center justify-center px-4 py-8 md:px-8">
       <div
         className={cn(
-          "w-full max-w-[480px] overflow-hidden rounded-xl border border-stone-950 bg-stone-100 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:bg-stone-900 dark:shadow-[1px_1px_0_var(--color-stone-700)]",
+          "border-border-strong bg-surface shadow-[1px_1px_0_var(--color-border-strong)] w-full max-w-[480px] overflow-hidden rounded-xl border",
           className,
         )}
       >
         {showHead ? (
-          <div className="flex items-center gap-3.5 border-b border-stone-950 px-7 py-6 dark:border-stone-700">
+          <div className="border-border-strong flex items-center gap-3.5 border-b px-7 py-6">
             {hideBrand ? null : (
               <img
                 src="/logo.png"
                 width={44}
                 height={44}
                 alt=""
-                className="rounded-md border border-stone-950 dark:border-stone-700"
+                className="border-border-strong rounded-md border"
               />
             )}
             <div className="min-w-0 flex-1">
-              {title ? (
-                <h1 className="m-0 truncate font-serif text-[1.625rem] leading-tight font-normal tracking-tight text-stone-950 dark:text-stone-100">
-                  {title}
-                </h1>
-              ) : null}
+              {title ? <h1 className="m-0 truncate text-[1.625rem]">{title}</h1> : null}
               {description ? (
-                <p className="mt-1 font-serif text-sm italic text-stone-700 dark:text-stone-300">
-                  {description}
-                </p>
+                <p className="text-fg-3 mt-1 font-serif text-sm italic">{description}</p>
               ) : null}
             </div>
           </div>

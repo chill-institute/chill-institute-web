@@ -306,8 +306,8 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   const hasOnlyUnavailableResults = visibleResults.length > 0 && sendableResultsCount === 0;
   const hasActiveFilters = resolutionFilter !== "all" || codecFilter !== "all";
   const shellClassName = isDesktop
-    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-    : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
+    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border-border-strong bg-surface text-fg-1 border p-0 shadow-[0_24px_48px_rgba(0,0,0,0.3)]"
+    : "max-h-[92vh] w-full overflow-y-auto bg-surface text-fg-1 p-0";
 
   return (
     <div className={shellClassName}>
@@ -332,7 +332,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             />
           </>
         ) : (
-          <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
+          <div className="absolute inset-0 bg-app" />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
         <div className="absolute inset-0 bg-linear-to-r from-stone-100/78 via-stone-100/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
@@ -362,7 +362,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
 
           <div className="min-w-0 flex-1">
             <div className="max-w-[560px] text-stone-950 dark:text-white dark:drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
-              <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{movie.title}</h3>
+              <h3 className="text-2xl leading-[1.05] sm:text-3xl">{movie.title}</h3>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-stone-700 dark:text-white/88">
                 <span className="flex items-center gap-1">
                   <Star className="fill-amber-400 text-xs" strokeWidth={0} />
@@ -396,7 +396,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
         <IconButton
           onClick={onClose}
           aria-label="Close movie details"
-          className="absolute right-3 top-3 z-20 rounded-full border-stone-950 bg-stone-100 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:bg-stone-900 dark:shadow-[1px_1px_0_var(--color-stone-700)]"
+          className="absolute right-3 top-3 z-20 rounded-full border-border-strong bg-surface shadow-[1px_1px_0_var(--color-border-strong)]"
         >
           <X />
         </IconButton>
@@ -404,7 +404,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
 
       <div className="flex flex-col gap-3.5 px-6 pt-[18px] pb-6">
         {synopsis ? (
-          <p className="m-0 max-w-[64ch] text-sm leading-relaxed text-pretty text-stone-700 dark:text-stone-300">
+          <p className="m-0 max-w-[64ch] text-sm leading-relaxed text-pretty text-fg-2">
             {synopsis}
           </p>
         ) : null}
@@ -413,7 +413,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             {metadataTags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full border border-stone-950 bg-stone-100 px-2 py-0.5 font-mono text-[0.6875rem] lowercase text-stone-700 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
+                className="inline-flex items-center rounded-full border-border-strong bg-surface text-fg-2 border px-2 py-0.5 font-mono text-[0.6875rem] lowercase"
               >
                 {tag}
               </span>
@@ -421,7 +421,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
           </div>
         ) : null}
 
-        <h4 className="m-0 font-mono text-[0.6875rem] font-medium tracking-[0.04em] lowercase text-stone-600 dark:text-stone-300">
+        <h4 className="m-0 font-mono text-[0.6875rem] font-medium tracking-[0.04em] lowercase text-fg-3">
           send to put.io
         </h4>
 
@@ -440,7 +440,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
           </div>
         ) : searchQuery.status === "error" ? (
           <div className="space-y-2">
-            <p className="text-sm text-stone-700 dark:text-stone-300">
+            <p className="text-sm text-fg-2">
               couldn&apos;t load torrent matches for this movie yet.
             </p>
             <UserErrorAlert error={searchQuery.error} />
@@ -476,7 +476,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             ) : (
               <>
                 {hasOnlyUnavailableResults ? (
-                  <p className="m-0 text-[0.8125rem] text-stone-600 dark:text-stone-300">
+                  <p className="m-0 text-[0.8125rem] text-fg-3">
                     results came back, but none include a usable transfer link yet.
                   </p>
                 ) : null}
@@ -505,11 +505,11 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                         )}
                       >
                         <div className="min-w-0 flex-1">
-                          <div className="break-words text-[0.8125rem] font-medium text-stone-950 dark:text-stone-100">
+                          <div className="break-words text-[0.8125rem] font-medium text-fg-1">
                             {result.title}
                           </div>
-                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
-                            <span className="text-stone-700 dark:text-stone-200">
+                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] text-fg-3">
+                            <span className="text-fg-2">
                               {result.indexer || result.source || "unknown"}
                             </span>
                             {resolution ? (
@@ -637,7 +637,7 @@ function ResultsToolbar({
           </Button>
         ) : null}
       </div>
-      <p className="m-0 self-end pb-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-stone-600 dark:text-stone-300">
+      <p className="m-0 self-end pb-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-fg-3">
         {visibleCount}
         {visibleCount !== totalCount ? ` of ${totalCount}` : ""} result
         {visibleCount === 1 ? "" : "s"}
@@ -649,7 +649,7 @@ function ResultsToolbar({
 function EmptyResults({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-700 dark:border-stone-700 dark:text-stone-300">
-      <div className="flex items-center gap-2 font-medium text-stone-950 dark:text-stone-100">
+      <div className="flex items-center gap-2 font-medium text-fg-1">
         <Search className="size-4" />
         <span>{title}</span>
       </div>

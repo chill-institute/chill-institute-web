@@ -136,15 +136,15 @@ function TvShowDetailContent({
     <IconButton
       onClick={onClose}
       aria-label="Close TV show details"
-      className="absolute right-3 top-3 z-20 rounded-full border-stone-950 bg-stone-100 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:bg-stone-900 dark:shadow-[1px_1px_0_var(--color-stone-700)]"
+      className="absolute right-3 top-3 z-20 rounded-full border-border-strong bg-surface shadow-[1px_1px_0_var(--color-border-strong)]"
     >
       <X />
     </IconButton>
   );
 
   const shellClassName = isDesktop
-    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border border-solid border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-    : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
+    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border-border-strong bg-surface text-fg-1 border border-solid p-0 shadow-[0_24px_48px_rgba(0,0,0,0.3)]"
+    : "max-h-[92vh] w-full overflow-y-auto bg-surface text-fg-1 p-0";
 
   return (
     <div className={shellClassName}>
@@ -169,7 +169,7 @@ function TvShowDetailContent({
             />
           </>
         ) : (
-          <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
+          <div className="absolute inset-0 bg-app" />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
         <div className="absolute inset-0 bg-linear-to-r from-stone-100/78 via-stone-100/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
@@ -200,7 +200,7 @@ function TvShowDetailContent({
           <div className="min-w-0 flex-1">
             {show ? (
               <div className="max-w-[520px] text-stone-950 dark:text-white dark:drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
-                <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{show.title}</h3>
+                <h3 className="text-2xl leading-[1.05] sm:text-3xl">{show.title}</h3>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-stone-700 dark:text-white/88">
                   <span className="flex items-center gap-1">
                     <Star className="fill-amber-400 text-xs" strokeWidth={0} />
@@ -268,9 +268,7 @@ function TvShowDetailContent({
         ) : null}
 
         {show?.overview ? (
-          <p className="mt-5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-            {show.overview}
-          </p>
+          <p className="mt-5 text-sm leading-relaxed text-fg-3">{show.overview}</p>
         ) : detailQuery.isPending ? (
           <div className="mt-5 flex flex-col gap-2">
             <Skeleton className="h-4 w-full" />
@@ -312,7 +310,7 @@ function TvShowDetailContent({
                 <div className="text-sm font-medium">
                   {selectedSeason.name || `Season ${selectedSeason.seasonNumber}`}
                 </div>
-                <div className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+                <div className="mt-1 text-xs text-fg-3">
                   {selectedSeason.episodeCount} episodes
                   <span className="mx-1.5">&middot;</span>
                   {formatAirDate(selectedSeason.airDate)}
@@ -377,15 +375,15 @@ function TvShowDetailContent({
                     key={`${episode.seasonNumber}-${episode.episodeNumber}`}
                     className="flex items-center gap-3 border-t border-stone-950/10 px-3 py-2.5 first:border-t-0 dark:border-stone-700/30"
                   >
-                    <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-stone-600 dark:text-stone-300">
+                    <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-fg-3">
                       e{paddedEpisode}
                     </span>
 
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[0.8125rem] text-stone-950 dark:text-stone-100">
+                      <div className="truncate text-[0.8125rem] text-fg-1">
                         {episode.name || `episode ${episode.episodeNumber}`}
                       </div>
-                      <div className="mt-0.5 flex flex-wrap gap-x-2 font-mono text-[0.6875rem] text-stone-600 dark:text-stone-300">
+                      <div className="mt-0.5 flex flex-wrap gap-x-2 font-mono text-[0.6875rem] text-fg-3">
                         <span>{formatAirDate(episode.airDate)}</span>
                         {episode.runtime ? <span>· {episode.runtime}m</span> : null}
                         {episode.rating ? <span>· ★ {episode.rating.toFixed(1)}</span> : null}
@@ -505,7 +503,7 @@ export function TvShowDetailModal({
       <DrawerDescription className="sr-only">
         Browse TV show metadata, seasons, and episode download actions.
       </DrawerDescription>
-      <DrawerContent className="overflow-hidden rounded-t-3xl border-x-0 border-b-0 border-t-0 bg-stone-100 p-0 shadow-[0_-24px_48px_rgba(0,0,0,0.24)] dark:bg-stone-900">
+      <DrawerContent className="overflow-hidden rounded-t-3xl border-x-0 border-b-0 border-t-0 bg-surface p-0 shadow-[0_-24px_48px_rgba(0,0,0,0.24)]">
         {content}
       </DrawerContent>
     </Drawer>
