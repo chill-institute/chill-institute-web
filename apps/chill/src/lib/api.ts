@@ -16,16 +16,10 @@ import {
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  CardDisplayType,
   defaultUserSettings,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
-  type GetMoviesResponse,
-  type GetTVShowDetailResponse,
-  type GetTVShowSeasonDownloadsResponse,
-  type GetTVShowSeasonResponse,
-  type GetTVShowsResponse,
   type SearchResponse,
   type UserIndexer,
 } from "./types";
@@ -139,14 +133,9 @@ function withSettingsDefaults(settings: UserSettings): UserSettings {
       settings.sortDirection === SortDirection.UNSPECIFIED
         ? defaultUserSettings.sortDirection
         : settings.sortDirection,
-    cardDisplayType:
-      settings.cardDisplayType === CardDisplayType.UNSPECIFIED
-        ? defaultUserSettings.cardDisplayType
-        : settings.cardDisplayType,
-    moviesSource:
-      settings.moviesSource === 0 ? defaultUserSettings.moviesSource : settings.moviesSource,
-    tvShowsSource:
-      settings.tvShowsSource === 0 ? defaultUserSettings.tvShowsSource : settings.tvShowsSource,
+    cardDisplayType: settings.cardDisplayType,
+    moviesSource: settings.moviesSource,
+    tvShowsSource: settings.tvShowsSource,
   };
 }
 
@@ -164,95 +153,6 @@ async function getUserProfile(authToken: string, signal?: AbortSignal): Promise<
     return await runAPIRequest(() =>
       runWithTimeout(signal, REQUEST_TIMEOUT_MS, "Profile request timed out", (timed) =>
         userClient.getUserProfile({}, { headers: authHeader(authToken), signal: timed }),
-      ),
-    );
-  } catch (error) {
-    redirectToSignInOnAuthFailure(error);
-    throw error;
-  }
-}
-
-async function getMovies(authToken: string, signal?: AbortSignal): Promise<GetMoviesResponse> {
-  try {
-    return await runAPIRequest(() =>
-      runWithTimeout(signal, REQUEST_TIMEOUT_MS, "Movies request timed out", (timed) =>
-        userClient.getMovies({}, { headers: authHeader(authToken), signal: timed }),
-      ),
-    );
-  } catch (error) {
-    redirectToSignInOnAuthFailure(error);
-    throw error;
-  }
-}
-
-async function getTVShows(authToken: string, signal?: AbortSignal): Promise<GetTVShowsResponse> {
-  try {
-    return await runAPIRequest(() =>
-      runWithTimeout(signal, REQUEST_TIMEOUT_MS, "TV shows request timed out", (timed) =>
-        userClient.getTVShows({}, { headers: authHeader(authToken), signal: timed }),
-      ),
-    );
-  } catch (error) {
-    redirectToSignInOnAuthFailure(error);
-    throw error;
-  }
-}
-
-async function getTVShowDetail(
-  authToken: string,
-  imdbId: string,
-  signal?: AbortSignal,
-): Promise<GetTVShowDetailResponse> {
-  try {
-    return await runAPIRequest(() =>
-      runWithTimeout(signal, REQUEST_TIMEOUT_MS, "TV show detail request timed out", (timed) =>
-        userClient.getTVShowDetail({ imdbId }, { headers: authHeader(authToken), signal: timed }),
-      ),
-    );
-  } catch (error) {
-    redirectToSignInOnAuthFailure(error);
-    throw error;
-  }
-}
-
-async function getTVShowSeason(
-  authToken: string,
-  imdbId: string,
-  seasonNumber: number,
-  signal?: AbortSignal,
-): Promise<GetTVShowSeasonResponse> {
-  try {
-    return await runAPIRequest(() =>
-      runWithTimeout(signal, REQUEST_TIMEOUT_MS, "TV show season request timed out", (timed) =>
-        userClient.getTVShowSeason(
-          { imdbId, seasonNumber },
-          { headers: authHeader(authToken), signal: timed },
-        ),
-      ),
-    );
-  } catch (error) {
-    redirectToSignInOnAuthFailure(error);
-    throw error;
-  }
-}
-
-async function getTVShowSeasonDownloads(
-  authToken: string,
-  imdbId: string,
-  seasonNumber: number,
-  signal?: AbortSignal,
-): Promise<GetTVShowSeasonDownloadsResponse> {
-  try {
-    return await runAPIRequest(() =>
-      runWithTimeout(
-        signal,
-        REQUEST_TIMEOUT_MS,
-        "TV show season downloads request timed out",
-        (timed) =>
-          userClient.getTVShowSeasonDownloads(
-            { imdbId, seasonNumber },
-            { headers: authHeader(authToken), signal: timed },
-          ),
       ),
     );
   } catch (error) {
@@ -372,14 +272,6 @@ async function getFolder(
 export function createApi(authToken: string) {
   return {
     getUserProfile: (signal?: AbortSignal) => getUserProfile(authToken, signal),
-    getMovies: (signal?: AbortSignal) => getMovies(authToken, signal),
-    getTVShows: (signal?: AbortSignal) => getTVShows(authToken, signal),
-    getTVShowDetail: (imdbId: string, signal?: AbortSignal) =>
-      getTVShowDetail(authToken, imdbId, signal),
-    getTVShowSeason: (imdbId: string, seasonNumber: number, signal?: AbortSignal) =>
-      getTVShowSeason(authToken, imdbId, seasonNumber, signal),
-    getTVShowSeasonDownloads: (imdbId: string, seasonNumber: number, signal?: AbortSignal) =>
-      getTVShowSeasonDownloads(authToken, imdbId, seasonNumber, signal),
     search: (query: string, indexerId?: string, signal?: AbortSignal) =>
       search(authToken, query, indexerId, signal),
     getIndexers: (signal?: AbortSignal) => getIndexers(authToken, signal),

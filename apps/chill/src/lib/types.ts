@@ -9,19 +9,11 @@ import {
   CardDisplayType,
   MoviesSource,
   TVShowsSource,
-  TVShowStatus,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
-  type GetMoviesResponse,
-  type GetTVShowDetailResponse,
-  type GetTVShowSeasonDownloadsResponse,
-  type GetTVShowSeasonResponse,
-  type GetTVShowsResponse,
-  type Movie,
   type SearchResponse,
   type SearchResult,
-  type TVShow,
   type UserSettings,
   type UserIndexer,
 } from "@chill-institute/contracts/chill/v4/api_pb";
@@ -34,94 +26,19 @@ export {
   SearchResultTitleBehavior,
   SortBy,
   SortDirection,
-  CardDisplayType,
-  MoviesSource,
-  TVShowsSource,
-  TVShowStatus,
 };
 
 export type {
   AddTransferResponse,
   GetDownloadFolderResponse,
   GetFolderResponse,
-  GetMoviesResponse,
-  GetTVShowDetailResponse,
-  GetTVShowSeasonDownloadsResponse,
-  GetTVShowSeasonResponse,
-  GetTVShowsResponse,
-  Movie,
   SearchResponse,
   SearchResult,
-  TVShow,
   UserSettings,
   UserIndexer,
 };
 
 type UserSettingsDefaults = Omit<UserSettings, "$typeName">;
-
-export const moviesSources = [
-  MoviesSource.IMDB_MOVIEMETER,
-  MoviesSource.YTS,
-  MoviesSource.ROTTEN_TOMATOES,
-  MoviesSource.TRAKT,
-  MoviesSource.IMDB_TOP_250,
-] as const;
-
-export const moviesSourceLabels: Record<MoviesSource, string> = {
-  [MoviesSource.UNSPECIFIED]: "IMDb Moviemeter",
-  [MoviesSource.IMDB_MOVIEMETER]: "IMDb Moviemeter",
-  [MoviesSource.IMDB_TOP_250]: "IMDb Top 250",
-  [MoviesSource.YTS]: "YTS",
-  [MoviesSource.ROTTEN_TOMATOES]: "Rotten Tomatoes",
-  [MoviesSource.TRAKT]: "Trakt",
-};
-
-export function getMoviesSourceLabel(source: MoviesSource): string {
-  return moviesSourceLabels[source];
-}
-
-export const tvShowsSources = [
-  TVShowsSource.TV_SHOWS_SOURCE_NETFLIX,
-  TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX,
-  TVShowsSource.TV_SHOWS_SOURCE_APPLE_TV_PLUS,
-  TVShowsSource.TV_SHOWS_SOURCE_PRIME_VIDEO,
-  TVShowsSource.TV_SHOWS_SOURCE_DISNEY_PLUS,
-] as const;
-
-export function getTVShowsSourceLabel(source: TVShowsSource): string {
-  switch (source) {
-    case TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX:
-      return "HBO Max";
-    case TVShowsSource.TV_SHOWS_SOURCE_APPLE_TV_PLUS:
-      return "Apple TV+";
-    case TVShowsSource.TV_SHOWS_SOURCE_PRIME_VIDEO:
-      return "Prime Video";
-    case TVShowsSource.TV_SHOWS_SOURCE_DISNEY_PLUS:
-      return "Disney+";
-    case TVShowsSource.TV_SHOWS_SOURCE_UNSPECIFIED:
-    case TVShowsSource.TV_SHOWS_SOURCE_NETFLIX:
-    default:
-      return "Netflix";
-  }
-}
-
-export function getTVShowStatusLabel(status: TVShowStatus): string {
-  switch (status) {
-    case TVShowStatus.TV_SHOW_STATUS_RETURNING:
-      return "Returning";
-    case TVShowStatus.TV_SHOW_STATUS_ENDED:
-      return "Ended";
-    case TVShowStatus.TV_SHOW_STATUS_CANCELED:
-      return "Canceled";
-    case TVShowStatus.TV_SHOW_STATUS_IN_PRODUCTION:
-      return "In production";
-    case TVShowStatus.TV_SHOW_STATUS_PLANNED:
-      return "Planned";
-    case TVShowStatus.TV_SHOW_STATUS_UNSPECIFIED:
-    default:
-      return "Unknown";
-  }
-}
 
 export const resolutionFilters = [
   ResolutionFilter.RESOLUTION_FILTER_720P,
