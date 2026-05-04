@@ -666,7 +666,7 @@ export function MovieDetailModal({ movie, onClose }: Props) {
       <Dialog open onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           showCloseButton={false}
-          className="fixed top-1/2 left-1/2 z-50 w-[min(100vw-1rem,760px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
+          className="fixed top-1/2 left-1/2 w-[min(100vw-1rem,760px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
         >
           <DialogTitle className="sr-only">{movie.title} details</DialogTitle>
           <DialogDescription className="sr-only">

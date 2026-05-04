@@ -9,7 +9,7 @@ const PopoverClose = PopoverPrimitive.Close;
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
 function PopoverArrow(props: ComponentProps<typeof PopoverPrimitive.Arrow>) {
-  return <PopoverPrimitive.Arrow {...props} className="fill-stone-950 dark:fill-stone-700" />;
+  return <PopoverPrimitive.Arrow {...props} className="fill-border-strong" />;
 }
 
 function PopoverContent({
@@ -31,7 +31,7 @@ function PopoverContent({
       >
         <PopoverPrimitive.Popup
           className={cn(
-            "ui-popup z-[70] w-72 rounded-md border border-stone-950 bg-stone-100 p-4 text-stone-950 shadow-md outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-50",
+            "ui-popup border-border-strong bg-surface text-fg-1 z-[70] w-72 rounded-md border p-4 shadow-md outline-none",
             className,
           )}
           {...props}

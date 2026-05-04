@@ -215,100 +215,105 @@ function HomePage() {
       const countLabel =
         visibleCount != null ? `${visibleCount} ${noun} · sorted by ${sortLabel}` : null;
 
-      const moviesContent = pendingMoviesRefresh ? (
-        <PosterGridSkeleton />
-      ) : (
-        match(moviesQuery)
-          .with({ status: "pending" }, () => <PosterGridSkeleton />)
-          .with({ status: "error" }, (movies) =>
-            movies.isFetching ? (
-              <PosterGridSkeleton />
-            ) : (
-              <UserErrorAlert className="mt-2" error={movies.error} />
-            ),
-          )
-          .with({ status: "success" }, (movies) => {
-            if (movies.data.source !== config.moviesSource) {
-              return <PosterGridSkeleton />;
-            }
+      // Only the active tab's content tree is computed each render. The
+      // inactive tab's data is still kept warm in the background by
+      // useMoviesQuery / useTVShowsQuery so flipping tabs is instant —
+      // we just skip the render-side work.
+      const activeContent =
+        activeTab === "movies" ? (
+          pendingMoviesRefresh ? (
+            <PosterGridSkeleton />
+          ) : (
+            match(moviesQuery)
+              .with({ status: "pending" }, () => <PosterGridSkeleton />)
+              .with({ status: "error" }, (movies) =>
+                movies.isFetching ? (
+                  <PosterGridSkeleton />
+                ) : (
+                  <UserErrorAlert className="mt-2" error={movies.error} />
+                ),
+              )
+              .with({ status: "success" }, (movies) => {
+                if (movies.data.source !== config.moviesSource) {
+                  return <PosterGridSkeleton />;
+                }
 
-            if (movies.data.movies.length === 0) {
-              if (movies.isFetching) {
+                if (movies.data.movies.length === 0) {
+                  if (movies.isFetching) {
+                    return <PosterGridSkeleton />;
+                  }
+                  return (
+                    <EmptyState message="couldn't fetch any movies from the selected source, please try another one." />
+                  );
+                }
+
+                return (
+                  <PosterGrid>
+                    {sortMovies(movies.data.movies, sort).map((movie, index) => (
+                      <PosterCard
+                        key={movie.id}
+                        className="animate-reveal"
+                        style={staggerDelay(index)}
+                        title={movie.title}
+                        image={movie.posterUrl ?? null}
+                        rating={movie.rating != null ? movie.rating.toFixed(1) : null}
+                        year={movie.year != null ? String(movie.year) : null}
+                        onClick={() => setSelectedMovie(movie)}
+                      />
+                    ))}
+                  </PosterGrid>
+                );
+              })
+              .exhaustive()
+          )
+        ) : pendingTVShowsRefresh ? (
+          <PosterGridSkeleton />
+        ) : (
+          match(tvShowsQuery)
+            .with({ status: "pending" }, () => <PosterGridSkeleton />)
+            .with({ status: "error" }, (shows) =>
+              shows.isFetching ? (
+                <PosterGridSkeleton />
+              ) : (
+                <UserErrorAlert className="mt-2" error={shows.error} />
+              ),
+            )
+            .with({ status: "success" }, (shows) => {
+              if (shows.data.source !== config.tvShowsSource) {
                 return <PosterGridSkeleton />;
               }
-              return (
-                <EmptyState message="couldn't fetch any movies from the selected source, please try another one." />
-              );
-            }
 
-            return (
-              <PosterGrid>
-                {sortMovies(movies.data.movies, sort).map((movie, index) => (
-                  <PosterCard
-                    key={movie.id}
-                    className="animate-reveal"
-                    style={staggerDelay(index)}
-                    title={movie.title}
-                    image={movie.posterUrl ?? null}
-                    rating={movie.rating != null ? movie.rating.toFixed(1) : null}
-                    year={movie.year != null ? String(movie.year) : null}
-                    onClick={() => setSelectedMovie(movie)}
-                  />
-                ))}
-              </PosterGrid>
-            );
-          })
-          .exhaustive()
-      );
-
-      const tvShowsContent = pendingTVShowsRefresh ? (
-        <PosterGridSkeleton />
-      ) : (
-        match(tvShowsQuery)
-          .with({ status: "pending" }, () => <PosterGridSkeleton />)
-          .with({ status: "error" }, (shows) =>
-            shows.isFetching ? (
-              <PosterGridSkeleton />
-            ) : (
-              <UserErrorAlert className="mt-2" error={shows.error} />
-            ),
-          )
-          .with({ status: "success" }, (shows) => {
-            if (shows.data.source !== config.tvShowsSource) {
-              return <PosterGridSkeleton />;
-            }
-
-            if (shows.data.shows.length === 0) {
-              if (shows.isFetching) {
-                return <PosterGridSkeleton />;
+              if (shows.data.shows.length === 0) {
+                if (shows.isFetching) {
+                  return <PosterGridSkeleton />;
+                }
+                return (
+                  <EmptyState message="couldn't fetch any tv shows from the selected source, please try another one." />
+                );
               }
-              return (
-                <EmptyState message="couldn't fetch any tv shows from the selected source, please try another one." />
-              );
-            }
 
-            return (
-              <PosterGrid>
-                {sortShows(shows.data.shows, sort).map((show, index) => (
-                  <PosterCard
-                    key={show.imdbId}
-                    className="animate-reveal"
-                    style={staggerDelay(index)}
-                    title={show.title}
-                    image={show.posterUrl ?? null}
-                    rating={show.rating != null ? show.rating.toFixed(1) : null}
-                    year={show.year != null ? String(show.year) : null}
-                    onClick={() => {
-                      setSelectedShowId(show.imdbId);
-                      setSelectedSeason(1);
-                    }}
-                  />
-                ))}
-              </PosterGrid>
-            );
-          })
-          .exhaustive()
-      );
+              return (
+                <PosterGrid>
+                  {sortShows(shows.data.shows, sort).map((show, index) => (
+                    <PosterCard
+                      key={show.imdbId}
+                      className="animate-reveal"
+                      style={staggerDelay(index)}
+                      title={show.title}
+                      image={show.posterUrl ?? null}
+                      rating={show.rating != null ? show.rating.toFixed(1) : null}
+                      year={show.year != null ? String(show.year) : null}
+                      onClick={() => {
+                        setSelectedShowId(show.imdbId);
+                        setSelectedSeason(1);
+                      }}
+                    />
+                  ))}
+                </PosterGrid>
+              );
+            })
+            .exhaustive()
+        );
 
       return (
         <HomeShell tab={activeTab} onTabChange={handleTabChange}>
@@ -332,7 +337,7 @@ function HomePage() {
             <div className="contents">{sourceSelector}</div>
           </SortRow>
 
-          {activeTab === "movies" ? moviesContent : tvShowsContent}
+          {activeContent}
 
           {saveConfigMutation.error ? (
             <UserErrorAlert className="mt-4" error={saveConfigMutation.error} />
