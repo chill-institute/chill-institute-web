@@ -334,8 +334,8 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
         ) : (
           <div className="absolute inset-0 bg-app" />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-linear-to-r from-stone-100/78 via-stone-100/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
+        <div className="from-surface via-surface/78 absolute inset-0 bg-linear-to-t via-30% to-transparent" />
+        <div className="from-surface/48 absolute inset-0 bg-linear-to-r to-transparent to-60%" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {movie.posterUrl ? (
@@ -351,7 +351,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                 alt={movie.title}
                 onLoad={() => setPosterLoaded(true)}
                 className={cn(
-                  "absolute inset-0 h-full w-full rounded-md border border-stone-950 object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] dark:border-stone-700 transition-opacity duration-300 ease-out",
+                  "absolute inset-0 h-full w-full border-border-strong rounded-md border object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-opacity duration-300 ease-out",
                   posterLoaded ? "opacity-100" : "opacity-0",
                 )}
               />
@@ -361,27 +361,27 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
           )}
 
           <div className="min-w-0 flex-1">
-            <div className="max-w-[560px] text-stone-950 dark:text-white dark:drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
+            <div className="text-fg-1 max-w-[560px]">
               <h3 className="text-2xl leading-[1.05] sm:text-3xl">{movie.title}</h3>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-stone-700 dark:text-white/88">
+              <div className="text-fg-2 mt-2 flex flex-wrap items-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
                   <Star className="fill-amber-400 text-xs" strokeWidth={0} />
                   <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
                 </span>
                 {movie.year ? (
                   <>
-                    <span className="text-stone-400 dark:text-white/45">&middot;</span>
-                    <span className="text-stone-600 dark:text-white/72">{movie.year}</span>
+                    <span className="text-fg-4">&middot;</span>
+                    <span className="text-fg-3">{movie.year}</span>
                   </>
                 ) : null}
                 {movie.externalUrl ? (
                   <>
-                    <span className="text-stone-400 dark:text-white/45">&middot;</span>
+                    <span className="text-fg-4">&middot;</span>
                     <a
                       href={movie.externalUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-0.5 text-stone-700 transition-colors hover:text-stone-950 dark:text-white/88 dark:hover:text-white"
+                      className="text-fg-2 hover:text-fg-1 inline-flex items-center gap-0.5 transition-colors"
                     >
                       <span>IMDb</span>
                       <ArrowUpRight className="text-xs" strokeWidth={1.25} />
@@ -426,11 +426,11 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
         </h4>
 
         {searchQuery.status === "pending" ? (
-          <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
+          <div className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border">
             {Array.from({ length: 6 }, (_, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 border-t border-stone-950/10 px-3 py-3 first:border-t-0 dark:border-stone-700/30"
+                className="flex items-center gap-3 border-t border-border-strong/10 dark:border-border-strong/30 px-3 py-3 first:border-t-0"
               >
                 <Skeleton className="h-3 w-14 rounded" />
                 <Skeleton className="h-4 flex-1" />
@@ -484,7 +484,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                 <div
                   role="list"
                   aria-label="Torrent results list"
-                  className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40"
+                  className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border"
                 >
                   {visibleResults.map(({ result, resolution, codec }) => {
                     const isSendable = canSendResult(result);

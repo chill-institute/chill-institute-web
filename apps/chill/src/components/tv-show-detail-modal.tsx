@@ -172,8 +172,8 @@ function TvShowDetailContent({
         ) : (
           <div className="absolute inset-0 bg-app" />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/10 via-35% to-black/45 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-linear-to-r from-black/35 via-transparent to-transparent" />
+        <div className="from-surface via-surface/78 absolute inset-0 bg-linear-to-t via-30% to-transparent" />
+        <div className="from-surface/48 absolute inset-0 bg-linear-to-r to-transparent to-60%" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {posterUrl ? (
@@ -189,7 +189,7 @@ function TvShowDetailContent({
                 alt={show?.title ?? "TV show poster"}
                 onLoad={() => setPosterLoaded(true)}
                 className={cn(
-                  "absolute inset-0 h-full w-full rounded-md border border-stone-950 object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] dark:border-stone-700 transition-opacity duration-300 ease-out",
+                  "absolute inset-0 h-full w-full border-border-strong rounded-md border object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-opacity duration-300 ease-out",
                   posterLoaded ? "opacity-100" : "opacity-0",
                 )}
               />
@@ -200,27 +200,27 @@ function TvShowDetailContent({
 
           <div className="min-w-0 flex-1">
             {show ? (
-              <div className="max-w-[520px] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
+              <div className="text-fg-1 max-w-[520px]">
                 <h3 className="text-2xl leading-[1.05] sm:text-3xl">{show.title}</h3>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-white/88">
+                <div className="text-fg-2 mt-2 flex flex-wrap items-center gap-2 text-sm">
                   <span className="flex items-center gap-1">
                     <Star className="fill-amber-400 text-xs" strokeWidth={0} />
                     <span>{show.rating ? show.rating.toFixed(1) : "N/A"}</span>
                   </span>
-                  <span className="text-white/45">&middot;</span>
-                  <span className="text-white/72">{show.year || "Unknown year"}</span>
-                  <span className="text-white/45">&middot;</span>
-                  <span className="text-white/72">
+                  <span className="text-fg-4">&middot;</span>
+                  <span className="text-fg-3">{show.year || "Unknown year"}</span>
+                  <span className="text-fg-4">&middot;</span>
+                  <span className="text-fg-3">
                     {detailQuery.data?.show?.seasonCount ?? show.seasonCount} seasons
                   </span>
                   {show.externalUrl ? (
                     <>
-                      <span className="text-white/45">&middot;</span>
+                      <span className="text-fg-4">&middot;</span>
                       <a
                         href={show.externalUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-0.5 text-white/88 transition-colors hover:text-white"
+                        className="text-fg-2 hover:text-fg-1 inline-flex items-center gap-0.5 transition-colors"
                       >
                         <span>IMDb</span>
                         <ArrowUpRight className="text-xs" strokeWidth={1.25} />
@@ -232,12 +232,12 @@ function TvShowDetailContent({
                   <TVShowStatusBadge status={detailQuery.data?.show?.status ?? show.status} />
                   {genres.length > 0 ? (
                     <>
-                      <span className="text-white/45">&middot;</span>
+                      <span className="text-fg-4">&middot;</span>
                       <div className="flex flex-wrap items-center gap-2">
                         {genres.map((genre) => (
                           <span
                             key={genre}
-                            className="rounded-md border border-white/16 bg-black/14 px-2 py-1 text-[0.6875rem] leading-none text-white/76"
+                            className="border-fg-1/10 bg-fg-1/[0.04] text-fg-2 rounded-md border px-2 py-1 font-mono text-[0.6875rem] leading-none lowercase"
                           >
                             {genre}
                           </span>
@@ -349,7 +349,7 @@ function TvShowDetailContent({
           {seasonQuery.status === "error" ? (
             <UserErrorAlert error={seasonQuery.error} />
           ) : seasonQuery.isPending ? (
-            <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
+            <div className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border">
               {Array.from({ length: 6 }, (_, index) => (
                 <div
                   key={index}
@@ -366,7 +366,7 @@ function TvShowDetailContent({
               ))}
             </div>
           ) : (
-            <div className="overflow-hidden rounded-lg border border-stone-950/15 bg-stone-50 dark:border-stone-700/70 dark:bg-stone-950/40">
+            <div className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border">
               {(seasonQuery.data?.episodes ?? []).map((episode) => {
                 const episodeDownload = downloadsByEpisode.get(episode.episodeNumber);
                 const paddedSeason = String(episode.seasonNumber).padStart(2, "0");
