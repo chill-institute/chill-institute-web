@@ -1,5 +1,11 @@
+/*
+ * Crash report shape shared between binge and chill. The `app` field
+ * is supplied by the caller so the same helpers serve both surfaces;
+ * the GitHub issue URL is fixed at chill-institute/chill-web because
+ * both apps live in this repo.
+ */
 type ErrorReport = {
-  app: "chill.institute/web";
+  app: string;
   componentStack?: string;
   error: {
     message: string;
@@ -14,6 +20,7 @@ type ErrorReport = {
 };
 
 type BuildErrorReportOptions = {
+  app: string;
   componentStack?: string;
   notes?: string;
   occurredAt: string;
@@ -53,15 +60,23 @@ function normalizeRoutePath(routePath: string) {
   return routePath;
 }
 
-export function buildErrorReport(
+function buildErrorReport(
   error: unknown,
-  { componentStack, notes, occurredAt, release, routePath, userAgent }: BuildErrorReportOptions,
+  {
+    app,
+    componentStack,
+    notes,
+    occurredAt,
+    release,
+    routePath,
+    userAgent,
+  }: BuildErrorReportOptions,
 ): ErrorReport {
   const normalizedNotes = notes?.trim();
   const normalizedComponentStack = componentStack?.trim();
 
   return {
-    app: "chill.institute/web",
+    app,
     componentStack: normalizedComponentStack || undefined,
     error: normalizeError(error),
     notes: normalizedNotes || undefined,
@@ -72,7 +87,7 @@ export function buildErrorReport(
   };
 }
 
-export function formatErrorReport(report: ErrorReport) {
+function formatErrorReport(report: ErrorReport) {
   return JSON.stringify(report, null, 2);
 }
 
@@ -80,7 +95,7 @@ function truncate(value: string, maxLength: number) {
   return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}…`;
 }
 
-export function buildGitHubIssueURL(report: ErrorReport) {
+function buildGitHubIssueURL(report: ErrorReport) {
   const title = truncate(`[bug] Crash on ${report.routePath}: ${report.error.message}`, 200);
   const stepsToReproduce = report.notes
     ? report.notes
@@ -110,6 +125,7 @@ export function buildGitHubIssueURL(report: ErrorReport) {
     "",
     "## Environment",
     "",
+    `- App: ${report.app}`,
     `- URL: ${report.routePath}`,
     `- Browser: ${report.userAgent}`,
     `- Commit / release: ${report.release}`,
@@ -127,3 +143,6 @@ export function buildGitHubIssueURL(report: ErrorReport) {
   url.searchParams.set("body", body);
   return url.toString();
 }
+
+export { buildErrorReport, buildGitHubIssueURL, formatErrorReport };
+export type { ErrorReport };

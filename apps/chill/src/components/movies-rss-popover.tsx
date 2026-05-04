@@ -1,6 +1,6 @@
 import { Rss, X } from "lucide-react";
 
-import { CopyButton } from "@/components/copy-button";
+import { CopyButton } from "@chill-institute/ui/components/copy-button";
 import {
   Popover,
   PopoverArrow,

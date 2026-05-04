@@ -2,8 +2,8 @@ import { useState } from "react";
 import { createFileRoute, Navigate, useRouterState } from "@tanstack/react-router";
 import { Eye, EyeOff, ShieldAlert } from "lucide-react";
 
-import { AuthPage } from "@/components/auth-page";
-import { CopyButton } from "@/components/copy-button";
+import { AuthPage } from "@chill-institute/ui/components/auth-page";
+import { CopyButton } from "@chill-institute/ui/components/copy-button";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth/cli-token")({

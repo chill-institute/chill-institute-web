@@ -5,10 +5,10 @@ import {
 } from "@tanstack/react-router";
 
 import type { RouterContext } from "@/router";
-import { AppErrorBoundary } from "@/components/app-error-boundary";
-import { AppErrorFallback } from "@/components/app-error-fallback";
+import { AppErrorBoundary } from "@chill-institute/ui/components/app-error-boundary";
+import { AppErrorFallback } from "@chill-institute/ui/components/app-error-fallback";
 import { AppShell } from "@/components/app-shell";
-import { BackendUnavailableScreen } from "@/components/backend-unavailable-screen";
+import { BackendUnavailableScreen } from "@chill-institute/ui/components/backend-unavailable-screen";
 import { AuthProvider } from "@/lib/auth";
 import { BackendHealthProvider, useBackendUnavailable } from "@/hooks/use-backend-unavailable";
 import { Toaster } from "@chill-institute/ui/components/ui/toaster";
@@ -22,7 +22,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function Root() {
   return (
-    <AppErrorBoundary>
+    <AppErrorBoundary app="binge.institute/web" release={import.meta.env.VITE_PUBLIC_RELEASE}>
       <AuthProvider>
         <TooltipProvider>
           <BackendHealthProvider>
@@ -50,7 +50,13 @@ function RootContent() {
 }
 
 function RootError({ error }: ErrorComponentProps) {
-  return <AppErrorFallback error={error} />;
+  return (
+    <AppErrorFallback
+      app="binge.institute/web"
+      release={import.meta.env.VITE_PUBLIC_RELEASE}
+      error={error}
+    />
+  );
 }
 
 function RootNotFound() {

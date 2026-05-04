@@ -8,6 +8,7 @@ describe("buildErrorReport", () => {
     error.name = "ExplosionError";
 
     const report = buildErrorReport(error, {
+      app: "binge.institute/web",
       componentStack: "\n    at AppShell",
       notes: "  I opened settings.  ",
       occurredAt: "2026-03-15T01:23:45.000Z",
@@ -34,6 +35,7 @@ describe("buildErrorReport", () => {
 
   it("falls back gracefully for non-Error values", () => {
     const report = buildErrorReport("oops", {
+      app: "chill.institute/web",
       occurredAt: "2026-03-15T01:23:45.000Z",
       release: "test-release",
       routePath: "search",
@@ -41,7 +43,7 @@ describe("buildErrorReport", () => {
     });
 
     expect(report).toEqual({
-      app: "binge.institute/web",
+      app: "chill.institute/web",
       componentStack: undefined,
       error: {
         message: "oops",
@@ -61,6 +63,7 @@ describe("formatErrorReport", () => {
   it("renders stable pretty JSON", () => {
     const output = formatErrorReport(
       buildErrorReport(new Error("kaboom"), {
+        app: "binge.institute/web",
         occurredAt: "2026-03-15T01:23:45.000Z",
         release: "test-release",
         routePath: "/",
@@ -77,6 +80,7 @@ describe("formatErrorReport", () => {
 describe("buildGitHubIssueURL", () => {
   it("prefills the bug template with the report details", () => {
     const report = buildErrorReport(new Error("kaboom"), {
+      app: "binge.institute/web",
       notes: "Open home page\nOpen settings",
       occurredAt: "2026-03-15T01:23:45.000Z",
       release: "test-release",

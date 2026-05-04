@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
-import { CopyButton } from "@/components/copy-button";
+import { CopyButton } from "@chill-institute/ui/components/copy-button";
 import { formatAge, formatBytes } from "@/lib/format";
 import type { SearchResult, UserSettings } from "@/lib/types";
 import { SearchResultTitleBehavior, SortBy, SortDirection } from "@/lib/types";

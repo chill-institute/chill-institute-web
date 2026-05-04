@@ -1,12 +1,16 @@
 import { ExternalLink, RefreshCw, ServerCrash } from "lucide-react";
 
-import { StatusPanel } from "@/components/status-panel";
+import { StatusPanel } from "./status-panel";
 
 type BackendUnavailableScreenProps = {
   onRetry?: () => Promise<unknown> | void;
 };
 
-export function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenProps) {
+/*
+ * Shown when the chill API is unreachable. The status page link is
+ * the same for both apps because the API is shared.
+ */
+function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenProps) {
   return (
     <StatusPanel>
       <div className="flex items-start gap-3">
@@ -22,9 +26,9 @@ export function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenPr
         </div>
       </div>
 
-      <div className="rounded border border-stone-950/15 bg-stone-50 p-3 text-sm dark:border-stone-700/70 dark:bg-stone-950/50">
+      <div className="border-border-strong/15 bg-surface-2 dark:border-border-strong/70 dark:bg-surface-2/50 rounded border p-3 text-sm">
         <div>Try again in a moment.</div>
-        <div className="text-stone-600 dark:text-stone-400">
+        <div className="text-fg-3">
           If this keeps happening, a page reload usually confirms whether the backend is back.
         </div>
       </div>
@@ -49,3 +53,5 @@ export function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenPr
     </StatusPanel>
   );
 }
+
+export { BackendUnavailableScreen };

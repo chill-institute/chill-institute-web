@@ -10,6 +10,7 @@
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
     "./cn": "./src/lib/cn.ts",
+    "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./components/ui/*": "./src/components/ui/*.tsx"
   },

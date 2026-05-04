@@ -1,8 +1,12 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-import { AppErrorFallback } from "@/components/app-error-fallback";
+import { AppErrorFallback } from "./app-error-fallback";
 
 type AppErrorBoundaryProps = {
+  /** App identifier baked into the crash report — e.g. "binge.institute/web". */
+  app: string;
+  /** Build release identifier (defaults to "dev" inside the fallback). */
+  release?: string;
   children: ReactNode;
 };
 
@@ -11,7 +15,12 @@ type AppErrorBoundaryState = {
   error: unknown;
 };
 
-export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorBoundaryState> {
+/*
+ * Top-level crash boundary. Mounts <AppErrorFallback> with the app
+ * identifier and (optional) release tag once a render throws. Each
+ * app passes its own `app` so the JSON report tags itself correctly.
+ */
+class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorBoundaryState> {
   state: AppErrorBoundaryState = {
     componentStack: undefined,
     error: null,
@@ -41,10 +50,17 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   render() {
     if (this.state.error) {
       return (
-        <AppErrorFallback error={this.state.error} componentStack={this.state.componentStack} />
+        <AppErrorFallback
+          app={this.props.app}
+          release={this.props.release}
+          error={this.state.error}
+          componentStack={this.state.componentStack}
+        />
       );
     }
 
     return this.props.children;
   }
 }
+
+export { AppErrorBoundary };

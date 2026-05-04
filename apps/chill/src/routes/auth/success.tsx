@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
-import { AuthPage } from "@/components/auth-page";
+import { AuthPage } from "@chill-institute/ui/components/auth-page";
 import { UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
 import { consumeCallbackToken } from "@/lib/auth";
 

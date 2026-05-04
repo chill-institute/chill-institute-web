@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ExternalLink, Loader } from "lucide-react";
 
-import { AuthPage } from "@/components/auth-page";
+import { AuthPage } from "@chill-institute/ui/components/auth-page";
 import { Button } from "@chill-institute/ui/components/ui/button";
 import { getPutioStartURL } from "@/lib/api";
 import { ACCESS_DENIED_ERROR, SESSION_EXPIRED_ERROR, UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";

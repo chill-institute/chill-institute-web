@@ -8,27 +8,40 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { StatusPanel } from "@/components/status-panel";
-import { buildErrorReport, buildGitHubIssueURL, formatErrorReport } from "@/lib/error-report";
+import { StatusPanel } from "./status-panel";
+import { buildErrorReport, buildGitHubIssueURL, formatErrorReport } from "../lib/error-report";
 
 type AppErrorFallbackProps = {
+  /** Identifier baked into the JSON crash report — e.g. "binge.institute/web". */
+  app: string;
   error: unknown;
   componentStack?: string;
+  /** Build release identifier — defaults to `import.meta.env.VITE_PUBLIC_RELEASE`. */
+  release?: string;
 };
 
-function getClientReportContext() {
+function getClientReportContext(release?: string) {
   const routePath = typeof window === "undefined" ? "/" : window.location.pathname;
   const userAgent = typeof navigator === "undefined" ? "unknown" : navigator.userAgent;
 
   return {
     occurredAt: new Date().toISOString(),
-    release: import.meta.env.VITE_PUBLIC_RELEASE ?? "dev",
+    release: release ?? "dev",
     routePath,
     userAgent,
   };
 }
 
-export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProps) {
+/*
+ * Crash fallback shared between binge and chill. The boundary mounts
+ * this once an error escapes React; it shows the message, lets the
+ * user copy a JSON report, and offers a one-click GitHub issue link.
+ *
+ * `app` lets each surface tag the report so a dropped crash report
+ * still says which app produced it. The release / userAgent / route
+ * context is derived at render time from `window`.
+ */
+function AppErrorFallback({ app, error, componentStack, release }: AppErrorFallbackProps) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [notes, setNotes] = useState("");
 
@@ -44,11 +57,12 @@ export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProp
   const report = useMemo(
     () =>
       buildErrorReport(error, {
-        ...getClientReportContext(),
+        app,
+        ...getClientReportContext(release),
         componentStack,
         notes,
       }),
-    [componentStack, error, notes],
+    [app, componentStack, error, notes, release],
   );
 
   const reportText = useMemo(() => formatErrorReport(report), [report]);
@@ -74,7 +88,7 @@ export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProp
         </div>
       </div>
 
-      <div className="rounded border border-stone-950/15 bg-stone-50 p-3 text-sm dark:border-stone-700/70 dark:bg-stone-950/50">
+      <div className="border-border-strong/15 bg-surface-2 dark:border-border-strong/70 dark:bg-surface-2/50 rounded border p-3 text-sm">
         <div>
           <strong>Message:</strong> {report.error.message}
         </div>
@@ -89,7 +103,7 @@ export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProp
       <label className="flex flex-col gap-2 text-sm">
         <span className="font-medium">What were you doing?</span>
         <textarea
-          className="min-h-24 rounded border border-stone-950 bg-stone-100 px-3 py-2 outline-none hover:bg-stone-200 hover:transition-colors focus:bg-stone-200 dark:border-stone-700 dark:bg-stone-900 dark:hover:bg-stone-800 dark:focus:bg-stone-800"
+          className="input min-h-24 px-3 py-2"
           placeholder="Optional notes to include in the copied report."
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
@@ -126,12 +140,14 @@ export function AppErrorFallback({ error, componentStack }: AppErrorFallbackProp
         </a>
       </div>
 
-      <details className="rounded border border-stone-950/15 bg-stone-50 p-3 text-sm dark:border-stone-700/70 dark:bg-stone-950/50">
-        <summary className="cursor-pointer select-none font-medium">Preview copied report</summary>
-        <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words text-xs leading-5">
+      <details className="border-border-strong/15 bg-surface-2 dark:border-border-strong/70 dark:bg-surface-2/50 rounded border p-3 text-sm">
+        <summary className="cursor-pointer font-medium select-none">Preview copied report</summary>
+        <pre className="mt-3 overflow-x-auto text-xs leading-5 break-words whitespace-pre-wrap">
           {reportText}
         </pre>
       </details>
     </StatusPanel>
   );
 }
+
+export { AppErrorFallback };
