@@ -2,10 +2,6 @@ import { Code, ConnectError, createClient, type Interceptor } from "@connectrpc/
 import { createConnectTransport } from "@connectrpc/connect-web";
 import {
   UserService,
-  SearchResultDisplayBehavior,
-  SearchResultTitleBehavior,
-  SortBy,
-  SortDirection,
   type AddTransferResponse,
   type GetDownloadFolderResponse,
   type GetFolderResponse,
@@ -20,28 +16,12 @@ import {
   type UserSettings,
 } from "@chill-institute/contracts/chill/v4/api_pb";
 
-import { SESSION_EXPIRED_ERROR } from "./auth-errors";
+import { redirectToSignInOnAuthFailure } from "./auth-failure";
 import { withTimeoutSignal } from "./request-timeout";
+import { withSearchSettingsDefaults } from "./settings-defaults";
 
 const REQUEST_TIMEOUT_MS = 8000;
 const SEARCH_TIMEOUT_MS = 10000;
-
-const AUTH_TOKEN_STORAGE_KEY = "chill.auth_token";
-const AUTH_CALLBACK_STORAGE_KEY = "chill.auth_callback";
-
-/*
- * Fallback proto enum values applied when the server returns a stored
- * UserSettings with UNSPECIFIED on a search-related enum. Catalog
- * fields (cardDisplayType / moviesSource / tvShowsSource) are passed
- * through untouched — chill ignores them and binge supplies its own
- * defaults at the call site.
- */
-const SEARCH_SETTINGS_FALLBACKS = {
-  searchResultDisplayBehavior: SearchResultDisplayBehavior.FASTEST,
-  searchResultTitleBehavior: SearchResultTitleBehavior.TEXT,
-  sortBy: SortBy.SEEDERS,
-  sortDirection: SortDirection.DESC,
-} as const;
 
 function newRequestID(): string {
   if (typeof globalThis.crypto?.randomUUID === "function") {
@@ -62,55 +42,6 @@ function authHeader(authToken?: string): HeadersInit | undefined {
   return { Authorization: `Bearer ${authToken}` };
 }
 
-/*
- * The chill backend returns Unauthenticated/PermissionDenied or a
- * grab bag of "unauthorized"-flavoured messages. When that happens the
- * stored auth token is stale; clear it and bounce to /sign-out so the
- * sign-in page can re-prompt the user. Both apps store under the same
- * `chill.auth_*` localStorage keys, so this lives in the shared client.
- */
-function redirectToSignInOnAuthFailure(error: unknown) {
-  const isAuthFailure = (() => {
-    if (error instanceof ConnectError) {
-      if (error.code === Code.Unauthenticated || error.code === Code.PermissionDenied) {
-        return true;
-      }
-      const message = `${error.rawMessage} ${error.message}`.toLowerCase();
-      return (
-        message.includes("invalid auth token") ||
-        message.includes("missing api key or auth token") ||
-        message.includes("missing credentials") ||
-        message.includes("unauthorized") ||
-        message.includes("401")
-      );
-    }
-    if (error instanceof Error) {
-      const message = error.message.toLowerCase();
-      return (
-        message.includes("invalid auth token") ||
-        message.includes("missing api key or auth token") ||
-        message.includes("missing credentials") ||
-        message.includes("unauthorized") ||
-        message.includes("401")
-      );
-    }
-    return false;
-  })();
-
-  if (!isAuthFailure) {
-    return;
-  }
-  if (typeof window === "undefined") {
-    return;
-  }
-  if (window.location.pathname === "/sign-in" || window.location.pathname === "/sign-out") {
-    return;
-  }
-  window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
-  window.sessionStorage.removeItem(AUTH_CALLBACK_STORAGE_KEY);
-  window.location.replace(`/sign-out?error=${encodeURIComponent(SESSION_EXPIRED_ERROR)}`);
-}
-
 async function runWithTimeout<T>(
   signal: AbortSignal | undefined,
   timeoutMs: number,
@@ -128,26 +59,6 @@ async function runWithTimeout<T>(
   } finally {
     timed.cleanup();
   }
-}
-
-function withSearchSettingsDefaults(settings: UserSettings): UserSettings {
-  return {
-    ...settings,
-    searchResultDisplayBehavior:
-      settings.searchResultDisplayBehavior === SearchResultDisplayBehavior.UNSPECIFIED
-        ? SEARCH_SETTINGS_FALLBACKS.searchResultDisplayBehavior
-        : settings.searchResultDisplayBehavior,
-    searchResultTitleBehavior:
-      settings.searchResultTitleBehavior === SearchResultTitleBehavior.UNSPECIFIED
-        ? SEARCH_SETTINGS_FALLBACKS.searchResultTitleBehavior
-        : settings.searchResultTitleBehavior,
-    sortBy:
-      settings.sortBy === SortBy.UNSPECIFIED ? SEARCH_SETTINGS_FALLBACKS.sortBy : settings.sortBy,
-    sortDirection:
-      settings.sortDirection === SortDirection.UNSPECIFIED
-        ? SEARCH_SETTINGS_FALLBACKS.sortDirection
-        : settings.sortDirection,
-  };
 }
 
 export type ChillApi = ReturnType<typeof createApi>;

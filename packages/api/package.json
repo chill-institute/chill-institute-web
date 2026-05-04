@@ -18,6 +18,7 @@
     "react": "catalog:"
   },
   "devDependencies": {
+    "@bufbuild/protobuf": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

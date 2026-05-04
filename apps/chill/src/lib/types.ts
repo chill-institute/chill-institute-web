@@ -107,6 +107,13 @@ export const sortByLabels: Record<(typeof sortByValues)[number], string> = {
   [SortBy.SOURCE]: "Source",
 };
 
+/*
+ * `cardDisplayType`, `moviesSource`, `tvShowsSource`, `showMovies`, and
+ * `showTvShows` are required by the UserSettings proto contract but
+ * unused by chill — chill is the search experience, binge owns the
+ * catalog. They're seeded here so SaveUserSettings round-trips the
+ * shared proto without dropping fields a binge user might have set.
+ */
 export const defaultUserSettings: UserSettingsDefaults = {
   codecFilters: [],
   disabledIndexerIds: [],

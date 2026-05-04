@@ -18,7 +18,7 @@ import { defaultUserSettings, normalizeBingeUserSettings, type UserSettings } fr
  * legacy show* visibility flags — into the shared client's settings
  * pipeline.
  */
-function withCatalogDefaults(settings: UserSettings): UserSettings {
+export function withCatalogDefaults(settings: UserSettings): UserSettings {
   return normalizeBingeUserSettings({
     ...settings,
     cardDisplayType:
