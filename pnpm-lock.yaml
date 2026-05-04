@@ -114,6 +114,9 @@ importers:
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.12.0
+      '@chill-institute/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@chill-institute/contracts':
         specifier: 'catalog:'
         version: 1.2.2
@@ -205,6 +208,9 @@ importers:
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.12.0
+      '@chill-institute/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@chill-institute/contracts':
         specifier: 'catalog:'
         version: 1.2.2
@@ -287,6 +293,28 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.1.20(@types/node@25.6.0)(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3)
+
+  packages/api:
+    dependencies:
+      '@chill-institute/contracts':
+        specifier: 'catalog:'
+        version: 1.2.2
+      '@connectrpc/connect':
+        specifier: 'catalog:'
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)
+      '@connectrpc/connect-web':
+        specifier: 'catalog:'
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))
+      react:
+        specifier: 'catalog:'
+        version: 19.2.5
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
 
   packages/ui:
     dependencies:

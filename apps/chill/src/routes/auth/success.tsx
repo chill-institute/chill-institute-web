@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Loader } from "lucide-react";
 
 import { AuthPage } from "@chill-institute/ui/components/auth-page";
-import { UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
+import { UNKNOWN_AUTH_ERROR } from "@chill-institute/api/auth-errors";
 import { consumeCallbackToken } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth/success")({

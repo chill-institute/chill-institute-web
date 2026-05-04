@@ -5,7 +5,11 @@ import { ExternalLink, Loader } from "lucide-react";
 import { AuthPage } from "@chill-institute/ui/components/auth-page";
 import { Button } from "@chill-institute/ui/components/ui/button";
 import { getPutioStartURL } from "@/lib/api";
-import { ACCESS_DENIED_ERROR, SESSION_EXPIRED_ERROR, UNKNOWN_AUTH_ERROR } from "@/lib/auth-errors";
+import {
+  ACCESS_DENIED_ERROR,
+  SESSION_EXPIRED_ERROR,
+  UNKNOWN_AUTH_ERROR,
+} from "@chill-institute/api/auth-errors";
 import { normalizeCallbackPath, useAuth } from "@/lib/auth";
 import { publicLinks } from "@/lib/public-links";
 

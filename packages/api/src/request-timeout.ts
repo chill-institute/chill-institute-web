@@ -4,6 +4,15 @@ type TimeoutSignal = {
   signal: AbortSignal;
 };
 
+/*
+ * Returns an AbortSignal that aborts when either the parent signal
+ * aborts or the timeout elapses, plus a `didTimeout()` flag so callers
+ * can distinguish "user/abort" from "we hit the deadline".
+ *
+ * Used by the chill API client to translate slow RPCs into a
+ * `Code.DeadlineExceeded` ConnectError without losing parent-cancellation
+ * semantics.
+ */
 export function withTimeoutSignal(
   parent: AbortSignal | undefined,
   timeoutMs: number,
