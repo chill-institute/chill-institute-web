@@ -10,9 +10,9 @@ import {
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@chill-institute/ui/components/ui/popover";
+import { ScrollArea } from "@chill-institute/ui/components/ui/scroll-area";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
 
 type Props = {
   folderId: bigint;

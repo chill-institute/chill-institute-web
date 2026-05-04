@@ -1,4 +1,4 @@
-import { cn } from "@/lib/cn";
+import { cn } from "@chill-institute/ui/cn";
 import { getTVShowStatusLabel, TVShowStatus } from "@/lib/types";
 
 function toneForStatus(status: TVShowStatus) {

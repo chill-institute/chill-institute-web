@@ -1,0 +1,25 @@
+{
+  "name": "@chill-institute/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check": "vp check",
+    "test": "vp test src --run --passWithNoTests"
+  },
+  "dependencies": {
+    "@chill-institute/contracts": "catalog:",
+    "@connectrpc/connect": "catalog:",
+    "@connectrpc/connect-web": "catalog:",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@bufbuild/protobuf": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

@@ -114,9 +114,15 @@ importers:
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.12.0
+      '@chill-institute/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@chill-institute/contracts':
         specifier: 'catalog:'
         version: 1.2.2
+      '@chill-institute/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@connectrpc/connect':
         specifier: 'catalog:'
         version: 2.1.1(@bufbuild/protobuf@2.12.0)
@@ -202,9 +208,15 @@ importers:
       '@bufbuild/protobuf':
         specifier: 'catalog:'
         version: 2.12.0
+      '@chill-institute/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@chill-institute/contracts':
         specifier: 'catalog:'
         version: 1.2.2
+      '@chill-institute/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@connectrpc/connect':
         specifier: 'catalog:'
         version: 2.1.1(@bufbuild/protobuf@2.12.0)
@@ -272,6 +284,86 @@ importers:
       '@vitejs/plugin-react':
         specifier: 'catalog:'
         version: 6.0.1(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3))
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vite:
+        specifier: npm:@voidzero-dev/vite-plus-core@0.1.20
+        version: '@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3)'
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.20(@types/node@25.6.0)(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3))(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3)
+
+  packages/api:
+    dependencies:
+      '@chill-institute/contracts':
+        specifier: 'catalog:'
+        version: 1.2.2
+      '@connectrpc/connect':
+        specifier: 'catalog:'
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)
+      '@connectrpc/connect-web':
+        specifier: 'catalog:'
+        version: 2.1.1(@bufbuild/protobuf@2.12.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.12.0))
+      react:
+        specifier: 'catalog:'
+        version: 19.2.5
+    devDependencies:
+      '@bufbuild/protobuf':
+        specifier: 'catalog:'
+        version: 2.12.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(jiti@2.6.1)(yaml@2.8.3))(yaml@2.8.3)
+
+  packages/ui:
+    dependencies:
+      '@base-ui/react':
+        specifier: 'catalog:'
+        version: 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      class-variance-authority:
+        specifier: 'catalog:'
+        version: 0.7.1
+      clsx:
+        specifier: 'catalog:'
+        version: 2.1.1
+      lucide-react:
+        specifier: 'catalog:'
+        version: 1.14.0(react@19.2.5)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.5
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.5(react@19.2.5)
+      sonner:
+        specifier: 'catalog:'
+        version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      tailwind-merge:
+        specifier: 'catalog:'
+        version: 3.5.0
+      ts-pattern:
+        specifier: 'catalog:'
+        version: 5.9.0
+      vaul:
+        specifier: 'catalog:'
+        version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.2.4(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.6.0)(jiti@2.6.1)(typescript@6.0.3)(yaml@2.8.3))
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.14)
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.2.4
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

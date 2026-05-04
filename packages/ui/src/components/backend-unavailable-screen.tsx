@@ -1,0 +1,57 @@
+import { ExternalLink, RefreshCw, ServerCrash } from "lucide-react";
+
+import { StatusPanel } from "./status-panel";
+
+type BackendUnavailableScreenProps = {
+  onRetry?: () => Promise<unknown> | void;
+};
+
+/*
+ * Shown when the chill API is unreachable. The status page link is
+ * the same for both apps because the API is shared.
+ */
+function BackendUnavailableScreen({ onRetry }: BackendUnavailableScreenProps) {
+  return (
+    <StatusPanel>
+      <div className="flex items-start gap-3">
+        <div className="rounded-full border border-red-500/40 bg-red-100 p-2 text-red-700 dark:bg-red-950/40 dark:text-red-300">
+          <ServerCrash />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl leading-7">The Institute is having a moment...</h1>
+          <p className="text-fg-2 text-sm">
+            We could not reach the API cleanly. This is usually a brief deploy blip or a temporary
+            outage, not a sign-out.
+          </p>
+        </div>
+      </div>
+
+      <div className="border-border-strong/15 bg-surface-2 dark:border-border-strong/70 dark:bg-surface-2/50 rounded border p-3 text-sm">
+        <div>Try again in a moment.</div>
+        <div className="text-fg-3">
+          If this keeps happening, a page reload usually confirms whether the backend is back.
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => {
+            void onRetry?.();
+            window.location.reload();
+          }}
+        >
+          <RefreshCw />
+          reload page
+        </button>
+        <a href="https://status.chill.institute/" target="_blank" rel="noreferrer" className="btn">
+          <ExternalLink />
+          view status page
+        </a>
+      </div>
+    </StatusPanel>
+  );
+}
+
+export { BackendUnavailableScreen };

@@ -2,11 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Search, Star, Users, X } from "lucide-react";
 
 import { AddTransferButton } from "@/components/add-transfer-button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { Button } from "@chill-institute/ui/components/ui/button";
+import { IconButton } from "@chill-institute/ui/components/icon-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@chill-institute/ui/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@chill-institute/ui/components/ui/drawer";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/cn";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
+import { cn } from "@chill-institute/ui/cn";
 import { formatAge, formatBytes } from "@/lib/format";
 import { type Movie, type SearchResult } from "@/lib/types";
 import { useMovieSearchQuery } from "@/queries/movies";
@@ -110,8 +122,14 @@ function compareBigintsDescending(left: bigint, right: bigint) {
   return left > right ? -1 : 1;
 }
 
+// Hoisted to module scope so the literals don't get re-evaluated on every
+// call — useMemo maps over every result and runs the parsers per row.
+const RESOLUTION_RE = /\b(2160p|1080p|720p)\b/i;
+const X265_RE = /\b(x265|h\.?265|hevc)\b/i;
+const X264_RE = /\b(x264|h\.?264|avc)\b/i;
+
 function parseResolution(title: string): ParsedResult["resolution"] {
-  const match = title.match(/\b(2160p|1080p|720p)\b/i);
+  const match = title.match(RESOLUTION_RE);
   if (!match) {
     return undefined;
   }
@@ -125,13 +143,11 @@ function parseResolution(title: string): ParsedResult["resolution"] {
 }
 
 function parseCodec(title: string): ParsedResult["codec"] {
-  const normalizedTitle = title.toLowerCase();
-
-  if (/\b(x265|h\.?265|hevc)\b/i.test(normalizedTitle)) {
+  if (X265_RE.test(title)) {
     return "x265";
   }
 
-  if (/\b(x264|h\.?264|avc)\b/i.test(normalizedTitle)) {
+  if (X264_RE.test(title)) {
     return "x264";
   }
 
@@ -290,12 +306,12 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
   const hasOnlyUnavailableResults = visibleResults.length > 0 && sendableResultsCount === 0;
   const hasActiveFilters = resolutionFilter !== "all" || codecFilter !== "all";
   const shellClassName = isDesktop
-    ? "max-h-[90vh] w-full max-w-[940px] overflow-y-auto rounded-xl border border-stone-950 bg-stone-100 p-0 text-stone-950 shadow-[0_24px_48px_rgba(0,0,0,0.3)] dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-    : "max-h-[92vh] w-full overflow-y-auto bg-stone-100 p-0 text-stone-950 dark:bg-stone-900 dark:text-stone-100";
+    ? "max-h-[calc(100vh-48px)] w-full max-w-[760px] overflow-y-auto rounded-xl border-border-strong bg-surface text-fg-1 border p-0 shadow-[0_24px_48px_rgba(0,0,0,0.3)]"
+    : "max-h-[92vh] w-full overflow-y-auto bg-surface text-fg-1 p-0";
 
   return (
     <div className={shellClassName}>
-      <div className="relative flex min-h-60 items-end overflow-hidden sm:min-h-90">
+      <div className="relative flex h-[280px] items-end overflow-hidden">
         {movie.backdropUrl ? (
           <>
             <Skeleton
@@ -316,10 +332,10 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
             />
           </>
         ) : (
-          <div className="absolute inset-0 bg-stone-300 dark:bg-stone-800" />
+          <div className="absolute inset-0 bg-app" />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-stone-100 via-stone-100/12 via-35% to-black/28 dark:from-stone-900 dark:via-stone-900/15 dark:to-black/55" />
-        <div className="absolute inset-0 bg-linear-to-r from-white/78 via-white/48 via-35% to-transparent dark:from-black/35 dark:via-black/14 dark:to-transparent" />
+        <div className="from-surface via-surface/78 absolute inset-0 bg-linear-to-t via-30% to-transparent" />
+        <div className="from-surface/48 absolute inset-0 bg-linear-to-r to-transparent to-60%" />
 
         <div className="relative z-10 flex w-full items-end gap-5 px-6 pb-6 sm:px-7">
           {movie.posterUrl ? (
@@ -335,7 +351,7 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                 alt={movie.title}
                 onLoad={() => setPosterLoaded(true)}
                 className={cn(
-                  "absolute inset-0 h-full w-full rounded-md border border-stone-950 object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] dark:border-stone-700 transition-opacity duration-300 ease-out",
+                  "absolute inset-0 h-full w-full border-border-strong rounded-md border object-cover shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-opacity duration-300 ease-out",
                   posterLoaded ? "opacity-100" : "opacity-0",
                 )}
               />
@@ -345,27 +361,27 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
           )}
 
           <div className="min-w-0 flex-1">
-            <div className="max-w-[560px] text-stone-950 dark:text-white dark:drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]">
-              <h3 className="font-serif text-2xl leading-tight sm:text-3xl">{movie.title}</h3>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-stone-700 dark:text-white/88">
+            <div className="text-fg-1 max-w-[560px]">
+              <h3 className="text-2xl leading-[1.05] sm:text-3xl">{movie.title}</h3>
+              <div className="text-fg-2 mt-2 flex flex-wrap items-center gap-2 text-sm">
                 <span className="flex items-center gap-1">
                   <Star className="fill-amber-400 text-xs" strokeWidth={0} />
                   <span>{movie.rating ? movie.rating.toFixed(1) : "N/A"}</span>
                 </span>
                 {movie.year ? (
                   <>
-                    <span className="text-stone-400 dark:text-white/45">&middot;</span>
-                    <span className="text-stone-600 dark:text-white/72">{movie.year}</span>
+                    <span className="text-fg-4">&middot;</span>
+                    <span className="text-fg-3">{movie.year}</span>
                   </>
                 ) : null}
                 {movie.externalUrl ? (
                   <>
-                    <span className="text-stone-400 dark:text-white/45">&middot;</span>
+                    <span className="text-fg-4">&middot;</span>
                     <a
                       href={movie.externalUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-0.5 text-stone-700 transition-colors hover:text-stone-950 dark:text-white/88 dark:hover:text-white"
+                      className="text-fg-2 hover:text-fg-1 inline-flex items-center gap-0.5 transition-colors"
                     >
                       <span>IMDb</span>
                       <ArrowUpRight className="text-xs" strokeWidth={1.25} />
@@ -373,239 +389,271 @@ function MovieDetailContent({ movie, onClose, isDesktop }: Props & { isDesktop: 
                   </>
                 ) : null}
               </div>
-              {metadataTags.length > 0 ? (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {metadataTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md border border-stone-950/10 bg-white/42 px-2 py-1 text-[11px] leading-none text-stone-700 backdrop-blur-sm dark:border-white/16 dark:bg-black/14 dark:text-white/76 dark:backdrop-blur-none"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
 
-        <button
-          type="button"
+        <IconButton
           onClick={onClose}
-          className="absolute right-3 top-3 z-20 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/50 text-white transition-[background-color,transform] duration-150 ease-out hover:bg-black/70 active:scale-[0.97]"
           aria-label="Close movie details"
+          className="absolute right-3 top-3 z-20 rounded-full border-border-strong bg-surface shadow-[1px_1px_0_var(--color-border-strong)]"
         >
-          <X className="h-4 w-4" />
-        </button>
+          <X />
+        </IconButton>
       </div>
 
-      <div className="px-6 pb-6">
+      <div className="flex flex-col gap-3.5 px-6 pt-[18px] pb-6">
         {synopsis ? (
-          <p className="mt-5 text-sm text-stone-600 dark:text-stone-400">{synopsis}</p>
+          <p className="m-0 max-w-[64ch] text-sm leading-relaxed text-pretty text-fg-2">
+            {synopsis}
+          </p>
         ) : null}
-        <div className="mt-5 border-t border-stone-950 pt-5 dark:border-stone-700">
-          {searchQuery.status === "pending" ? (
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 6 }, (_, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 rounded-md border border-stone-950/10 px-3 py-3 dark:border-stone-700/30"
-                >
-                  <Skeleton className="h-5 w-5 rounded" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-3 w-1/3" />
-                  </div>
-                  <Skeleton className="h-8 w-28 rounded-md" />
-                </div>
-              ))}
-            </div>
-          ) : searchQuery.status === "error" ? (
-            <div className="space-y-2">
-              <p className="text-sm text-stone-600 dark:text-stone-400">
-                We couldn&apos;t load torrent matches for this movie yet.
-              </p>
-              <UserErrorAlert error={searchQuery.error} />
-            </div>
-          ) : results.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-              <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
-                <Search className="size-4" />
-                <span>No torrent results found</span>
-              </div>
-              <p className="mt-2">
-                We searched by movie title and year, but nothing usable came back yet.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap items-end justify-between gap-2">
-                <div className="flex flex-wrap items-end gap-2">
-                  <FilterSelect
-                    label="Resolution"
-                    value={resolutionFilter}
-                    onChange={(value) => setResolutionFilter(value as ResolutionFilterValue)}
-                    options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
-                      value,
-                      label: value === "all" ? "All resolutions" : value,
-                    }))}
-                  />
-                  <FilterSelect
-                    label="Codec"
-                    value={codecFilter}
-                    onChange={(value) => setCodecFilter(value as CodecFilterValue)}
-                    options={CODEC_FILTER_OPTIONS.map((value) => ({
-                      value,
-                      label: value === "all" ? "All codecs" : value,
-                    }))}
-                  />
-                  <FilterSelect
-                    label="Sort"
-                    value={sortBy}
-                    onChange={(value) => setSortBy(value as SortValue)}
-                    options={[
-                      { value: "seeders", label: "Most seeders" },
-                      { value: "size", label: "Largest size" },
-                      { value: "age", label: "Newest first" },
-                    ]}
-                  />
-                  {hasActiveFilters ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setResolutionFilter("all");
-                        setCodecFilter("all");
-                      }}
-                      className="btn btn-secondary text-xs"
-                    >
-                      Clear filters
-                    </button>
-                  ) : null}
-                </div>
-                <p className="self-end pb-0.5 text-xs leading-none tabular-nums text-stone-500 dark:text-stone-400">
-                  {visibleResults.length}
-                  {visibleResults.length !== results.length ? ` of ${results.length}` : ""} result
-                  {visibleResults.length === 1 ? "" : "s"}
-                </p>
-              </div>
+        {metadataTags.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {metadataTags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center rounded-full border-border-strong bg-surface text-fg-2 border px-2 py-0.5 font-mono text-[0.6875rem] lowercase"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
-              {visibleResults.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-                  <div className="flex items-center gap-2 font-medium text-stone-900 dark:text-stone-100">
-                    <Search className="size-4" />
-                    <span>No results match these filters</span>
-                  </div>
-                  <p className="mt-2">
-                    Try a different resolution or codec to widen the result set.
+        <h4 className="m-0 font-mono text-[0.6875rem] font-medium tracking-[0.04em] lowercase text-fg-3">
+          send to put.io
+        </h4>
+
+        {searchQuery.status === "pending" ? (
+          <div className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 border-t border-border-strong/10 dark:border-border-strong/30 px-3 py-3 first:border-t-0"
+              >
+                <Skeleton className="h-3 w-14 rounded" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-7 w-28 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : searchQuery.status === "error" ? (
+          <div className="space-y-2">
+            <p className="text-sm text-fg-2">
+              couldn&apos;t load torrent matches for this movie yet.
+            </p>
+            <UserErrorAlert error={searchQuery.error} />
+          </div>
+        ) : results.length === 0 ? (
+          <EmptyResults
+            title="no torrent results found"
+            body="searched by movie title and year, but nothing usable came back yet."
+          />
+        ) : (
+          <>
+            <ResultsToolbar
+              resolutionFilter={resolutionFilter}
+              codecFilter={codecFilter}
+              sortBy={sortBy}
+              hasActiveFilters={hasActiveFilters}
+              visibleCount={visibleResults.length}
+              totalCount={results.length}
+              onResolutionChange={setResolutionFilter}
+              onCodecChange={setCodecFilter}
+              onSortChange={setSortBy}
+              onClearFilters={() => {
+                setResolutionFilter("all");
+                setCodecFilter("all");
+              }}
+            />
+
+            {visibleResults.length === 0 ? (
+              <EmptyResults
+                title="no results match these filters"
+                body="try a different resolution or codec to widen the result set."
+              />
+            ) : (
+              <>
+                {hasOnlyUnavailableResults ? (
+                  <p className="m-0 text-[0.8125rem] text-fg-3">
+                    results came back, but none include a usable transfer link yet.
                   </p>
-                </div>
-              ) : null}
+                ) : null}
 
-              {hasOnlyUnavailableResults ? (
-                <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-3 text-sm text-stone-600 dark:border-stone-700 dark:text-stone-400">
-                  Results came back, but none include a usable transfer link yet.
-                </div>
-              ) : null}
+                <div
+                  role="list"
+                  aria-label="Torrent results list"
+                  className="overflow-hidden border-border-strong/15 dark:border-border-strong/70 bg-surface-2 dark:bg-surface-2/40 rounded-lg border"
+                >
+                  {visibleResults.map(({ result, resolution, codec }) => {
+                    const isSendable = canSendResult(result);
+                    const ageLabel = formatResultAge(result.uploadedAt);
+                    const uploadedAtLabel = result.uploadedAt
+                      ? formatUploadedAt(result.uploadedAt)
+                      : undefined;
+                    const sizeLabel = result.size > 0n ? formatBytes(result.size) : undefined;
+                    const seederLabel = formatSeederCount(result.seeders);
 
-              <div role="list" aria-label="Torrent results list" className="flex flex-col gap-2">
-                {visibleResults.map(({ result, resolution, codec }) => {
-                  const isSendable = canSendResult(result);
-                  const ageLabel = formatResultAge(result.uploadedAt);
-                  const uploadedAtLabel = result.uploadedAt
-                    ? formatUploadedAt(result.uploadedAt)
-                    : undefined;
-                  const sizeLabel = result.size > 0n ? formatBytes(result.size) : undefined;
-                  const seederLabel = formatSeederCount(result.seeders);
-
-                  return (
-                    <div
-                      key={result.id || `${result.title}-${result.link}`}
-                      role="listitem"
-                      className={cn(
-                        "flex flex-col gap-3 rounded-lg border border-stone-950 bg-stone-50 px-3 py-3 dark:border-stone-700 dark:bg-stone-950/40 sm:flex-row sm:items-center sm:justify-between",
-                        !isSendable && "border-dashed border-stone-950/40 dark:border-stone-700/80",
-                      )}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="break-words text-sm font-medium">{result.title}</div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-stone-600 dark:text-stone-400">
-                          <span className="font-medium text-stone-700 dark:text-stone-300">
-                            {result.indexer || result.source || "Unknown source"}
-                          </span>
-                          {resolution ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="rounded-full border border-stone-950/12 bg-stone-200/80 px-2 py-0.5 text-[11px] leading-none text-stone-700 dark:border-stone-700/70 dark:bg-stone-800/90 dark:text-stone-300">
-                                {resolution}
-                              </span>
-                            </>
-                          ) : null}
-                          {codec ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="rounded-full border border-stone-950/12 bg-stone-200/80 px-2 py-0.5 text-[11px] leading-none text-stone-700 dark:border-stone-700/70 dark:bg-stone-800/90 dark:text-stone-300">
-                                {codec}
-                              </span>
-                            </>
-                          ) : null}
-                          {sizeLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span>{sizeLabel}</span>
-                            </>
-                          ) : null}
-                          {seederLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span className="inline-flex items-center gap-1">
-                                <Users className="size-3" />
-                                {seederLabel}
-                              </span>
-                            </>
-                          ) : null}
-                          {ageLabel ? (
-                            <>
-                              <span>&middot;</span>
-                              <span title={uploadedAtLabel}>{ageLabel}</span>
-                            </>
-                          ) : null}
-                          {!isSendable ? (
-                            <>
-                              <span>&middot;</span>
-                              <span>Unavailable</span>
-                            </>
-                          ) : null}
+                    return (
+                      <div
+                        key={result.id || `${result.title}-${result.link}`}
+                        role="listitem"
+                        className={cn(
+                          "flex flex-col gap-3 border-t border-stone-950/10 px-3 py-3 first:border-t-0 sm:flex-row sm:items-center sm:justify-between dark:border-stone-700/30",
+                          !isSendable && "opacity-70",
+                        )}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="break-words text-[0.8125rem] font-medium text-fg-1">
+                            {result.title}
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] text-fg-3">
+                            <span className="text-fg-2">
+                              {result.indexer || result.source || "unknown"}
+                            </span>
+                            {resolution ? (
+                              <>
+                                <span>·</span>
+                                <span>{resolution}</span>
+                              </>
+                            ) : null}
+                            {codec ? (
+                              <>
+                                <span>·</span>
+                                <span>{codec}</span>
+                              </>
+                            ) : null}
+                            {sizeLabel ? (
+                              <>
+                                <span>·</span>
+                                <span className="tabular-nums">{sizeLabel}</span>
+                              </>
+                            ) : null}
+                            {seederLabel ? (
+                              <>
+                                <span>·</span>
+                                <span className="inline-flex items-center gap-1 tabular-nums">
+                                  <Users className="size-3" />
+                                  {seederLabel}
+                                </span>
+                              </>
+                            ) : null}
+                            {ageLabel ? (
+                              <>
+                                <span>·</span>
+                                <span title={uploadedAtLabel}>{ageLabel}</span>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          {isSendable ? (
+                            <AddTransferButton className="w-full sm:w-auto" url={result.link}>
+                              send to put.io
+                            </AddTransferButton>
+                          ) : (
+                            <Button
+                              variant="off"
+                              disabled
+                              className="w-full sm:w-auto"
+                              aria-label={`Cannot send ${result.title} to put.io`}
+                              title="This result is missing a usable transfer link"
+                            >
+                              unavailable
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {isSendable ? (
-                          <AddTransferButton
-                            className="w-full sm:w-auto"
-                            url={result.link}
-                            ariaLabel={`Send ${result.title} to put.io`}
-                          >
-                            send to put.io
-                          </AddTransferButton>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled
-                            className="btn btn-secondary w-full cursor-not-allowed opacity-60 sm:w-auto"
-                            aria-label={`Cannot send ${result.title} to put.io`}
-                            title="This result is missing a usable transfer link"
-                          >
-                            unavailable
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </div>
+    </div>
+  );
+}
+
+function ResultsToolbar({
+  resolutionFilter,
+  codecFilter,
+  sortBy,
+  hasActiveFilters,
+  visibleCount,
+  totalCount,
+  onResolutionChange,
+  onCodecChange,
+  onSortChange,
+  onClearFilters,
+}: {
+  resolutionFilter: ResolutionFilterValue;
+  codecFilter: CodecFilterValue;
+  sortBy: SortValue;
+  hasActiveFilters: boolean;
+  visibleCount: number;
+  totalCount: number;
+  onResolutionChange: (value: ResolutionFilterValue) => void;
+  onCodecChange: (value: CodecFilterValue) => void;
+  onSortChange: (value: SortValue) => void;
+  onClearFilters: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-2">
+      <div className="flex flex-wrap items-end gap-2">
+        <FilterSelect
+          label="Resolution"
+          value={resolutionFilter}
+          onChange={(value) => onResolutionChange(value as ResolutionFilterValue)}
+          options={RESOLUTION_FILTER_OPTIONS.map((value) => ({
+            value,
+            label: value === "all" ? "all resolutions" : value,
+          }))}
+        />
+        <FilterSelect
+          label="Codec"
+          value={codecFilter}
+          onChange={(value) => onCodecChange(value as CodecFilterValue)}
+          options={CODEC_FILTER_OPTIONS.map((value) => ({
+            value,
+            label: value === "all" ? "all codecs" : value,
+          }))}
+        />
+        <FilterSelect
+          label="Sort"
+          value={sortBy}
+          onChange={(value) => onSortChange(value as SortValue)}
+          options={[
+            { value: "seeders", label: "most seeders" },
+            { value: "size", label: "largest size" },
+            { value: "age", label: "newest first" },
+          ]}
+        />
+        {hasActiveFilters ? (
+          <Button variant="ghost" size="sm" onClick={onClearFilters}>
+            clear filters
+          </Button>
+        ) : null}
+      </div>
+      <p className="m-0 self-end pb-0.5 font-mono text-[0.6875rem] leading-none tabular-nums text-fg-3">
+        {visibleCount}
+        {visibleCount !== totalCount ? ` of ${totalCount}` : ""} result
+        {visibleCount === 1 ? "" : "s"}
+      </p>
+    </div>
+  );
+}
+
+function EmptyResults({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-stone-950/20 px-4 py-6 text-sm text-stone-700 dark:border-stone-700 dark:text-stone-300">
+      <div className="flex items-center gap-2 font-medium text-fg-1">
+        <Search className="size-4" />
+        <span>{title}</span>
+      </div>
+      <p className="m-0 mt-2">{body}</p>
     </div>
   );
 }
@@ -618,7 +666,7 @@ export function MovieDetailModal({ movie, onClose }: Props) {
       <Dialog open onOpenChange={(open) => !open && onClose()}>
         <DialogContent
           showCloseButton={false}
-          className="fixed left-1/2 top-1/2 z-50 w-[min(100vw-1rem,940px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
+          className="fixed top-1/2 left-1/2 w-[min(100vw-1rem,760px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 shadow-none"
         >
           <DialogTitle className="sr-only">{movie.title} details</DialogTitle>
           <DialogDescription className="sr-only">

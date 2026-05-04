@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import { Settings, X } from "lucide-react";
 
 import { SettingsPanel } from "@/components/settings-panel";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
+import { Button } from "@chill-institute/ui/components/ui/button";
+import { IconButton } from "@chill-institute/ui/components/icon-button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@chill-institute/ui/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from "@chill-institute/ui/components/ui/drawer";
 
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(() =>
@@ -42,21 +53,18 @@ function SettingsModalBody({ isDesktop, onClose }: { isDesktop: boolean; onClose
       <div className="border-b border-stone-950/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),rgba(255,255,255,0))] px-5 py-4 dark:border-stone-100/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0))] sm:px-6">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h2 className="font-serif text-2xl leading-tight sm:text-[2rem]">
-              Tune your binge setup
-            </h2>
+            <h2 className="text-2xl sm:text-[2rem]">Tune your binge setup</h2>
             <p className="mt-1 max-w-xl text-sm text-stone-600 dark:text-stone-400">
               Adjust your theme, download folder, and account preferences.
             </p>
           </div>
-          <button
-            type="button"
+          <IconButton
             onClick={onClose}
-            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-stone-950/10 bg-stone-950/5 text-stone-700 transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/10 active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/5 dark:text-stone-200 dark:hover:bg-stone-100/10"
             aria-label="Close settings"
+            className="rounded-full border-stone-950 shadow-[1px_1px_0_var(--color-stone-950)] dark:border-stone-700 dark:shadow-[1px_1px_0_var(--color-stone-700)]"
           >
-            <X className="h-4 w-4" />
-          </button>
+            <X />
+          </IconButton>
         </div>
       </div>
       <div className="max-h-[min(72vh,760px)] overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
@@ -113,6 +121,12 @@ export function SettingsModal({
   );
 }
 
+/*
+ * Compact form lives in the sticky header right strip — uses IconButton
+ * so it inherits the same hover/press vocabulary as the search/theme/etc
+ * buttons it sits next to. Non-compact form is the labelled stamp button
+ * used wherever settings need a verbal anchor.
+ */
 export function SettingsModalTrigger({
   onClick,
   compact = false,
@@ -120,21 +134,18 @@ export function SettingsModalTrigger({
   onClick: () => void;
   compact?: boolean;
 }) {
+  if (compact) {
+    return (
+      <IconButton onClick={onClick} aria-label="Open settings">
+        <Settings />
+      </IconButton>
+    );
+  }
+
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size={compact ? "icon-sm" : "sm"}
-      className={
-        compact
-          ? "rounded-full text-stone-500 transition-[color,transform] duration-150 ease-out hover:bg-transparent hover:text-stone-900 active:scale-[0.97] dark:text-stone-400 dark:hover:bg-transparent dark:hover:text-stone-100"
-          : "rounded-full border border-stone-950/10 bg-stone-950/[0.04] px-3 text-stone-700 shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-[background-color,transform] duration-150 ease-out hover:bg-stone-950/[0.08] active:scale-[0.97] dark:border-stone-100/10 dark:bg-stone-100/[0.04] dark:text-stone-200 dark:hover:bg-stone-100/[0.09]"
-      }
-      onClick={onClick}
-      aria-label="Open settings"
-    >
-      <Settings className="h-4 w-4" />
-      {compact ? null : <span>settings</span>}
+    <Button onClick={onClick} aria-label="Open settings">
+      <Settings />
+      <span>settings</span>
     </Button>
   );
 }

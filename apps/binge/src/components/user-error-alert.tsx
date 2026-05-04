@@ -1,6 +1,6 @@
 import { LogIn, RefreshCw } from "lucide-react";
 
-import { ErrorAlert } from "@/components/ui/error-alert";
+import { ErrorAlert } from "@chill-institute/ui/components/ui/error-alert";
 import { getPutioStartURL } from "@/lib/api";
 import { readCurrentCallbackPath, storePendingCallbackURL } from "@/lib/auth";
 import { localizeError, type LocalizedErrorRecoveryAction } from "@/lib/errors";

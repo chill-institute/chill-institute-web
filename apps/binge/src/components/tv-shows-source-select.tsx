@@ -1,4 +1,4 @@
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@chill-institute/ui/components/ui/toggle-group";
 import {
   getTVShowsSourceLabel,
   TVShowsSource,
@@ -6,13 +6,15 @@ import {
   type UserSettings,
 } from "@/lib/types";
 
+// Lowercased per the design's voice rules. "apple tv+" / "disney+" preserve
+// brand symbols; everything else loses the title casing.
 const tvShowsSourceTabLabels: Record<UserSettings["tvShowsSource"], string> = {
-  [TVShowsSource.TV_SHOWS_SOURCE_UNSPECIFIED]: "Netflix",
-  [TVShowsSource.TV_SHOWS_SOURCE_NETFLIX]: "Netflix",
-  [TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX]: "HBO Max",
-  [TVShowsSource.TV_SHOWS_SOURCE_APPLE_TV_PLUS]: "Apple TV+",
-  [TVShowsSource.TV_SHOWS_SOURCE_PRIME_VIDEO]: "Prime",
-  [TVShowsSource.TV_SHOWS_SOURCE_DISNEY_PLUS]: "Disney+",
+  [TVShowsSource.TV_SHOWS_SOURCE_UNSPECIFIED]: "netflix",
+  [TVShowsSource.TV_SHOWS_SOURCE_NETFLIX]: "netflix",
+  [TVShowsSource.TV_SHOWS_SOURCE_HBO_MAX]: "hbo max",
+  [TVShowsSource.TV_SHOWS_SOURCE_APPLE_TV_PLUS]: "apple tv+",
+  [TVShowsSource.TV_SHOWS_SOURCE_PRIME_VIDEO]: "prime",
+  [TVShowsSource.TV_SHOWS_SOURCE_DISNEY_PLUS]: "disney+",
 };
 
 export function TVShowsSourceSelect({
@@ -24,7 +26,7 @@ export function TVShowsSourceSelect({
 }) {
   return (
     <ToggleGroup
-      className="w-full justify-start gap-1 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      className="flex flex-wrap items-center gap-1.5"
       onValueChange={(next) => {
         if (next.length === 0) {
           return;
@@ -38,7 +40,7 @@ export function TVShowsSourceSelect({
           key={source}
           value={String(source)}
           aria-label={getTVShowsSourceLabel(source)}
-          className="h-7.5 shrink-0 rounded-md px-2 text-[12px] whitespace-nowrap border border-transparent data-[pressed]:border-stone-950 data-[pressed]:shadow-[1px_1px_rgba(12,10,9,1)] dark:data-[pressed]:border-stone-700 dark:data-[pressed]:shadow-[1px_1px_rgba(68,64,60,1)]"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-transparent bg-transparent px-2.5 py-1 text-[0.8125rem] whitespace-nowrap text-stone-700 motion-safe:transition-[color,background-color,box-shadow,transform] motion-safe:duration-150 motion-safe:ease-[var(--ease-out)] hover-hover:hover:bg-stone-200 hover-hover:hover:text-stone-950 data-[pressed]:border-stone-950 data-[pressed]:bg-stone-100 data-[pressed]:text-stone-950 data-[pressed]:shadow-[1px_1px_0_var(--color-stone-950)] data-[pressed]:active:translate-x-px data-[pressed]:active:translate-y-px data-[pressed]:active:shadow-none data-[pressed]:active:duration-100 dark:text-stone-200 dark:hover-hover:hover:bg-stone-800 dark:hover-hover:hover:text-stone-100 dark:data-[pressed]:border-stone-700 dark:data-[pressed]:bg-stone-900 dark:data-[pressed]:text-stone-100 dark:data-[pressed]:shadow-[1px_1px_0_var(--color-stone-700)]"
         >
           {tvShowsSourceTabLabels[source]}
         </ToggleGroupItem>

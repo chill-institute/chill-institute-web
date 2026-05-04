@@ -87,8 +87,8 @@ test.describe("tv shows home", () => {
 
     await authenticatedPage.goto("/");
 
-    await expect(authenticatedPage.getByRole("button", { name: "movies" })).toBeVisible();
-    await expect(authenticatedPage.getByRole("button", { name: "tv shows" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("tab", { name: "movies" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("tab", { name: "tv shows" })).toBeVisible();
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
   });
 
@@ -103,7 +103,7 @@ test.describe("tv shows home", () => {
 
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
 
-    await authenticatedPage.getByRole("button", { name: "tv shows" }).click();
+    await authenticatedPage.getByRole("tab", { name: "tv shows" }).click();
 
     await expect(authenticatedPage.getByText("The Pitt")).toBeVisible();
     await expect(authenticatedPage.getByText("Inception")).toBeHidden();
@@ -157,7 +157,7 @@ test.describe("tv shows home", () => {
     });
 
     await authenticatedPage.goto("/");
-    await authenticatedPage.getByRole("button", { name: "tv shows" }).click();
+    await authenticatedPage.getByRole("tab", { name: "tv shows" }).click();
 
     await expect(authenticatedPage.getByText("Beauty in Black")).toBeVisible();
 
@@ -230,14 +230,9 @@ test.describe("tv shows home", () => {
     );
 
     await authenticatedPage.goto("/");
-    await authenticatedPage.getByRole("button", { name: "tv shows" }).click();
+    await authenticatedPage.getByRole("tab", { name: "tv shows" }).click();
 
-    await authenticatedPage
-      .locator("article")
-      .filter({ hasText: "The Pitt" })
-      .first()
-      .getByRole("button")
-      .click();
+    await authenticatedPage.locator("article").filter({ hasText: "The Pitt" }).first().click();
 
     const modal = authenticatedPage.getByRole("dialog", { name: "The Pitt" });
 

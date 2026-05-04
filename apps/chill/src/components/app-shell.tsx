@@ -17,33 +17,21 @@ export function AppShell() {
     pathname.startsWith("/auth/") || pathname === "/sign-in" || pathname === "/sign-out";
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh">
       {showAuthShell ? (
-        <>
-          <header className="flex flex-col items-center py-4 md:py-8 space-y-4">
-            <div className="rounded-md overflow-hidden">
-              <img src="/logo-xmas.png" width={96} height={96} alt="Logo" />
-            </div>
-            <Link to="/">
-              <h3 className="text-center text-4xl tracking-tight">Welcome to the Institute</h3>
-            </Link>
-          </header>
-          <div className="relative overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 py-6 px-5 border-x-0 rounded-none">
-            <div className="flex justify-center">
-              <Outlet />
-            </div>
-          </div>
-        </>
+        // Auth routes own their full-page card via <AuthPage>; the shell
+        // just hands them the viewport so the page can centre itself.
+        <Outlet />
       ) : (
         <>
           {isHome ? (
             <>
-              <header className="flex flex-col items-center py-4 md:py-8 space-y-4">
+              <header className="px-4 pt-8 pb-6">
                 <Link to="/">
-                  <h3 className="text-center text-4xl tracking-tight">Welcome to the Institute</h3>
+                  <h1 className="m-0 text-center">Welcome to the Institute</h1>
                 </Link>
               </header>
-              <div className="relative overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 py-6 border-x-0 rounded-none">
+              <div className="border-border-strong bg-surface border-y px-4 py-6">
                 <MobileBox>
                   <ShellSearchForm
                     initialQuery={searchParamQ}
@@ -58,21 +46,18 @@ export function AppShell() {
             </>
           ) : (
             <>
-              <div className="w-full top-0 left-0">
-                <div className="relative overflow-hidden border border-solid border-stone-950 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 pt-4 pb-2 border-0 border-b rounded-none">
-                  <ResponsiveBox>
-                    <div className="flex flex-row justify-center items-start lg:space-x-4">
-                      <Link className="hidden lg:block" to="/">
-                        <h3 className="font-serif text-3xl leading-8 tracking-tight">
-                          chill.institute
-                        </h3>
-                      </Link>
-                      <div className="flex-1 lg:max-w-lg">
-                        <ShellSearchForm initialQuery={searchParamQ} />
-                        <ShellSettingsMenu />
-                      </div>
-                    </div>
-                  </ResponsiveBox>
+              <div className="border-border-strong bg-surface border-b px-4 py-3">
+                <div className="mx-auto flex max-w-5xl flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-6">
+                  <Link
+                    to="/"
+                    className="text-fg-1 hidden shrink-0 font-serif text-[1.375rem] leading-9 tracking-[-0.01em] sm:block"
+                  >
+                    chill.institute
+                  </Link>
+                  <div className="w-full max-w-md flex-1">
+                    <ShellSearchForm initialQuery={searchParamQ} />
+                    <ShellSettingsMenu />
+                  </div>
                 </div>
               </div>
               <div className="my-6">

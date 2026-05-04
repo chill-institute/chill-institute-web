@@ -6,10 +6,10 @@ import { match } from "ts-pattern";
 import { useAuth } from "@/lib/auth";
 import { DownloadFolderPicker } from "@/components/download-folder-picker";
 import { UserErrorAlert } from "@/components/user-error-alert";
-import { CheckboxGroup } from "@/components/ui/checkbox-group";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
+import { CheckboxGroup } from "@chill-institute/ui/components/ui/checkbox-group";
+import { Label } from "@chill-institute/ui/components/ui/label";
+import { Skeleton } from "@chill-institute/ui/components/ui/skeleton";
+import { Switch } from "@chill-institute/ui/components/ui/switch";
 import { combineQueries } from "@/queries/combine";
 import { useSettingsQuery, useSaveSettings } from "@/queries/settings";
 import { useDownloadFolderQuery } from "@/queries/download-folder";
@@ -273,33 +273,6 @@ export function SettingsPanel() {
           <div>
             <SectionTitle>Download folder</SectionTitle>
             <SectionBody>{downloadFolderContent}</SectionBody>
-          </div>
-
-          <div>
-            <SectionTitle>Home page</SectionTitle>
-            <SectionBody>
-              <div className="flex items-center justify-between space-x-1">
-                <Label htmlFor="show-movies">Show movies in the home page</Label>
-                <Switch
-                  id="show-movies"
-                  aria-label="Show movies in the home page"
-                  checked={effective.showMovies}
-                  onCheckedChange={(checked) => persistPatch({ showMovies: checked === true })}
-                />
-              </div>
-            </SectionBody>
-            <SectionBody>
-              <div className="flex items-center justify-between space-x-1">
-                <Label htmlFor="show-tv-shows">Show TV shows in the home page</Label>
-                <Switch
-                  id="show-tv-shows"
-                  aria-label="Show TV shows in the home page"
-                  checked={effective.showTvShows}
-                  onCheckedChange={(checked) => persistPatch({ showTvShows: checked === true })}
-                />
-              </div>
-            </SectionBody>
-            <div className="h-0.5" />
           </div>
 
           <div>

@@ -1,0 +1,517 @@
+/*
+ * @chill-institute/ui — design system stylesheet.
+ *
+ * This file is consumed by apps after their own `@import "tailwindcss";`.
+ * It contributes:
+ *   - @theme tokens (font families, breakpoints)
+ *   - @font-face declarations served from the app's /fonts/* public dir
+ *   - design system semantic colour, motion, and geometry CSS variables
+ *   - base element styling (body, focus-visible, headings, .lucide)
+ *   - the canonical .btn / .input "stamp" component classes
+ *   - animation keyframes and @utility helpers
+ *
+ * The package declares its own @source so apps don't need to know
+ * the workspace layout. Tailwind v4 resolves @source relative to the
+ * CSS file declaring it, so this picks up packages/ui/src/**.
+ *
+ * Apps must call `@custom-variant dark (&:where(.dark, .dark *));` themselves
+ * before importing this file so the dark-mode rules below resolve.
+ */
+
+@source "./**/*.{ts,tsx}";
+
+@theme {
+  --breakpoint-xs: 400px;
+  --font-sans: "Metric", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Family", ui-serif, "Iowan Old Style", "Apple Garamond", Georgia, serif;
+
+  /* Semantic surface + foreground tokens. Tailwind v4 exposes any --color-*
+     declared here as a real utility, so call sites can write `bg-surface
+     text-fg-2 border-border-strong` instead of stamping a stone-100 / dark:stone-900
+     pair on every component. The dark mode values are flipped in the `.dark`
+     selector below. */
+  --color-app: var(--color-stone-300);
+  --color-surface: var(--color-stone-100);
+  --color-surface-2: var(--color-stone-50);
+  --color-hover: var(--color-stone-200);
+  --color-active: var(--color-stone-300);
+  --color-skeleton: var(--color-stone-400);
+
+  --color-fg-1: var(--color-stone-950);
+  --color-fg-2: var(--color-stone-700);
+  --color-fg-3: var(--color-stone-600);
+  --color-fg-4: var(--color-stone-500);
+  --color-fg-inverse: var(--color-stone-100);
+
+  --color-border-strong: var(--color-stone-950);
+}
+
+/* ---------- Webfonts ---------- */
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-regular-italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-medium-italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-semibold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Metric";
+  src: url("/fonts/metric/metric-semibold-italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Family";
+  src: url("/fonts/family/family-regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* ---------- Design system tokens ----------
+   Motion, geometry, shadow. Surface + foreground colors live in the
+   @theme block above so Tailwind exposes them as `bg-surface`,
+   `text-fg-1`, etc. */
+@layer base {
+  :root {
+    @apply antialiased;
+
+    /* motion */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    --duration-press: 120ms;
+    --duration-fast: 140ms;
+    --duration-base: 180ms;
+    --duration-slow: 240ms;
+
+    --shadow-press: 1px 1px 0 var(--color-stone-950);
+    --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.3);
+    --shadow-poster: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-drawer: 0 -24px 48px rgba(0, 0, 0, 0.24);
+
+    /* control geometry — figma-extracted */
+    --control-h-sm: 1.375rem; /* 22px */
+    --control-h: 1.8125rem; /* 29px — canonical .btn */
+    --control-h-md: 2.25rem; /* 36px — hero / tab */
+  }
+
+  /* Dark mode flips the @theme color tokens (surface/fg/border) and the
+     shadow stamp colours. Everything else stays the same. */
+  .dark {
+    --color-app: var(--color-stone-800);
+    --color-surface: var(--color-stone-900);
+    --color-surface-2: var(--color-stone-950);
+    --color-hover: var(--color-stone-800);
+    --color-active: var(--color-stone-700);
+    --color-skeleton: var(--color-stone-700);
+
+    --color-fg-1: var(--color-stone-100);
+    --color-fg-2: var(--color-stone-200);
+    --color-fg-3: var(--color-stone-300);
+    --color-fg-4: var(--color-stone-400);
+    --color-fg-inverse: var(--color-stone-950);
+
+    --color-border-strong: var(--color-stone-700);
+
+    --shadow-press: 1px 1px 0 var(--color-stone-700);
+    --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.6);
+    --shadow-poster: 0 8px 24px rgba(0, 0, 0, 0.55);
+    --shadow-drawer: 0 -24px 48px rgba(0, 0, 0, 0.5);
+  }
+
+  body {
+    @apply bg-app text-fg-1;
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    @apply rounded;
+    @apply outline-none;
+    @apply ring-2 ring-stone-400 ring-offset-2 ring-offset-stone-300;
+  }
+
+  .dark :focus-visible {
+    @apply ring-stone-700 ring-offset-stone-800;
+  }
+}
+
+@layer components {
+  /* Family-serif printed-press headlines — the design system specifies
+     line-height 1.05 / 1.2 and -0.01em letter-spacing across the heading
+     scale, so the element selectors carry it instead of every component
+     repeating `font-serif leading-tight tracking-tight font-normal`. */
+  h1,
+  h2,
+  h3,
+  h5,
+  .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+
+  h1 {
+    @apply text-4xl;
+    line-height: 1.05;
+  }
+
+  h2 {
+    @apply text-3xl;
+    line-height: 1.2;
+  }
+
+  h3 {
+    @apply text-2xl;
+    line-height: 1.2;
+  }
+
+  h5 {
+    font-size: 1.0625rem;
+    line-height: 1.05;
+  }
+
+  /* h4 stays size-only — it is a structural heading the design system
+     intentionally leaves un-styled (e.g. modal "send to put.io" labels
+     compose `<h4>` with their own font-mono / sizing). */
+  h4 {
+    @apply text-xl;
+  }
+
+  /* The signature "stamp" button. 29px tall, 1px stone-950 border, 1px,1px shadow.
+     Press translates 1px,1px and drops the shadow — it slides into its stamp.
+     Use the React <Button> component instead of this class wherever possible. */
+  .btn {
+    @apply inline-flex min-h-7.5 cursor-pointer select-none items-center justify-center gap-1 rounded border border-stone-950 bg-stone-100 px-2 py-1.5 text-sm leading-none hover:bg-stone-200 disabled:cursor-not-allowed disabled:opacity-70 dark:border-stone-700 dark:bg-stone-900 dark:hover:bg-stone-800;
+    box-shadow: var(--shadow-press);
+    transition:
+      transform var(--duration-press) var(--ease-out),
+      background-color var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent hover:bg-stone-200 dark:hover:bg-stone-800;
+  }
+
+  .btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+
+  .input {
+    @apply min-h-7.5 rounded border border-stone-950 bg-stone-100 px-2 py-1 text-sm outline-none hover:bg-stone-200 focus:bg-stone-200 dark:border-stone-700 dark:bg-stone-900 dark:hover:bg-stone-800 dark:focus:bg-stone-800;
+    transition:
+      background-color var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      box-shadow var(--duration-base) var(--ease-out);
+  }
+
+  .ui-popup {
+    transform-origin: var(--transform-origin, center);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out),
+      filter var(--duration-base) ease;
+    will-change: opacity, transform, filter;
+  }
+
+  .ui-popup[data-side="top"] {
+    --popup-shift-y: 0.4rem;
+  }
+
+  .ui-popup[data-side="right"] {
+    --popup-shift-x: -0.4rem;
+  }
+
+  .ui-popup[data-side="bottom"] {
+    --popup-shift-y: -0.4rem;
+  }
+
+  .ui-popup[data-side="left"] {
+    --popup-shift-x: 0.4rem;
+  }
+
+  .ui-popup[data-starting-style],
+  .ui-popup[data-ending-style] {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translate3d(var(--popup-shift-x, 0), var(--popup-shift-y, 0), 0) scale(0.96);
+  }
+
+  .ui-tooltip {
+    transform-origin: var(--transform-origin, center);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out),
+      filter var(--duration-fast) ease;
+    will-change: opacity, transform, filter;
+  }
+
+  .ui-tooltip[data-side="top"] {
+    --tooltip-shift-y: 0.2rem;
+  }
+
+  .ui-tooltip[data-side="right"] {
+    --tooltip-shift-x: -0.2rem;
+  }
+
+  .ui-tooltip[data-side="bottom"] {
+    --tooltip-shift-y: -0.2rem;
+  }
+
+  .ui-tooltip[data-side="left"] {
+    --tooltip-shift-x: 0.2rem;
+  }
+
+  .ui-tooltip[data-starting-style],
+  .ui-tooltip[data-ending-style] {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translate3d(var(--tooltip-shift-x, 0), var(--tooltip-shift-y, 0), 0) scale(0.98);
+  }
+
+  .ui-tooltip[data-instant] {
+    transition-duration: 0.01ms;
+    filter: none;
+  }
+}
+
+.lucide {
+  width: 1em;
+  height: 1em;
+}
+
+@keyframes collapsible-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--collapsible-panel-height);
+  }
+}
+
+@keyframes matrix {
+  0%,
+  100% {
+    color: #ef4444;
+  }
+  50% {
+    color: #3b82f6;
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--collapsible-panel-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes feedback-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes soft-pop {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), var(--tw-enter-scale, 1))
+      rotate(var(--tw-enter-rotate, 0));
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--tw-exit-opacity, 1);
+    transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0)
+      scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1))
+      rotate(var(--tw-exit-rotate, 0));
+  }
+}
+
+@utility animate-collapsible-down {
+  @variant motion-safe {
+    animation: collapsible-down 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+@utility animate-collapsible-up {
+  @variant motion-safe {
+    animation: collapsible-up 180ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+
+@utility animate-in {
+  --tw-enter-opacity: initial;
+  --tw-enter-scale: initial;
+  --tw-enter-translate-x: initial;
+  --tw-enter-translate-y: initial;
+  --tw-enter-rotate: initial;
+  @variant motion-safe {
+    animation-name: enter;
+    animation-duration: 150ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+@utility animate-out {
+  --tw-exit-opacity: initial;
+  --tw-exit-scale: initial;
+  --tw-exit-translate-x: initial;
+  --tw-exit-translate-y: initial;
+  --tw-exit-rotate: initial;
+  @variant motion-safe {
+    animation-name: exit;
+    animation-duration: 150ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+}
+
+@utility fade-in-0 {
+  --tw-enter-opacity: 0;
+}
+
+@utility fade-out-0 {
+  --tw-exit-opacity: 0;
+}
+
+@utility zoom-in-95 {
+  --tw-enter-scale: 0.95;
+}
+
+@utility zoom-out-95 {
+  --tw-exit-scale: 0.95;
+}
+
+@utility slide-in-from-top-1 {
+  --tw-enter-translate-y: -0.25rem;
+}
+
+@utility slide-in-from-top-2 {
+  --tw-enter-translate-y: -0.5rem;
+}
+
+@utility slide-in-from-bottom-1 {
+  --tw-enter-translate-y: 0.25rem;
+}
+
+@utility slide-in-from-bottom-2 {
+  --tw-enter-translate-y: 0.5rem;
+}
+
+@utility slide-in-from-left-1 {
+  --tw-enter-translate-x: -0.25rem;
+}
+
+@utility slide-in-from-left-2 {
+  --tw-enter-translate-x: -0.5rem;
+}
+
+@utility slide-in-from-right-1 {
+  --tw-enter-translate-x: 0.25rem;
+}
+
+@utility slide-in-from-right-2 {
+  --tw-enter-translate-x: 0.5rem;
+}
+
+@utility animate-matrix {
+  @variant motion-safe {
+    animation: matrix 2s ease-in-out infinite;
+  }
+}
+
+@keyframes content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-reveal {
+  @variant motion-safe {
+    animation: content-reveal 180ms var(--ease-out) both;
+  }
+}
+
+@utility animate-feedback-in {
+  @variant motion-safe {
+    animation: feedback-in 160ms var(--ease-out) both;
+  }
+}
+
+@utility animate-soft-pop {
+  @variant motion-safe {
+    animation: soft-pop 220ms var(--ease-out) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active {
+    transform: none;
+  }
+
+  .ui-popup[data-starting-style],
+  .ui-popup[data-ending-style],
+  .ui-tooltip[data-starting-style],
+  .ui-tooltip[data-ending-style] {
+    filter: none;
+    transform: none;
+  }
+}

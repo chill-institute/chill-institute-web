@@ -90,9 +90,11 @@ const homeMethods = (overrides?: Record<string, unknown>) => ({
 });
 
 async function openFirstMovieModal(page: Page) {
+  // PosterCard exposes the article itself as role="button" — there's no
+  // longer a nested <button>. Click the article directly.
   const firstArticle = page.locator("article").first();
   await expect(firstArticle).toBeVisible();
-  await firstArticle.getByRole("button").click();
+  await firstArticle.click();
 }
 
 test.describe("movies", () => {
@@ -135,8 +137,8 @@ test.describe("movies", () => {
 
     await authenticatedPage.goto("/");
 
-    await expect(authenticatedPage.getByRole("button", { name: "movies" })).toBeVisible();
-    await expect(authenticatedPage.getByRole("button", { name: "tv shows" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("tab", { name: "movies" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("tab", { name: "tv shows" })).toBeVisible();
     await expect(authenticatedPage.getByText("Inception")).toBeVisible();
   });
 
@@ -149,7 +151,7 @@ test.describe("movies", () => {
 
     await authenticatedPage.goto("/");
 
-    await expect(authenticatedPage.getByRole("button", { name: "movies" })).toBeVisible();
+    await expect(authenticatedPage.getByRole("tab", { name: "movies" })).toBeVisible();
     await expect(authenticatedPage.locator("article")).toHaveCount(2);
   });
 
